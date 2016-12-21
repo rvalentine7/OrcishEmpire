@@ -1,7 +1,7 @@
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2008
-
-Project("{D0155BFC-5960-E964-1D8B-8AF9D52A9B11}") = "OrcishEmpire", "Assembly-CSharp.csproj", "{C1BFD1C4-D844-7744-96EB-A942BC0A81D9}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrcishEmpire", "OrcishEmpire.csproj", "{F38548E7-A6E9-0EDB-A91B-35BFEAB87C94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,15 +9,12 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C1BFD1C4-D844-7744-96EB-A942BC0A81D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C1BFD1C4-D844-7744-96EB-A942BC0A81D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C1BFD1C4-D844-7744-96EB-A942BC0A81D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C1BFD1C4-D844-7744-96EB-A942BC0A81D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F38548E7-A6E9-0EDB-A91B-35BFEAB87C94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F38548E7-A6E9-0EDB-A91B-35BFEAB87C94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F38548E7-A6E9-0EDB-A91B-35BFEAB87C94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F38548E7-A6E9-0EDB-A91B-35BFEAB87C94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal
