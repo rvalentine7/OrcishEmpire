@@ -44,18 +44,32 @@ public class RoadPlacement : MonoBehaviour {
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
         mousePos.z = 0;
+
+        bool valid = true;
+        //Buildings cannot be placed in negative number locations
+        if (mousePos.x < 0)
+        {
+            mousePos.x = 0;
+            valid = false;
+        }
+        if (mousePos.y < 0)
+        {
+            mousePos.y = 0;
+            valid = false;
+        }
+
         //Check if the structure is currently in a valid location
         //need to make sure there isn't a road/building already in the place where the road is currently located
         //check roadArr for the x/y coordinates of the mousePos to see if there is anything there...
         GameObject[,] structureArr = myControls.constructNetwork.getConstructArr();
 
-        bool valid = true;
+        //bool valid = true;
         //39 in the follow line needs to be replaced with mapSize when more levels are added
         if ((mousePos.x <= 0 && mousePos.x >= 39 && mousePos.y <= 0 && mousePos.y >= 39))
         {
             valid = false;
         }
-        //can't place a road on other objects
+        //can't place a road on other constructs
         if (valid && structureArr[(int)mousePos.y, (int)mousePos.x] != null
             && (structureArr[(int) mousePos.y, (int) mousePos.x].tag == "Road"
             || structureArr[(int)mousePos.y, (int)mousePos.x].tag == "Building"))

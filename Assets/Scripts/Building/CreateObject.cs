@@ -5,7 +5,7 @@ using System.Collections;
  * Used by the RoadCreation button in the game UI to create roads.
  */
 public class CreateObject : MonoBehaviour {
-    public GameObject road;
+    public GameObject construct;
 
 	// Use this for initialization
 	void Start () {
@@ -22,7 +22,7 @@ public class CreateObject : MonoBehaviour {
      */
     public void Create ()
     {
-        GameObject roadObj = Instantiate(road, Input.mousePosition, Quaternion.identity) as GameObject;
-        roadObj.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        GameObject constructObj = Instantiate(construct, Input.mousePosition, Quaternion.identity) as GameObject;
+        constructObj.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }
 }
