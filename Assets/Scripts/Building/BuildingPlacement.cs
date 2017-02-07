@@ -30,8 +30,9 @@ public class BuildingPlacement : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        GameObject myCamera = GameObject.Find("Main Camera");
-        Controls myControls = myCamera.GetComponent<Controls>();
+        //following stuff should probably be in start
+        GameObject world = GameObject.Find("WorldInformation");
+        World myWorld = world.GetComponent<World>();
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
@@ -50,12 +51,35 @@ public class BuildingPlacement : MonoBehaviour {
             validPlacement = false;
         }
 
-        GameObject[,] structureArr = myControls.constructNetwork.getConstructArr();
+        GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
 
         //39s in the follow line need to be replaced with mapSize when a level manager is added
-        if (validPlacement && (mousePos.x <= 0 && mousePos.x >= 39 && mousePos.y <= 0 && mousePos.y >= 39))
+        if (validPlacement && (mousePos.x < 1 && mousePos.x >= 39 && mousePos.y < 1 && mousePos.y >= 39))
         {
             validPlacement = false;
+        }
+        //houses can only be built within a distance of 2 from a road in horizontal and vertical directions
+        if (validPlacement && gameObject.tag == "House")
+        {
+            if ((mousePos.x >= myWorld.mapSize - 1 || (mousePos.x + 1 > 0 && mousePos.x + 1 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
+                && (structureArr[(int)mousePos.x + 1, (int)mousePos.y] == null || structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag != "Road")))
+                && (mousePos.x >= myWorld.mapSize - 2 || (mousePos.x + 2 > 0 && mousePos.x + 2 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
+                && (structureArr[(int)mousePos.x + 2, (int)mousePos.y] == null || structureArr[(int)mousePos.x + 2, (int)mousePos.y].tag != "Road")))
+                && (mousePos.x <= 1 || (mousePos.x - 1 > 0 && mousePos.x - 1 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
+                && (structureArr[(int)mousePos.x - 1, (int)mousePos.y] == null || structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag != "Road")))
+                && (mousePos.x <= 2 || (mousePos.x - 2 > 0 && mousePos.x - 2 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
+                && (structureArr[(int)mousePos.x - 2, (int)mousePos.y] == null || structureArr[(int)mousePos.x - 2, (int)mousePos.y].tag != "Road")))
+                && (mousePos.y >= myWorld.mapSize - 1 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y + 1 > 0 && mousePos.y + 1 < myWorld.mapSize
+                && (structureArr[(int)mousePos.x, (int)mousePos.y + 1] == null || structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag != "Road")))
+                && (mousePos.y >= myWorld.mapSize - 2 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y + 2 > 0 && mousePos.y + 2 < myWorld.mapSize
+                && (structureArr[(int)mousePos.x, (int)mousePos.y + 2] == null || structureArr[(int)mousePos.x, (int)mousePos.y + 2].tag != "Road")))
+                && (mousePos.y <= 1 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y - 1 > 0 && mousePos.y - 1 < myWorld.mapSize
+                && (structureArr[(int)mousePos.x, (int)mousePos.y - 1] == null || structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag != "Road")))
+                && (mousePos.y <= 2 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y - 2 > 0 && mousePos.y - 2 < myWorld.mapSize
+                && (structureArr[(int)mousePos.x, (int)mousePos.y - 2] == null || structureArr[(int)mousePos.x, (int)mousePos.y - 2].tag != "Road"))))
+            {
+                validPlacement = false;
+            }
         }
         //can't place a building on other constructs
         int r = 0;
@@ -64,9 +88,10 @@ public class BuildingPlacement : MonoBehaviour {
             int c = 0;
             while (validPlacement && c < width)
             {
-                if (structureArr[(int)mousePos.y + r, (int)mousePos.x + c] != null
-                    && (structureArr[(int)mousePos.y + r, (int)mousePos.x + c].tag == "Road"
-                    || structureArr[(int)mousePos.y + r, (int)mousePos.x + c].tag == "Building"))
+                if (structureArr[(int)mousePos.x + c, (int)mousePos.y + r] != null
+                    && (structureArr[(int)mousePos.x + c, (int)mousePos.y + r].tag == "Road"
+                    || structureArr[(int)mousePos.x + c, (int)mousePos.y + r].tag == "Building"
+                    || structureArr[(int)mousePos.x + c, (int)mousePos.y + r].tag == "House"))
                 {
                     validPlacement = false;
                 }
@@ -84,6 +109,7 @@ public class BuildingPlacement : MonoBehaviour {
         {
             GetComponent<SpriteRenderer>().sprite = impossibleSprite;
         }
+        //Debug.Log("Mouse position: " + mousePos.x + ", " + mousePos.y);
 
         //If the building is in a valid location and the left mouse is clicked, place it in the world
         if (Input.GetMouseButton(0) && validPlacement)
@@ -91,17 +117,27 @@ public class BuildingPlacement : MonoBehaviour {
             if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
             {//swap 39s with mapSize
                 transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
-            }
-            
-            //create the new building in the game world
-            GameObject buildingObj = Instantiate(building, mousePos, Quaternion.identity) as GameObject;
-            for (r = 0; r < height; r++)
-            {
-                for (int c = 0; c < width; c++)
+
+                //create the new building in the game world
+                GameObject buildingObj = Instantiate(building, mousePos, Quaternion.identity) as GameObject;
+                for (r = 0; r < height; r++)
                 {
-                    myControls.constructNetwork.setConstructArr((int)mousePos.y + r, (int)mousePos.x + c, buildingObj);
+                    for (int c = 0; c < width; c++)
+                    {
+                        myWorld.constructNetwork.setConstructArr((int)mousePos.x + c, (int)mousePos.y + r, buildingObj);
+                    }
                 }
             }
+            
+            ////create the new building in the game world
+            //GameObject buildingObj = Instantiate(building, mousePos, Quaternion.identity) as GameObject;
+            //for (r = 0; r < height; r++)
+            //{
+            //    for (int c = 0; c < width; c++)
+            //    {
+            //        myWorld.constructNetwork.setConstructArr((int)mousePos.x + c, (int)mousePos.y + r, buildingObj);
+            //    }
+            //}
         }
 
         if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)

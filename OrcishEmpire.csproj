@@ -82,7 +82,16 @@
     <Compile Include="Assets\Scripts\Building\PreConstructedRoads.cs" />
     <Compile Include="Assets\Scripts\Building\RoadPlacement.cs" />
     <Compile Include="Assets\Scripts\Camera\Controls.cs" />
+    <Compile Include="Assets\Scripts\Player\AstarSearch.cs" />
+    <Compile Include="Assets\Scripts\Player\Citizen.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
+    <Compile Include="Assets\Scripts\Town\HouseInformation.cs" />
+    <Compile Include="Assets\Scripts\Town\Immigrate.cs" />
+    <Compile Include="Assets\Scripts\Town\Market.cs" />
+    <Compile Include="Assets\Scripts\Town\Water.cs" />
+    <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />
+    <Compile Include="Assets\Scripts\World\TerrainSegment.cs" />
+    <Compile Include="Assets\Scripts\World\World.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

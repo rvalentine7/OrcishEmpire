@@ -32,9 +32,9 @@ public class ConstructionNetwork {
      * @param x is the x coordinate of the road object
      * @param road is the road GameObject being inserted into the array
      */
-    public void setConstructArr(int y, int x, GameObject road)
+    public void setConstructArr(int x, int y, GameObject road)
     {
-        constructArr[y, x] = road;
+        constructArr[x, y] = road;
     }
 
     /**
@@ -42,8 +42,8 @@ public class ConstructionNetwork {
      * @param y is the y coordinate of the road object
      * @param x is the x coordinate of the road object
      */
-    public void removeFromBuildArr(int y, int x)
+    public void removeFromBuildArr(int x, int y)
     {
-        constructArr[y, x] = null;
+        constructArr[x, y] = null;
     }
 }

@@ -28,56 +28,56 @@ public class Clear : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        GameObject myCamera = GameObject.Find("Main Camera");
-        Controls myControls = myCamera.GetComponent<Controls>();
+        GameObject world = GameObject.Find("WorldInformation");
+        World myWorld = world.GetComponent<World>();
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
         mousePos.z = 0;
 
-        GameObject[,] structureArr = myControls.constructNetwork.getConstructArr();
+        GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
 
         if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)//swap 39 with mapSize
         {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
         }
 
-        if (Input.GetMouseButton(0) && structureArr[(int)mousePos.y, (int)mousePos.x] != null
-            && (structureArr[(int)mousePos.y, (int)mousePos.x].tag == "Road"
-            || structureArr[(int)mousePos.y, (int)mousePos.x].tag == "Building"))
+        if (Input.GetMouseButton(0) && structureArr[(int)mousePos.x, (int)mousePos.y] != null
+            && (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road"
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"))
         {
-            GameObject structureToClear = structureArr[(int)mousePos.y, (int)mousePos.x];
+            GameObject structureToClear = structureArr[(int)mousePos.x, (int)mousePos.y];
             //If the deleted object is a road, the surrounding roads need to be updated to reflect
             // the fact there is no longer a road where the deleted one was
-            if (structureArr[(int)mousePos.y, (int)mousePos.x].tag == "Road")
+            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road")
             {
-                structureArr[(int)mousePos.y, (int)mousePos.x] = null;
+                structureArr[(int)mousePos.x, (int)mousePos.y] = null;
                 //updateRoadConnection(mousePos, structureArr);
                 //go through roads attached to the deleted road to update them visibly
                 //do not update the roads outside building limits
-                if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.y + 1, (int)mousePos.x] != null
-                   && structureArr[(int)mousePos.y + 1, (int)mousePos.x].tag == "Road")
+                if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
+                   && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
                 {
                     //update road above the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.y + 1, (int)mousePos.x], structureArr);
+                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y + 1], structureArr);
                 }
-                if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.y - 1, (int)mousePos.x] != null
-                    && structureArr[(int)mousePos.y - 1, (int)mousePos.x].tag == "Road")
+                if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
+                    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
                 {
                     //update road below the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.y - 1, (int)mousePos.x], structureArr);
+                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y - 1], structureArr);
                 }
-                if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.y, (int)mousePos.x - 1] != null
-                    && structureArr[(int)mousePos.y, (int)mousePos.x - 1].tag == "Road")
+                if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
+                    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
                 {
                     //update road to the left of the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.y, (int)mousePos.x - 1], structureArr);
+                    updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
                 }
-                if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.y, (int)mousePos.x + 1] != null
-                    && structureArr[(int)mousePos.y, (int)mousePos.x + 1].tag == "Road")
+                if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
+                    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
                 {
                     //update road to the right of the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.y, (int)mousePos.x + 1], structureArr);
+                    updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
                 }
             }
 
@@ -93,37 +93,37 @@ public class Clear : MonoBehaviour {
      */
     void updateRoadConnection(GameObject road, GameObject[,] structureArr)
     {
-        GameObject myCamera = GameObject.Find("Main Camera");
-        Controls myControls = myCamera.GetComponent<Controls>();
+        GameObject world = GameObject.Find("WorldInformation");
+        World myWorld = world.GetComponent<World>();
         Vector2 roadPos = road.transform.position;
 
         //check here for what gameobject I want and add it to the buildArr
         int nearbyRoadCount = 0;
         //booleans allow me to where the other roads are
         bool top = false;
-        if (structureArr[(int)roadPos.y + 1, (int)roadPos.x] != null
-            && structureArr[(int)roadPos.y + 1, (int)roadPos.x].tag == "Road")
+        if (structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
         {
             top = true;
             nearbyRoadCount++;
         }
         bool bot = false;
-        if (structureArr[(int)roadPos.y - 1, (int)roadPos.x] != null
-            && structureArr[(int)roadPos.y - 1, (int)roadPos.x].tag == "Road")
+        if (structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == "Road")
         {
             bot = true;
             nearbyRoadCount++;
         }
         bool left = false;
-        if (structureArr[(int)roadPos.y, (int)roadPos.x - 1] != null
-            && structureArr[(int)roadPos.y, (int)roadPos.x - 1].tag == "Road")
+        if (structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == "Road")
         {
             left = true;
             nearbyRoadCount++;
         }
         bool right = false;
-        if (structureArr[(int)roadPos.y, (int)roadPos.x + 1] != null
-            && structureArr[(int)roadPos.y, (int)roadPos.x + 1].tag == "Road")
+        if (structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
         {
             right = true;
             nearbyRoadCount++;
@@ -143,7 +143,7 @@ public class Clear : MonoBehaviour {
                 rotationVector.z = 90;
                 roadObj.transform.rotation = Quaternion.Euler(rotationVector);
             }
-            myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
         }
 
         //straight or corner; depends on if nearby roads are opposite or diagonal
@@ -152,7 +152,7 @@ public class Clear : MonoBehaviour {
             if (right && left)
             {
                 roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (top && bot)
             {
@@ -160,7 +160,7 @@ public class Clear : MonoBehaviour {
                 var rotationVector = transform.rotation.eulerAngles;
                 rotationVector.z = 90;
                 roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (top)
             {
@@ -172,7 +172,7 @@ public class Clear : MonoBehaviour {
                     rotationVector.z = 270;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (bot)
             {
@@ -189,7 +189,7 @@ public class Clear : MonoBehaviour {
                     rotationVector.z = 90;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
         }
 
@@ -211,7 +211,7 @@ public class Clear : MonoBehaviour {
                     rotationVector.z = 90;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (right && left)
             {
@@ -224,7 +224,7 @@ public class Clear : MonoBehaviour {
                     rotationVector.z = 180;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
         }
 
@@ -232,7 +232,7 @@ public class Clear : MonoBehaviour {
         if (nearbyRoadCount == 4)
         {
             roadObj = Instantiate(crossRoad, roadPos, Quaternion.identity) as GameObject;
-            myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
         }
 
         //delete the old road so there aren't two roads in one spot

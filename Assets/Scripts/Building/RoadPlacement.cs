@@ -37,9 +37,9 @@ public class RoadPlacement : MonoBehaviour {
             //exits out of construction mode if the right mouse button or escape is clicked
             Destroy(gameObject);
         }
-        
-        GameObject myCamera = GameObject.Find("Main Camera");
-        Controls myControls = myCamera.GetComponent<Controls>();
+
+        GameObject world = GameObject.Find("WorldInformation");
+        World myWorld = world.GetComponent<World>();
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
@@ -61,7 +61,7 @@ public class RoadPlacement : MonoBehaviour {
         //Check if the structure is currently in a valid location
         //need to make sure there isn't a road/building already in the place where the road is currently located
         //check roadArr for the x/y coordinates of the mousePos to see if there is anything there...
-        GameObject[,] structureArr = myControls.constructNetwork.getConstructArr();
+        GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
 
         //bool valid = true;
         //39 in the follow line needs to be replaced with mapSize when more levels are added
@@ -70,9 +70,10 @@ public class RoadPlacement : MonoBehaviour {
             valid = false;
         }
         //can't place a road on other constructs
-        if (valid && structureArr[(int)mousePos.y, (int)mousePos.x] != null
-            && (structureArr[(int) mousePos.y, (int) mousePos.x].tag == "Road"
-            || structureArr[(int)mousePos.y, (int)mousePos.x].tag == "Building"))
+        if (valid && structureArr[(int)mousePos.x, (int)mousePos.y] != null
+            && (structureArr[(int) mousePos.x, (int) mousePos.y].tag == "Road"
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House"))
         {
             valid = false;
         }
@@ -84,7 +85,7 @@ public class RoadPlacement : MonoBehaviour {
         //    Debug.Log("hit");
         //}
 
-        if (valid && (structureArr[(int) mousePos.y, (int) mousePos.x] == null))
+        if (valid && (structureArr[(int) mousePos.x, (int) mousePos.y] == null))
         {
             validPlacement = true;
             //Border is green when it is possible to place a sprite in its current location
@@ -103,37 +104,72 @@ public class RoadPlacement : MonoBehaviour {
             if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
             {//swap 39s with mapSize
                 transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
+
+                //update the new road
+                updateRoadConnection(gameObject, structureArr);
+                structureArr = myWorld.constructNetwork.getConstructArr();
+                //go through roads attached to the new road to update them visibly
+                //do not update the roads outside building limits
+                if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
+                   && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
+                {
+                    //update road above the one you are trying to build
+                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y + 1], structureArr);
+                }
+                if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
+                    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
+                {
+                    //update road below the one you are trying to build
+                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y - 1], structureArr);
+                }
+                if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
+                    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
+                {
+                    //update road to the left of the one you are trying to build
+                    updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
+                }
+                if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
+                    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
+                {
+                    //update road to the right of the one you are trying to build
+                    updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
+                }
+
+                if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
+                {//swap 39s with mapSize
+                    transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
+                }
             }
 
-            //update the new road
-            updateRoadConnection(gameObject, structureArr);
-            structureArr = myControls.constructNetwork.getConstructArr();
-            //go through roads attached to the new road to update them visibly
-            //do not update the roads outside building limits
-            if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.y + 1, (int)mousePos.x] != null
-               && structureArr[(int)mousePos.y + 1, (int)mousePos.x].tag == "Road")
-            {
-                //update road above the one you are trying to build
-                updateRoadConnection(structureArr[(int)mousePos.y + 1, (int)mousePos.x], structureArr);
-            }
-            if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.y - 1, (int)mousePos.x] != null
-                && structureArr[(int)mousePos.y - 1, (int)mousePos.x].tag == "Road")
-            {
-                //update road below the one you are trying to build
-                updateRoadConnection(structureArr[(int)mousePos.y - 1, (int)mousePos.x], structureArr);
-            }
-            if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.y, (int)mousePos.x - 1] != null
-                && structureArr[(int)mousePos.y, (int)mousePos.x - 1].tag == "Road")
-            {
-                //update road to the left of the one you are trying to build
-                updateRoadConnection(structureArr[(int)mousePos.y, (int)mousePos.x - 1], structureArr);
-            }
-            if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.y, (int)mousePos.x + 1] != null
-                && structureArr[(int)mousePos.y, (int)mousePos.x + 1].tag == "Road")
-            {
-                //update road to the right of the one you are trying to build
-                updateRoadConnection(structureArr[(int)mousePos.y, (int)mousePos.x + 1], structureArr);
-            }
+            ////update the new road
+            //updateRoadConnection(gameObject, structureArr);
+            //structureArr = myWorld.constructNetwork.getConstructArr();
+            ////go through roads attached to the new road to update them visibly
+            ////do not update the roads outside building limits
+            //if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
+            //   && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
+            //{
+            //    //update road above the one you are trying to build
+            //    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y + 1], structureArr);
+            //}
+            //if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
+            //    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
+            //{
+            //    //update road below the one you are trying to build
+            //    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y - 1], structureArr);
+            //}
+            //if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
+            //    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
+            //{
+            //    //update road to the left of the one you are trying to build
+            //    updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
+            //}
+            //if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
+            //    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
+            //{
+            //    //update road to the right of the one you are trying to build
+            //    updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
+            //}
 
             if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
             {//swap 39s with mapSize
@@ -153,37 +189,37 @@ public class RoadPlacement : MonoBehaviour {
      */
     void updateRoadConnection(GameObject road, GameObject[,] structureArr)
     {
-        GameObject myCamera = GameObject.Find("Main Camera");
-        Controls myControls = myCamera.GetComponent<Controls>();
+        GameObject world = GameObject.Find("WorldInformation");
+        World myWorld = world.GetComponent<World>();
         Vector2 roadPos = road.transform.position;
 
         //check here for what gameobject I want and add it to the buildArr
         int nearbyRoadCount = 0;
         //booleans allow me to where the other roads are
         bool top = false;
-        if (structureArr[(int)roadPos.y + 1, (int)roadPos.x] != null
-            && structureArr[(int)roadPos.y + 1, (int)roadPos.x].tag == "Road")
+        if (structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
         {
             top = true;
             nearbyRoadCount++;
         }
         bool bot = false;
-        if (structureArr[(int)roadPos.y - 1, (int)roadPos.x] != null
-            && structureArr[(int)roadPos.y - 1, (int)roadPos.x].tag == "Road")
+        if (structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == "Road")
         {
             bot = true;
             nearbyRoadCount++;
         }
         bool left = false;
-        if (structureArr[(int)roadPos.y, (int)roadPos.x - 1] != null
-            && structureArr[(int)roadPos.y, (int)roadPos.x - 1].tag == "Road")
+        if (structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == "Road")
         {
             left = true;
             nearbyRoadCount++;
         }
         bool right = false;
-        if (structureArr[(int)roadPos.y, (int)roadPos.x + 1] != null
-            && structureArr[(int)roadPos.y, (int)roadPos.x + 1].tag == "Road")
+        if (structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
         {
             right = true;
             nearbyRoadCount++;
@@ -195,7 +231,7 @@ public class RoadPlacement : MonoBehaviour {
         if (nearbyRoadCount == 0)
         {
             roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
-            myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
         }
 
         //Positions in the structureArr:
@@ -215,7 +251,7 @@ public class RoadPlacement : MonoBehaviour {
                 rotationVector.z = 90;
                 roadObj.transform.rotation = Quaternion.Euler(rotationVector);
             }
-            myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
         }
 
         //straight or corner; depends on if nearby roads are opposite or diagonal
@@ -224,7 +260,7 @@ public class RoadPlacement : MonoBehaviour {
             if (right && left)
             {
                 roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (top && bot)
             {
@@ -232,7 +268,7 @@ public class RoadPlacement : MonoBehaviour {
                 var rotationVector = transform.rotation.eulerAngles;
                 rotationVector.z = 90;
                 roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (top)
             {
@@ -244,7 +280,7 @@ public class RoadPlacement : MonoBehaviour {
                     rotationVector.z = 270;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (bot)
             {
@@ -261,7 +297,7 @@ public class RoadPlacement : MonoBehaviour {
                     rotationVector.z = 90;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
         }
 
@@ -283,7 +319,7 @@ public class RoadPlacement : MonoBehaviour {
                     rotationVector.z = 90;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
             else if (right && left)
             {
@@ -296,7 +332,7 @@ public class RoadPlacement : MonoBehaviour {
                     rotationVector.z = 180;
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
-                myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
             }
         }
 
@@ -304,7 +340,7 @@ public class RoadPlacement : MonoBehaviour {
         if (nearbyRoadCount == 4)
         {
             roadObj = Instantiate(crossRoad, roadPos, Quaternion.identity) as GameObject;
-            myControls.constructNetwork.setConstructArr((int)roadPos.y, (int)roadPos.x, roadObj);
+            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
         }
 
         //if the road is one of those surrounding the newly-placed road, delete it so
@@ -322,8 +358,8 @@ public class RoadPlacement : MonoBehaviour {
      */
     void updateRoadPreview(GameObject road, GameObject[,] structureArr)
     {
-        GameObject myCamera = GameObject.Find("Main Camera");
-        Controls myControls = myCamera.GetComponent<Controls>();
+        //GameObject myCamera = GameObject.Find("Main Camera");
+        //Controls myControls = myCamera.GetComponent<Controls>();
         Vector2 roadPos = road.transform.position;
         //pretty much the same as the part up above
         //also add structureArr as something that needs to be passed in?
@@ -336,29 +372,29 @@ public class RoadPlacement : MonoBehaviour {
         // my current road object is surrounded on
         int nearbyRoadCount = 0;
         bool top = false;
-        if ((int)roadPos.y + 1 < 39 && structureArr[(int)roadPos.y + 1, (int)roadPos.x] != null
-            && structureArr[(int)roadPos.y + 1, (int)roadPos.x].tag == "Road")
+        if ((int)roadPos.y + 1 < 39 && structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
         {
             top = true;
             nearbyRoadCount++;
         }
         bool bot = false;
-        if ((int)roadPos.y - 1 > 0 && structureArr[(int)roadPos.y - 1, (int)roadPos.x] != null
-            && structureArr[(int)roadPos.y - 1, (int)roadPos.x].tag == "Road")
+        if ((int)roadPos.y - 1 > 0 && structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == "Road")
         {
             bot = true;
             nearbyRoadCount++;
         }
         bool left = false;
-        if ((int)roadPos.x - 1 > 0 && structureArr[(int)roadPos.y, (int)roadPos.x - 1] != null
-            && structureArr[(int)roadPos.y, (int)roadPos.x - 1].tag == "Road")
+        if ((int)roadPos.x - 1 > 0 && structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == "Road")
         {
             left = true;
             nearbyRoadCount++;
         }
         bool right = false;
-        if ((int)roadPos.x + 1 < 39 && structureArr[(int)roadPos.y, (int)roadPos.x + 1] != null
-            && structureArr[(int)roadPos.y, (int)roadPos.x + 1].tag == "Road")
+        if ((int)roadPos.x + 1 < 39 && structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
         {
             right = true;
             nearbyRoadCount++;

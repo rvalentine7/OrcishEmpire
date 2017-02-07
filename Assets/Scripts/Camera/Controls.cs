@@ -6,19 +6,10 @@ using System.Collections;
  */
 public class Controls : MonoBehaviour {
     public float scrollSpeed = 0.001f;
-    public ConstructionNetwork constructNetwork;
     private Camera myCamera;
     private float mapSize;
     private float zoomLevel;//x zoom and y zoom... might need to be fixed later on to account for different screen sizes
-
-    /**
-     * Creates an instance of BuildingNetwork when a level is loaded.
-     */
-    void Awake()
-    {
-        constructNetwork = new ConstructionNetwork();
-    }
-
+    
     /**
      * Initializes variables used by the Controls class.
      */
