@@ -3,21 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /**
- * See note at the beginning of Update() in BuildingPlacement.cs
+ * Uses A* to form a path which the orc immigrant will then use to move in to a house.
  */
 public class Immigrate : MonoBehaviour {
-    //If the home is destroyed, it will need to find a nearest exit off the map.
-    //If a part of it's path is destroyed at any point in time, it should find a new path.
+    //TODO: If a part of it's path is destroyed at any point in time, it should find a new path.
     private GameObject[,] network;
     public GameObject goalObject;
     private List<Vector2> path;
     public float stepSize;
+    private bool changePath;
 
     /**
      * Instantiates the information necessary for the orc to find its way to its new house.
      */
     void Start () {
         path = new List<Vector2>();
+        changePath = false;
         GameObject world = GameObject.Find("WorldInformation");
         World myWorld = world.GetComponent<World>();
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
@@ -27,7 +28,7 @@ public class Immigrate : MonoBehaviour {
         {
             for (int j = 0; j < network.GetLength(1); j++)
             {
-                if (network[i, j] == null)
+                if (structureArr[i, j] == null)
                 {
                     network[i, j] = terrainArr[i, j];
                 }
@@ -46,18 +47,19 @@ public class Immigrate : MonoBehaviour {
         if (goalObject != null)
         {
             Vector2 goal = goalObject.transform.position;
-            if (path.Count == 0)
+            if (path.Count == 0 || changePath == true)
             {
                 AstarSearch aStarSearch = new AstarSearch();
                 //y in the following line of code is floored to an int in case I decide to bump up the position by 0.5 when the agent
                 // spawns so that it is walking in the middle of the block (so that it doesn't appear to walk just below the road)
-                Vector2 start = new Vector2(gameObject.transform.position.x, Mathf.FloorToInt(gameObject.transform.position.y));
-                path = aStarSearch.aStar(start, goal, network);
+                Vector2 start = new Vector2(Mathf.CeilToInt(gameObject.transform.position.x), Mathf.FloorToInt(gameObject.transform.position.y));
+                path = aStarSearch.aStar(start, goalObject, network);
                 if (path.Count == 0)
                 {
                     Debug.Log("Spawned orc immigrant had no path to house.  It has been destroyed.");
                     Destroy(gameObject);
                 }
+                changePath = false;
             }
             //use path to go to the next available vector2 in it
             Vector2 nextLocation = path[0];
@@ -82,10 +84,23 @@ public class Immigrate : MonoBehaviour {
             //the agent has arrived at the goal location
             if (path.Count == 0)
             {
-                HouseInformation houseInfo = goalObject.GetComponent<HouseInformation>();
-                houseInfo.addInhabitant();
+                if (goalObject.tag == "Building" || goalObject.tag == "House")
+                {
+                    HouseInformation houseInfo = goalObject.GetComponent<HouseInformation>();
+                    OrcInformation orcInfo = gameObject.GetComponent<OrcInformation>();
+                    houseInfo.addInhabitants(orcInfo.getOrcCount());
+                }
                 Destroy(gameObject);
             }
+        } else//house was deleted, find a new place to go to
+        {
+            Debug.Log("goal object was deleted, making new goal object");
+            GameObject world = GameObject.Find("WorldInformation");
+            World myWorld = world.GetComponent<World>();
+            Vector2 goal = myWorld.exitLocation;
+            GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+            goalObject = terrainArr[(int) goal.x, (int) goal.y];
+            changePath = true;
         }
     }
 }

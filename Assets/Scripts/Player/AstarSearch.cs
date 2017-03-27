@@ -20,12 +20,13 @@ public class AstarSearch {
      * @param network is a multidimensional array of objects in the game world
      * @return the path found by A* to go from the start to the goal
      */
-    public List<Vector2> aStar (Vector2 start, Vector2 goal, GameObject[,] network)
+    public List<Vector2> aStar(Vector2 start, GameObject goalObject, GameObject[,] network)
     {
+        Vector2 goal = goalObject.transform.position;
         List<Vector2> closedSet = new List<Vector2>();
         List<Vector2> openSet = new List<Vector2>();
         openSet.Add(start);
-        Dictionary <Vector2, Vector2> cameFrom = new Dictionary<Vector2, Vector2>();
+        Dictionary<Vector2, Vector2> cameFrom = new Dictionary<Vector2, Vector2>();
 
         Dictionary<Vector2, int> gScore = new Dictionary<Vector2, int>();
         Dictionary<Vector2, int> fScore = new Dictionary<Vector2, int>();
@@ -35,7 +36,8 @@ public class AstarSearch {
             {
                 //can either make this what characters cannot travel over (buildings)
                 // or make it what they can (roads)
-                if (network[i, j] != null && (network[i, j].tag != "Building" || new Vector2(i, j) == goal))
+                if (network[i, j] != null && (network[i, j].tag != "Building" || new Vector2(i, j) == goal
+                    || network[i, j] == goalObject))
                 {
                     gScore.Add(new Vector2(i, j), int.MaxValue);
                     fScore.Add(new Vector2(i, j), int.MaxValue);
@@ -57,13 +59,9 @@ public class AstarSearch {
                     current = point;
                 }
             }
-            if (current.Equals(goal))
+            if (current.Equals(goal) || network[(int)current.x, (int)current.y] == goalObject)
             {
                 List<Vector2> path = aStarPath(cameFrom, current, start, goal);
-                /*foreach (Vector2 point in path)
-                {
-                    Debug.Log("Point: " + point.x + ", " + point.y);
-                }*/
                 return path;
             }
             openSet.Remove(current);
@@ -76,25 +74,29 @@ public class AstarSearch {
             World myWorld = world.GetComponent<World>();
             if (current.x + 1 < myWorld.mapSize && current.y > 0
                 && network[(int)current.x + 1, (int)current.y] != null
-                && (network[(int)current.x + 1, (int)current.y].tag != "Building" || new Vector2(current.x + 1, current.y).Equals(goal)))
+                && (network[(int)current.x + 1, (int)current.y].tag != "Building" || new Vector2(current.x + 1, current.y).Equals(goal)
+                || network[(int)current.x + 1, (int)current.y] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x + 1, current.y));
             }
             if (current.x - 1 > 0 && current.y > 0
                 && network[(int)current.x - 1, (int)current.y] != null
-                && (network[(int)current.x - 1, (int)current.y].tag != "Building" || new Vector2(current.x - 1, current.y).Equals(goal)))
+                && (network[(int)current.x - 1, (int)current.y].tag != "Building" || new Vector2(current.x - 1, current.y).Equals(goal)
+                || network[(int)current.x - 1, (int)current.y] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x - 1, current.y));
             }
             if (current.y + 1 < myWorld.mapSize && current.x > 0
                 && network[(int)current.x, (int)current.y + 1] != null
-                && (network[(int)current.x, (int)current.y + 1].tag != "Building" || new Vector2(current.x, current.y + 1).Equals(goal)))
+                && (network[(int)current.x, (int)current.y + 1].tag != "Building" || new Vector2(current.x, current.y + 1).Equals(goal)
+                || network[(int)current.x, (int)current.y + 1] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x, current.y + 1));
             }
             if (current.y - 1 > 0 && current.x > 0
                 && network[(int)current.x, (int)current.y - 1] != null
-                && (network[(int)current.x, (int)current.y - 1].tag != "Building" || new Vector2(current.x, current.y - 1).Equals(goal)))
+                && (network[(int)current.x, (int)current.y - 1].tag != "Building" || new Vector2(current.x, current.y - 1).Equals(goal)
+                || network[(int)current.x, (int)current.y - 1] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x, current.y - 1));
             }
@@ -112,13 +114,14 @@ public class AstarSearch {
                 {
                     tentativeGScore = gScore[current] + 1;
                 }
-                else if (new Vector2(neighbor.x, neighbor.y) == goal)
+                else if (new Vector2(neighbor.x, neighbor.y) == goal
+                    || network[(int)neighbor.x, (int)neighbor.y] == goalObject)
                 {
                     tentativeGScore = gScore[current];
                 }
                 else
                 {
-                    tentativeGScore = gScore[current] + 3;
+                    tentativeGScore = gScore[current] + 20;
                 }
 
                 if (!openSet.Contains(neighbor))
@@ -147,16 +150,12 @@ public class AstarSearch {
     List<Vector2> aStarPath (Dictionary<Vector2, Vector2> cameFrom, Vector2 current, Vector2 start, Vector2 goal)
     {
         List<Vector2> path = new List<Vector2>();
-        //path.Add(current);
+        //the 0.4f added to the y value is to bump the characters up enough to appear as though they are
+        // travelling in the middle of the block rather than the bottom
         path.Add(new Vector2(current.x, current.y + 0.4f));
-        /*foreach (KeyValuePair<Vector2, Vector2> kvp in cameFrom)
-        {
-            Debug.Log("Key: " + kvp.Key.x + ", " + kvp.Key.y + " Value: " + kvp.Value.x + ", " + kvp.Value.y);
-        }*/
         while(current != start)
         {
             current = cameFrom[current];
-            //path.Add(current);
             path.Add(new Vector2(current.x, current.y + 0.4f));
         }
         if (path.Contains(start))

@@ -3,6 +3,8 @@
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Building\BuildingPlacement.cs">
     <Files>
       <File FileName="Assets\Scripts\Building\BuildingPlacement.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Town\AvailableHome.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Player\OrcInformation.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

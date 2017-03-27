@@ -17,10 +17,13 @@ public class World : MonoBehaviour {
      */
     void Awake()
     {
+        //eventually change these to be general and passed in by a level
+        // manager
         constructNetwork = new ConstructionNetwork();
         terrainNetwork = new TerrainNetwork();
         mapSize = 42;
         spawnLocation = new Vector2(0f, 5.41f);
+        exitLocation = new Vector2(39f, 5.41f);
     }
 
     // Use this for initialization
@@ -32,4 +35,7 @@ public class World : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    //with a level manager, I will need getters and setters for information such as "spawnLocation" so that
+    // the level manager can input the data and all other classes will get the data from getters
 }

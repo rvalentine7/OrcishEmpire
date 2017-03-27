@@ -44,9 +44,20 @@ public class Clear : MonoBehaviour {
 
         if (Input.GetMouseButton(0) && structureArr[(int)mousePos.x, (int)mousePos.y] != null
             && (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road"
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"))
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House"))
         {
             GameObject structureToClear = structureArr[(int)mousePos.x, (int)mousePos.y];
+            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House")
+            {
+                HouseInformation houseInfo = structureToClear.GetComponent<HouseInformation>();
+                houseInfo.destroyHouse();
+            }
+            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building")
+            {
+                Employment employment = structureToClear.GetComponent<Employment>();
+                employment.destroyEmployment();
+            }
             //If the deleted object is a road, the surrounding roads need to be updated to reflect
             // the fact there is no longer a road where the deleted one was
             if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road")
