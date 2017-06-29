@@ -7,6 +7,7 @@ using UnityEngine;
  * in knowing.
  */
 public class OrcInformation : MonoBehaviour {
+    public GameObject orcPopupObject;
     private int orcCount;
     //will want to keep track of where an orc is working
 
@@ -31,5 +32,18 @@ public class OrcInformation : MonoBehaviour {
     public int getOrcCount()
     {
         return orcCount;
+    }
+
+    /**
+     * Click the object to see information about it
+     */
+    void OnMouseDown()
+    {
+        if (GameObject.FindWithTag("Popup") == null)
+        {
+            //might want the object creating this to determine if the orc is emmigrating/immigrating for
+            // the popup status to change and to avoid creating even more popups
+            Instantiate(orcPopupObject);
+        }
     }
 }

@@ -22,6 +22,11 @@ public class CreateObject : MonoBehaviour {
      */
     public void Create ()
     {
+        //Destroys the existing popup/building creation object if the user attempts to create something else
+        if (GameObject.FindWithTag("Popup") != null)
+        {
+            Destroy(GameObject.FindWithTag("Popup"));
+        }
         GameObject constructObj = Instantiate(construct, Input.mousePosition, Quaternion.identity) as GameObject;
         constructObj.transform.position = Camera.main.ScreenToWorldPoint(Input.mousePosition);
     }

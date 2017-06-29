@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\Player\Citizen.cs" />
     <Compile Include="Assets\Scripts\Player\OrcInformation.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
+    <Compile Include="Assets\Scripts\Town\Collect.cs" />
     <Compile Include="Assets\Scripts\Town\Delivery.cs" />
     <Compile Include="Assets\Scripts\Town\Employment.cs" />
     <Compile Include="Assets\Scripts\Town\HouseInformation.cs" />
@@ -93,7 +94,14 @@
     <Compile Include="Assets\Scripts\Town\Marketplace.cs" />
     <Compile Include="Assets\Scripts\Town\PigFarm.cs" />
     <Compile Include="Assets\Scripts\Town\Storage.cs" />
+    <Compile Include="Assets\Scripts\Town\Warehouse.cs" />
     <Compile Include="Assets\Scripts\Town\Well.cs" />
+    <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\FarmPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\HousePopup.cs" />
+    <Compile Include="Assets\Scripts\UI\MarketPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\WarehousePopup.cs" />
+    <Compile Include="Assets\Scripts\UI\WellPopup.cs" />
     <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />
     <Compile Include="Assets\Scripts\World\TerrainSegment.cs" />
     <Compile Include="Assets\Scripts\World\World.cs" />

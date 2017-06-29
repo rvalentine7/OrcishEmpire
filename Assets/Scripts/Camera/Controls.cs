@@ -7,16 +7,20 @@ using System.Collections;
 public class Controls : MonoBehaviour {
     public float scrollSpeed = 0.001f;
     private Camera myCamera;
-    private float mapSize;
     private float zoomLevel;//x zoom and y zoom... might need to be fixed later on to account for different screen sizes
+    private GameObject world;
+    private World myWorld;
+    private int mapSize;
     
     /**
      * Initializes variables used by the Controls class.
      */
     void Start () {
         myCamera = GetComponent<Camera>();
-        mapSize = 39f;//will need to pass in a variable here from a level manager when I get it in
-	}
+        world = GameObject.Find("WorldInformation");
+        myWorld = world.GetComponent<World>();
+        mapSize = myWorld.mapSize;
+    }
 	
     /**
      * Updates the camera based on the player's inputs.
@@ -25,7 +29,7 @@ public class Controls : MonoBehaviour {
         //Moving the camera around the x and y directions by moving the mouse to the edges of the screen
         Vector3 currentPos = transform.position;
         float cameraSize = myCamera.orthographicSize / 5;
-        if (Input.mousePosition.y >= Screen.height * 0.98 && currentPos.y < mapSize - myCamera.orthographicSize)
+        if (Input.mousePosition.y >= Screen.height * 0.98 && currentPos.y < mapSize - myCamera.orthographicSize - 1)
         {
             transform.position = new Vector3(currentPos.x, currentPos.y + scrollSpeed * Time.deltaTime * cameraSize, currentPos.z);
         }
@@ -33,7 +37,7 @@ public class Controls : MonoBehaviour {
         {
             transform.position = new Vector3(currentPos.x, currentPos.y - scrollSpeed * Time.deltaTime * cameraSize, currentPos.z);
         }
-        if (Input.mousePosition.x >= Screen.width * 0.98 && currentPos.x < mapSize - myCamera.aspect * myCamera.orthographicSize)
+        if (Input.mousePosition.x >= Screen.width * 0.98 && currentPos.x < mapSize - myCamera.aspect * myCamera.orthographicSize - 1)
         {
             transform.position = new Vector3(currentPos.x + scrollSpeed * Time.deltaTime * cameraSize, currentPos.y, currentPos.z);
         }

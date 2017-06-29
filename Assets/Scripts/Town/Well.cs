@@ -11,6 +11,7 @@ public class Well : MonoBehaviour {
     public float timeInterval;
     public int waterRadius;
     public int waterPerTick;
+    public GameObject wellPopupObject;
 
     /**
      * Initializes the Well.
@@ -48,4 +49,15 @@ public class Well : MonoBehaviour {
             }
         }
 	}
+
+    /**
+     * Click the object to see information about it
+     */
+    void OnMouseDown()
+    {
+        if (GameObject.FindWithTag("Popup") == null)
+        {
+            Instantiate(wellPopupObject);
+        }
+    }
 }

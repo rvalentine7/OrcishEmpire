@@ -10,6 +10,7 @@ public class HouseInformation : MonoBehaviour {
     public float timeInterval;
     public int inhabitantWaterConsumption;
     public int jobSearchRadius;
+    public GameObject housePopupObject;
     public Sprite sign;
     public Sprite firstLevelHouse;
     //add future house sprites here
@@ -143,10 +144,16 @@ public class HouseInformation : MonoBehaviour {
     {
         //Need to have this create a pop-up that displays number of inhabitants,
         // food, water, furniture, other resources of the house
-        Debug.Log("Number of inhabitants: " + numInhabitants);
+        /*Debug.Log("Number of inhabitants: " + numInhabitants);
         Debug.Log("Number of employed inhabitants: " + numEmployedInhabitants + "/" + numInhabitants);
         Debug.Log("Total water: " + water);
-        Debug.Log("Total food: " + food);
+        Debug.Log("Total food: " + food);*/
+        if (GameObject.FindWithTag("Popup") == null)
+        {
+            GameObject popup = Instantiate(housePopupObject) as GameObject;
+            HousePopup housePopup = popup.GetComponent<HousePopup>();
+            housePopup.setHouse(gameObject);
+        }
     }
 
     /**
@@ -228,6 +235,15 @@ public class HouseInformation : MonoBehaviour {
     }
 
     /**
+     * Tells how many inhabitants are currently employed.
+     * @return numEmployedInhabitants the number of inhabitants currently employed
+     */
+    public int getNumEmployedInhabs()
+    {
+        return numEmployedInhabitants;
+    }
+
+    /**
      * Removes a work location from the inhabWorkLocations dictionary and
      * unemploys the inhabitants who worked there.
      * @param employment the work location to be removed
@@ -259,5 +275,23 @@ public class HouseInformation : MonoBehaviour {
                 water = 100;
             }
         }
+    }
+
+    /**
+     * Gets the water count at the house.
+     * @return water the amount of water the house holds
+     */
+    public int getWaterCount()
+    {
+        return water;
+    }
+
+    /**
+     * Gets the food count at the house.
+     * @return food the amount of food the house holds
+     */
+    public int getFoodCount()
+    {
+        return food;
     }
 }

@@ -195,7 +195,7 @@ public class Delivery : MonoBehaviour {
             }
         }
         List<List<Vector2>> possiblePaths = new List<List<Vector2>>();
-        //checks for the closest market
+        //checks for the closest warehouse
         List<GameObject> discoveredDeliveryLocs = new List<GameObject>();
         for (int i = 0; i <= searchRadius * 2; i++)
         {
@@ -214,7 +214,7 @@ public class Delivery : MonoBehaviour {
                         && structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j].GetComponent<Storage>() != null
                         && structureArr[(int)originalLocation.x - searchRadius + i,
-                        (int)originalLocation.y - searchRadius + j].GetComponent<Storage>().storageType.Equals("Market"))
+                        (int)originalLocation.y - searchRadius + j].GetComponent<Storage>().storageType.Equals("Warehouse"))
                 {
                     //final check to make sure this location will take the delivery orc's goods
                     bool acceptsMyResources = false;
@@ -243,7 +243,7 @@ public class Delivery : MonoBehaviour {
                 }
             }
         }
-        //check for other storage-type buildings if there are no available markets (warehouse, grainery, etc)
+        //check for other storage-type buildings if there are no available warehouses (market, grainery, etc)
         if (possiblePaths.Count == 0)
         {
 

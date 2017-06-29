@@ -10,7 +10,7 @@ public class World : MonoBehaviour {
     public TerrainNetwork terrainNetwork;
     public int mapSize;
     public Vector2 spawnLocation;//location where immigrants will spawn in
-    public Vector2 exitLocation;//locations wher emmigrants will exit the world
+    public Vector2 exitLocation;//locations where emmigrants will exit the world
 
     /**
      * Initializes the necessary information for a world.

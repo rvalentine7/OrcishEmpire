@@ -7,8 +7,9 @@ using UnityEngine;
  */
 public class PigFarm : MonoBehaviour {
     public GameObject deliveryOrc;
+    public GameObject farmPopupObject;
     public float timeInterval;
-    public int meatProduced;
+    public int meatProduced;//this should be changed to resourceProduced when making this class more generalized
     private int progress;
     private float checkTime;
     private int numWorkers;
@@ -64,8 +65,14 @@ public class PigFarm : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        Debug.Log("Number of workers: " + numWorkers + "/" + employment.getWorkerCap());
-        Debug.Log("Production Progress: " + progress);
+        /*Debug.Log("Number of workers: " + numWorkers + "/" + employment.getWorkerCap());
+        Debug.Log("Production Progress: " + progress);*/
+        if (GameObject.FindWithTag("Popup") == null)
+        {
+            GameObject popup = Instantiate(farmPopupObject) as GameObject;
+            FarmPopup farmPopup = popup.GetComponent<FarmPopup>();
+            farmPopup.setFarm(gameObject);
+        }
     }
 
     /**
@@ -137,7 +144,9 @@ public class PigFarm : MonoBehaviour {
 
         GameObject newDeliveryOrc = Instantiate(deliveryOrc, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
         Delivery delivery = newDeliveryOrc.GetComponent<Delivery>();
-        delivery.addResources("Meat", meatProduced);
+        delivery.addResources("Meat", meatProduced);//TODO: have the class take a public string variable which tells what type of resource this building
+        // produces and use that to make this a generalized class for all production places (other farms/quarries/lumberyards/etc)
+        // I would need to update the popup in the onMouseDown section
         delivery.setOriginalLocation(spawnPosition);
         delivery.setOrcEmployment(gameObject);
     }
@@ -150,5 +159,14 @@ public class PigFarm : MonoBehaviour {
     public void setDeliveryStatus(bool status)
     {
         orcOutForDelivery = status;
+    }
+
+    /**
+     * Gets the progress towards completion out of 100.
+     * @return progress how far the farm is to completion
+     */
+    public int getProgressNum()
+    {
+        return progress;
     }
 }

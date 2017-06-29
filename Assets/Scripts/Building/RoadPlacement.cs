@@ -9,6 +9,8 @@ using System.Collections;
  */
 public class RoadPlacement : MonoBehaviour {
     private bool validPlacement;
+    private GameObject world;
+    private World myWorld;
     public Sprite possibleSprite;
     public Sprite possibleXRoadSprite;
     public Sprite possibleTRoadSprite;
@@ -25,6 +27,8 @@ public class RoadPlacement : MonoBehaviour {
      */
 	void Start () {
         validPlacement = true;
+        world = GameObject.Find("WorldInformation");
+        myWorld = world.GetComponent<World>();
     }
 	
 	/**
@@ -38,18 +42,23 @@ public class RoadPlacement : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        GameObject world = GameObject.Find("WorldInformation");
-        World myWorld = world.GetComponent<World>();
+        //GameObject world = GameObject.Find("WorldInformation");
+        //World myWorld = world.GetComponent<World>();
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
         mousePos.z = 0;
 
         bool valid = true;
-        //Buildings cannot be placed in negative number locations
+        //Buildings cannot be placed outside of the map
         if (mousePos.x < 0)
         {
             mousePos.x = 0;
+            valid = false;
+        }
+        if (mousePos.x > myWorld.mapSize - 1)
+        {
+            mousePos.x = myWorld.mapSize - 1;
             valid = false;
         }
         if (mousePos.y < 0)
@@ -57,15 +66,20 @@ public class RoadPlacement : MonoBehaviour {
             mousePos.y = 0;
             valid = false;
         }
+        if (mousePos.y > myWorld.mapSize - 1)
+        {
+            mousePos.y = myWorld.mapSize - 1;
+            valid = false;
+        }
 
         //Check if the structure is currently in a valid location
         //need to make sure there isn't a road/building already in the place where the road is currently located
         //check roadArr for the x/y coordinates of the mousePos to see if there is anything there...
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+        GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
 
         //bool valid = true;
-        //39 in the follow line needs to be replaced with mapSize when more levels are added
-        if ((mousePos.x <= 0 && mousePos.x >= 39 && mousePos.y <= 0 && mousePos.y >= 39))
+        if ((mousePos.x <= 0 && mousePos.x >= myWorld.mapSize && mousePos.y <= 0 && mousePos.y >= myWorld.mapSize))
         {
             valid = false;
         }
@@ -74,6 +88,11 @@ public class RoadPlacement : MonoBehaviour {
             && (structureArr[(int) mousePos.x, (int) mousePos.y].tag == "Road"
             || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"
             || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House"))
+        {
+            valid = false;
+        }
+        if (valid && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
+            && terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Water")
         {
             valid = false;
         }
@@ -101,8 +120,8 @@ public class RoadPlacement : MonoBehaviour {
         if (Input.GetMouseButton(0) && validPlacement)
         {
             //when mouse down, can place road in any viable location the mouse moves to
-            if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
-            {//swap 39s with mapSize
+            if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
+            {
                 transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
 
                 //update the new road
@@ -110,7 +129,7 @@ public class RoadPlacement : MonoBehaviour {
                 structureArr = myWorld.constructNetwork.getConstructArr();
                 //go through roads attached to the new road to update them visibly
                 //do not update the roads outside building limits
-                if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
+                if ((int)mousePos.y + 1 < myWorld.mapSize && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
                    && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
                 {
                     //update road above the one you are trying to build
@@ -128,56 +147,26 @@ public class RoadPlacement : MonoBehaviour {
                     //update road to the left of the one you are trying to build
                     updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
                 }
-                if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
+                if ((int)mousePos.x + 1 < myWorld.mapSize && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
                     && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
                 {
                     //update road to the right of the one you are trying to build
                     updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
                 }
 
-                if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
-                {//swap 39s with mapSize
+                if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
+                {
                     transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
                 }
             }
 
-            ////update the new road
-            //updateRoadConnection(gameObject, structureArr);
-            //structureArr = myWorld.constructNetwork.getConstructArr();
-            ////go through roads attached to the new road to update them visibly
-            ////do not update the roads outside building limits
-            //if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
-            //   && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
-            //{
-            //    //update road above the one you are trying to build
-            //    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y + 1], structureArr);
-            //}
-            //if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
-            //    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
-            //{
-            //    //update road below the one you are trying to build
-            //    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y - 1], structureArr);
-            //}
-            //if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
-            //    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
-            //{
-            //    //update road to the left of the one you are trying to build
-            //    updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
-            //}
-            //if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
-            //    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
-            //{
-            //    //update road to the right of the one you are trying to build
-            //    updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
-            //}
-
-            if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
-            {//swap 39s with mapSize
+            if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
+            {
                 transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
             }
         }
-        if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
-        {//swap 39s with mapSize
+        if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
+        {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
         }
     }
@@ -189,8 +178,6 @@ public class RoadPlacement : MonoBehaviour {
      */
     void updateRoadConnection(GameObject road, GameObject[,] structureArr)
     {
-        GameObject world = GameObject.Find("WorldInformation");
-        World myWorld = world.GetComponent<World>();
         Vector2 roadPos = road.transform.position;
 
         //check here for what gameobject I want and add it to the buildArr
@@ -372,7 +359,7 @@ public class RoadPlacement : MonoBehaviour {
         // my current road object is surrounded on
         int nearbyRoadCount = 0;
         bool top = false;
-        if ((int)roadPos.y + 1 < 39 && structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
+        if ((int)roadPos.y + 1 < myWorld.mapSize && structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
             && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
         {
             top = true;
@@ -393,7 +380,7 @@ public class RoadPlacement : MonoBehaviour {
             nearbyRoadCount++;
         }
         bool right = false;
-        if ((int)roadPos.x + 1 < 39 && structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
+        if ((int)roadPos.x + 1 < myWorld.mapSize && structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
             && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
         {
             right = true;

@@ -10,15 +10,18 @@ public class BuildingPlacement : MonoBehaviour {
     public Sprite possibleSprite;
     public Sprite impossibleSprite;
     public GameObject building;
-    //private int buildingPos;
     private bool validPlacement;
+    private GameObject world;
+    private World myWorld;
 
     /**
      * Initializes the BuildingPlacement class
      */
     void Start () {
         //validPlacement = true;
-	}
+        world = GameObject.Find("WorldInformation");
+        myWorld = world.GetComponent<World>();
+    }
 	
 	/**
      * Allows the player to place a building in a viable location.
@@ -29,20 +32,22 @@ public class BuildingPlacement : MonoBehaviour {
             //exits out of construction mode if the right mouse button or escape is clicked
             Destroy(gameObject);
         }
-
-        //following stuff should probably be in start
-        GameObject world = GameObject.Find("WorldInformation");
-        World myWorld = world.GetComponent<World>();
+        
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
         mousePos.z = 0;
 
         validPlacement = true;
-        //Buildings cannot be placed in negative number locations
+        //Buildings cannot be placed outside of the map
         if (mousePos.x < 0)
         {
             mousePos.x = 0;
+            validPlacement = false;
+        }
+        if (mousePos.x > myWorld.mapSize - 1)
+        {
+            mousePos.x = myWorld.mapSize - 1;
             validPlacement = false;
         }
         if (mousePos.y < 0)
@@ -50,18 +55,23 @@ public class BuildingPlacement : MonoBehaviour {
             mousePos.y = 0;
             validPlacement = false;
         }
+        if (mousePos.y > myWorld.mapSize - 1)
+        {
+            mousePos.y = myWorld.mapSize - 1;
+            validPlacement = false;
+        }
 
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+        GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         //distance to location just outside object? floor(width / 2 + 1) floor(height / 2 + 1)
-
-        //39s in the follow line need to be replaced with mapSize when a level manager is added
-        if (validPlacement && (mousePos.x - Mathf.FloorToInt(width / 2) < 1 || mousePos.x + Mathf.FloorToInt(width / 2) >= 39
-            || mousePos.y - Mathf.FloorToInt(height / 2) < 1 || mousePos.y + Mathf.FloorToInt(height / 2) >= 39))
+        
+        if (validPlacement && (mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) < 1 || mousePos.x + Mathf.FloorToInt(width / 2) >= myWorld.mapSize - 1
+            || mousePos.y - Mathf.FloorToInt(height / 2) < 1 || mousePos.y + Mathf.FloorToInt(height / 2) >= myWorld.mapSize - 1))
         {
             validPlacement = false;
         }
         //houses can only be built within a distance of 2 from a road in horizontal and vertical directions
-        if (validPlacement && gameObject.tag == "House")
+        if (validPlacement && gameObject.name == "BuildHouse(Clone)")
         {
             if ((mousePos.x >= myWorld.mapSize - 1 || (mousePos.x + 1 > 0 && mousePos.x + 1 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
                 && (structureArr[(int)mousePos.x + 1, (int)mousePos.y] == null || structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag != "Road")))
@@ -83,23 +93,24 @@ public class BuildingPlacement : MonoBehaviour {
                 validPlacement = false;
             }
         }
-        //can't place a building on other constructs
+        //can't place a building on other constructs or water
         int r = 0;
         while (validPlacement && r < height)
         {
             int c = 0;
             while (validPlacement && c < width)
             {
-                //need to update to check locations besides the one x, y for buildings bigger than 1x1
-                //if (structureArr[(int)mousePos.x - Mathf.FloorToInt(width / 2) + c, (int)mousePos.y - Mathf.FloorToInt(height / 2) + r] != null
-                //    && (structureArr[(int)mousePos.x - Mathf.FloorToInt(width / 2) + c, (int)mousePos.y - Mathf.FloorToInt(height / 2) + r].tag == "Road"
-                //    || structureArr[(int)mousePos.x - Mathf.FloorToInt(width / 2) + c, (int)mousePos.y - Mathf.FloorToInt(height / 2) + r].tag == "Building"
-                //    || structureArr[(int)mousePos.x - Mathf.FloorToInt(width / 2) + c, (int)mousePos.y - Mathf.FloorToInt(height / 2) + r].tag == "House"))
                 //Mathf.CeilToInt(width / 2.0f - 1) finds the middle square and then that is subtracted from x to get to the edge to start checking the structure array
+                //TODO: change the following to be areas that can be built on because the areas that can't be built on are more numerous
                 if (structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
                     && (structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Road"
                     || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Building"
                     || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "House"))
+                {
+                    validPlacement = false;
+                }
+                if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
+                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Water")
                 {
                     validPlacement = false;
                 }
@@ -121,8 +132,8 @@ public class BuildingPlacement : MonoBehaviour {
         //Place the object in the world upon left mouse click
         if (Input.GetMouseButton(0) && validPlacement)
         {
-            if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)
-            {//swap 39s with mapSize
+            if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
+            {
                 transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
 
                 float adjustedX = 0f;
@@ -142,8 +153,6 @@ public class BuildingPlacement : MonoBehaviour {
                 {
                     for (int c = 0; c < width; c++)
                     {
-                        //myWorld.constructNetwork.setConstructArr((int)mousePos.x - Mathf.FloorToInt(width / 2) + c,
-                        //    (int)mousePos.y - Mathf.FloorToInt(height / 2) + r, buildingObj);
                         myWorld.constructNetwork.setConstructArr((int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c,
                             (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r, buildingObj);
                     }
@@ -151,9 +160,9 @@ public class BuildingPlacement : MonoBehaviour {
             }
         }
 
-        if (mousePos.x - Mathf.FloorToInt(width / 2) + 1 > 0 && mousePos.x + Mathf.FloorToInt(width / 2) - 1 < 39
-            && mousePos.y - Mathf.FloorToInt(height / 2) + 1 > 0 && mousePos.y + Mathf.FloorToInt(height / 2) - 1 < 39)
-        {//swap 39s with mapSize
+        if (mousePos.x - Mathf.FloorToInt(width / 2) + 1 > 0 && mousePos.x + Mathf.FloorToInt(width / 2) - 1 < myWorld.mapSize - 1
+            && mousePos.y - Mathf.FloorToInt(height / 2) + 1 > 0 && mousePos.y + Mathf.FloorToInt(height / 2) - 1 < myWorld.mapSize - 1)
+        {
             float adjustedX = 0f;
             float adjustedY = 0f;
             if (width % 2 == 0)
@@ -165,8 +174,7 @@ public class BuildingPlacement : MonoBehaviour {
                 adjustedY += 0.5f;
             }
             Vector2 buildingVec = new Vector2(mousePos.x + adjustedX, mousePos.y + adjustedY);
-            transform.position = Vector2.Lerp(transform.position, buildingVec, 1f);//mousePos instead of BuildingVec
-            //Debug.Log("Transformation position.x: " + transform.position.x + " position.y: " + transform.position.y);
+            transform.position = Vector2.Lerp(transform.position, buildingVec, 1f);
         }
     }
 }
