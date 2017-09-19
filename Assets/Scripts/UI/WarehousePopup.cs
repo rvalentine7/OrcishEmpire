@@ -37,7 +37,7 @@ public class WarehousePopup : MonoBehaviour {
             status.text = "This warehouse is efficiently distributing goods.";
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
-        meatNum.text = "" + storage.getMeatInfo();
+        meatNum.text = "" + storage.getMeatCount();
     }
 
     /**

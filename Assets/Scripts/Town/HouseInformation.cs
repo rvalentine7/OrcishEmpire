@@ -142,12 +142,6 @@ public class HouseInformation : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        //Need to have this create a pop-up that displays number of inhabitants,
-        // food, water, furniture, other resources of the house
-        /*Debug.Log("Number of inhabitants: " + numInhabitants);
-        Debug.Log("Number of employed inhabitants: " + numEmployedInhabitants + "/" + numInhabitants);
-        Debug.Log("Total water: " + water);
-        Debug.Log("Total food: " + food);*/
         if (GameObject.FindWithTag("Popup") == null)
         {
             GameObject popup = Instantiate(housePopupObject) as GameObject;

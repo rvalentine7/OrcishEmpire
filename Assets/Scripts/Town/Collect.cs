@@ -9,7 +9,7 @@ using UnityEngine;
 public class Collect : MonoBehaviour {
     private Dictionary<string, int> resources;
     private string resourcesToCollect;
-    private int carryingCapacity;
+    //private int carryingCapacity;
     private int remainingCapacity;
     private GameObject[,] network;
     private Vector2 originalLocation;
@@ -35,7 +35,7 @@ public class Collect : MonoBehaviour {
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
         resources = new Dictionary<string, int>();
         resourcesToCollect = "";
-        carryingCapacity = 0;
+        //carryingCapacity = 0;
         remainingCapacity = 0;
         originalLocation = new Vector2();
         reachedGoal = false;
@@ -131,9 +131,9 @@ public class Collect : MonoBehaviour {
                         Storage storage = goalObject.GetComponent<Storage>();
                         if (resourcesToCollect.Equals("Food") && storage.getFoodCount() > 0)
                         {
-                            if (storage.getMeatInfo() > 0)
+                            if (storage.getMeatCount() > 0)
                             {
-                                int meatCount = storage.getMeatInfo();
+                                int meatCount = storage.getMeatCount();
                                 if (meatCount > remainingCapacity)
                                 {
                                     resources.Add("Meat", remainingCapacity);
@@ -347,7 +347,7 @@ public class Collect : MonoBehaviour {
      */
     public void setCarryingCapacity(int num)
     {
-        carryingCapacity = num;
+        //carryingCapacity = num;
         remainingCapacity = num;
     }
 }

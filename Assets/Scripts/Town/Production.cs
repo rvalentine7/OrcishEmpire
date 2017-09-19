@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /**
- * Pig Farms raise pigs to produce meat which orc citizens use for food.
+ * Production creates goods from a production type building (farm, lumbermill, blacksmith, etc.) and then
+ * creates a delivery worker to deliver the goods upon completion of the goods.
  */
-public class PigFarm : MonoBehaviour {
+public class Production : MonoBehaviour {
     public GameObject deliveryOrc;
     public GameObject farmPopupObject;
     public float timeInterval;
-    public int meatProduced;//this should be changed to resourceProduced when making this class more generalized
+    public string resourceName;
+    public int resourceProduced;
     private int progress;
     private float checkTime;
     private int numWorkers;
@@ -18,7 +20,7 @@ public class PigFarm : MonoBehaviour {
     private bool orcOutForDelivery;
 
     /**
-     * Initializes the pig farm.
+     * Initializes the production site.
      */
     void Start () {
         employment = gameObject.GetComponent<Employment>();
@@ -27,12 +29,11 @@ public class PigFarm : MonoBehaviour {
         numWorkers = employment.getNumWorkers();
         workerValue = employment.getWorkerValue();
         orcOutForDelivery = false;
-
     }
 	
 	/**
-     * Updates progress on the meat production and sends out a worker to deliver
-     *  the meat upon progress completion.
+     * Updates progress on the production and sends out a worker to deliver
+     *  the goods upon progress completion.
      */
 	void Update () {
         orcOutForDelivery = employment.getWorkerDeliveringGoods();
@@ -76,7 +77,7 @@ public class PigFarm : MonoBehaviour {
     }
 
     /**
-     * Creates an orc to carry meat from the pig farm to a storage location.
+     * Creates an orc to carry resources from the production site to a storage location.
      * This building favors placing an orc at the first available road segment
      *  it finds in the order of: bottom, top, left, right
      */
@@ -144,16 +145,14 @@ public class PigFarm : MonoBehaviour {
 
         GameObject newDeliveryOrc = Instantiate(deliveryOrc, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
         Delivery delivery = newDeliveryOrc.GetComponent<Delivery>();
-        delivery.addResources("Meat", meatProduced);//TODO: have the class take a public string variable which tells what type of resource this building
-        // produces and use that to make this a generalized class for all production places (other farms/quarries/lumberyards/etc)
-        // I would need to update the popup in the onMouseDown section
+        delivery.addResources(resourceName, resourceProduced);
         delivery.setOriginalLocation(spawnPosition);
         delivery.setOrcEmployment(gameObject);
     }
 
     /**
      * Sets the boolean status of whether or not the delivery worker
-     * is out for delivery or at the pig farm.
+     * is out for delivery or at the production site.
      * @param status is whether or not the orc is out for delivery
      */
     public void setDeliveryStatus(bool status)
@@ -163,7 +162,7 @@ public class PigFarm : MonoBehaviour {
 
     /**
      * Gets the progress towards completion out of 100.
-     * @return progress how far the farm is to completion
+     * @return progress how far the production is to completion
      */
     public int getProgressNum()
     {

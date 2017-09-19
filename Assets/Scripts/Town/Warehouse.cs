@@ -20,8 +20,6 @@ public class Warehouse : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        /*List<int> meatInfo = storage.getMeatInfo();
-        Debug.Log("Meat: " + meatInfo[0] + "/" + meatInfo[1]);*/
         if (GameObject.FindWithTag("Popup") == null)
         {
             GameObject popup = Instantiate(warehousePopupObject) as GameObject;

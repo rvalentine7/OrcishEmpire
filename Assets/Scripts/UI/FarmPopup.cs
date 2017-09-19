@@ -16,7 +16,7 @@ public class FarmPopup : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        PigFarm pigFarm = farm.GetComponent<PigFarm>();//would need to be made more general to apply for more farms
+        Production pigFarm = farm.GetComponent<Production>();//would need to be made more general to apply for more farms
         //can do this by making the pigfarm class a more general "farm" type and set any special fields (such as produce type)
         //through public variables on the prefab
         progressNum.text = "" + pigFarm.getProgressNum() + "/100";

@@ -11,8 +11,8 @@ using UnityEngine;
  */
 public class Marketplace : MonoBehaviour {
     private GameObject[,] constructArr;
-    private int numWorkers;
-    private int workerValue;
+    //private int numWorkers;
+    //private int workerValue;
     private bool orcOutForCollection;
     private Employment employment;
     public GameObject collectorOrc;
@@ -24,8 +24,8 @@ public class Marketplace : MonoBehaviour {
      */
     void Start () {
         employment = gameObject.GetComponent<Employment>();
-        numWorkers = employment.getNumWorkers();
-        workerValue = employment.getWorkerValue();
+        //numWorkers = employment.getNumWorkers();
+        //workerValue = employment.getWorkerValue();
         orcOutForCollection = false;
     }
 	
@@ -33,9 +33,6 @@ public class Marketplace : MonoBehaviour {
      * Creates workers for collecting and distributing resources
      */
 	void Update () {
-        GameObject world = GameObject.Find("WorldInformation");
-        World myWorld = world.GetComponent<World>();
-        constructArr = myWorld.constructNetwork.getConstructArr();
         //TODO:  If only one worker, it should switch between gathering supplies and distributing them
         //  Alternatively, I might have worker count affect how much the workers are able to carry around with them
         //  and instead make it so the marketplace can either collect resources or distribute them, but not both at the same time
@@ -70,8 +67,6 @@ public class Marketplace : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        /*List<int> meatInfo = storage.getMeatInfo();
-        Debug.Log("Meat: " + meatInfo[0] + "/" + meatInfo[1]);*/
         if (GameObject.FindWithTag("Popup") == null)
         {
             GameObject popup = Instantiate(marketPopupObject) as GameObject;

@@ -9,7 +9,6 @@ using UnityEngine;
 public class Storage : MonoBehaviour {
     public string storageType;
     private int meatCount;
-    //private int meatMax;//instead of setting a max on each resource type, might want a max on total resources
     public int storageMax;
 
     /**
@@ -105,11 +104,8 @@ public class Storage : MonoBehaviour {
      * Returns both the total amount of meat in storage
      * @return meatCount the amount of meat in storage
      */
-    public int getMeatInfo()
+    public int getMeatCount()
     {
-        /*List<int> meatInfo = new List<int>();
-        meatInfo.Add(meatCount);
-        meatInfo.Add(meatMax);*/
         return meatCount;
     }
 

@@ -37,7 +37,7 @@ public class MarketPopup : MonoBehaviour {
             status.text = "This marketplace is efficiently distributing goods.";
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
-        meatNum.text = "" + storage.getMeatInfo();
+        meatNum.text = "" + storage.getMeatCount();
     }
 
     /**

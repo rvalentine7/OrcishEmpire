@@ -20,7 +20,7 @@ public class AstarSearch {
      * @param network is a multidimensional array of objects in the game world
      * @return the path found by A* to go from the start to the goal
      */
-    public List<Vector2> aStar(Vector2 start, GameObject goalObject, GameObject[,] network)
+    public List<Vector2> aStar(/*GameObject objectToMove, */Vector2 start, GameObject goalObject, GameObject[,] network)
     {
         Vector2 goal = goalObject.transform.position;
         List<Vector2> closedSet = new List<Vector2>();
@@ -62,6 +62,19 @@ public class AstarSearch {
             if (current.Equals(goal) || network[(int)current.x, (int)current.y] == goalObject)
             {
                 List<Vector2> path = aStarPath(cameFrom, current, start, goal);
+                /*if (objectToMove.GetComponent<Immigrate>() != null)
+                {
+                    Immigrate immigrate = objectToMove.GetComponent<Immigrate>();
+                    immigrate.setPath(path);
+                }
+                else if (objectToMove.GetComponent<Delivery>() != null)
+                {
+                    Delivery delivery = objectToMove.GetComponent<Delivery>();
+                }
+                else if (objectToMove.GetComponent<Collect>() != null)
+                {
+                    Collect collect = objectToMove.GetComponent<Collect>();
+                }*/
                 return path;
             }
             openSet.Remove(current);
@@ -138,6 +151,7 @@ public class AstarSearch {
             }
         }
         return new List<Vector2>();
+        //yield return null;
     }
 
     /**

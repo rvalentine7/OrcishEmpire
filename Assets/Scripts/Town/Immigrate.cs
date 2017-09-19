@@ -28,7 +28,7 @@ public class Immigrate : MonoBehaviour {
         {
             for (int j = 0; j < network.GetLength(1); j++)
             {
-                if (structureArr[i, j] == null)
+                if (structureArr[i, j] == null && terrainArr[i, j].tag != "Water")
                 {
                     network[i, j] = terrainArr[i, j];
                 }
@@ -49,6 +49,11 @@ public class Immigrate : MonoBehaviour {
             Vector2 goal = goalObject.transform.position;
             if (path.Count == 0 || changePath == true)
             {
+                //What if I had a class attached to this gameobject that A* could call? It would get the path and be able to tell this class when A* is done.
+                // In this case, I would need to have another variable here that says A* is running so I don't keep calling it.  When the special class
+                // used to get data from A* is updated, that class tells the variable A* is done running and updates the "path" variable in this class.
+                // All of update would need to check if A* is running (add a new if statement encasing everything and also add checks in this embedded
+                // section)
                 AstarSearch aStarSearch = new AstarSearch();
                 //y in the following line of code is floored to an int in case I decide to bump up the position by 0.5 when the agent
                 // spawns so that it is walking in the middle of the block (so that it doesn't appear to walk just below the road)
@@ -57,6 +62,9 @@ public class Immigrate : MonoBehaviour {
                 if (path.Count == 0)
                 {
                     Debug.Log("Spawned orc immigrant had no path to house.  It has been destroyed.");
+                    //TODO: fix the destroy so this script doesn't continue afterwards (Ex. should be destroyed and run into no problems
+                    // when a house is created in an impossible location, but it does not.  Might want to run A* check on a house when
+                    // it is created and if no path, try again in 10-15s... if no path again, delete the house.)
                     Destroy(gameObject);
                 }
                 changePath = false;

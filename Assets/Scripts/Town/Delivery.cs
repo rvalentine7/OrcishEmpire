@@ -274,7 +274,6 @@ public class Delivery : MonoBehaviour {
      */
     private List<Vector2> findPathHome()
     {
-        //Debug.Log("trying to go home");
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
         for (int i = 0; i < network.GetLength(0); i++)
         {
@@ -304,9 +303,6 @@ public class Delivery : MonoBehaviour {
      */
     public void addResources(string resourceName, int num)
     {
-        //Debug.Log("Resource name: " + resourceName);
-        //Debug.Log("Num: " + num);
-        //resources.Clear();
         if (resources.ContainsKey(resourceName))
         {
             resources[resourceName] += num;
