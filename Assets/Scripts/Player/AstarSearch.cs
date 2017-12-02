@@ -6,7 +6,7 @@ using UnityEngine;
  * Searches for a route for an agent to take to traverse the game world.
  */
 public class AstarSearch {
-
+    
     public AstarSearch()
     {
 
@@ -20,13 +20,16 @@ public class AstarSearch {
      * @param network is a multidimensional array of objects in the game world
      * @return the path found by A* to go from the start to the goal
      */
-    public List<Vector2> aStar(/*GameObject objectToMove, */Vector2 start, GameObject goalObject, GameObject[,] network)
+     //change the method type to IEnumerator, have a variable at the start that is System.Action<List<Vector2>> path
+     //path will be returned through callback
+    public IEnumerator aStar(System.Action<List<Vector2>> finalPath, Vector2 start, GameObject goalObject, GameObject[,] network)
     {
         Vector2 goal = goalObject.transform.position;
         List<Vector2> closedSet = new List<Vector2>();
         List<Vector2> openSet = new List<Vector2>();
         openSet.Add(start);
         Dictionary<Vector2, Vector2> cameFrom = new Dictionary<Vector2, Vector2>();
+        //Debug.Log("starting A*");
 
         Dictionary<Vector2, int> gScore = new Dictionary<Vector2, int>();
         Dictionary<Vector2, int> fScore = new Dictionary<Vector2, int>();
@@ -43,8 +46,14 @@ public class AstarSearch {
                     fScore.Add(new Vector2(i, j), int.MaxValue);
                     cameFrom.Add(new Vector2(i, j), new Vector2(i, j));
                 }
+                //if (j % 50 == 0)
+                //{
+                //    yield return new WaitForSeconds(1f);
+                //}
             }
+            yield return new WaitForSeconds(0.05f);
         }
+        //yield return null;
         gScore[start] = 0;
         fScore[start] = distance(start, goal);
         while (openSet.Count != 0)
@@ -58,7 +67,9 @@ public class AstarSearch {
                     lowestFVal = fScore[point];
                     current = point;
                 }
+                //yield return null;
             }
+            //yield return null;
             if (current.Equals(goal) || network[(int)current.x, (int)current.y] == goalObject)
             {
                 List<Vector2> path = aStarPath(cameFrom, current, start, goal);
@@ -75,7 +86,9 @@ public class AstarSearch {
                 {
                     Collect collect = objectToMove.GetComponent<Collect>();
                 }*/
-                return path;
+                //return path;
+                finalPath(path);
+                yield break;
             }
             openSet.Remove(current);
             closedSet.Add(current);
@@ -113,7 +126,7 @@ public class AstarSearch {
             {
                 neighbors.Add(new Vector2(current.x, current.y - 1));
             }
-
+            
             foreach (Vector2 neighbor in neighbors)
             {
                 if (closedSet.Contains(neighbor))
@@ -150,8 +163,8 @@ public class AstarSearch {
                 fScore[neighbor] = gScore[neighbor] + distance(neighbor, goal);
             }
         }
-        return new List<Vector2>();
-        //yield return null;
+        //return new List<Vector2>();
+        yield return new WaitForSeconds(0.05f);
     }
 
     /**

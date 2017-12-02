@@ -19,6 +19,7 @@ public class Collect : MonoBehaviour {
     private GameObject goalObject;
     private bool reachedGoal;
     private bool changePath;
+    private bool runningAStar;
     private bool headingHome;
     private GameObject world;
     private World myWorld;
@@ -52,14 +53,22 @@ public class Collect : MonoBehaviour {
      */
     void Start()
     {
-        path = findPathToStorage();
+        //path = findPathToStorage();
+        StartCoroutine(findPathToStorage(returnPath =>
+        {
+            path = returnPath;
+        }));
     }
 
     /**
      * Plans out the movement and collection of resources for the collector orc
      */
     void Update () {
-        //if the place of employment is destroyed, this gameobject should be as well
+        if (runningAStar == false)
+        {
+            StartCoroutine(runCollect());
+        }
+        /*//if the place of employment is destroyed, this gameobject should be as well
         if (!placeOfEmployment)
         {
             Destroy(gameObject);
@@ -183,14 +192,169 @@ public class Collect : MonoBehaviour {
             {
                 changePath = true;
             }
+        }*/
+    }
+
+    private IEnumerator runCollect()
+    {
+        //if the place of employment is destroyed, this gameobject should be as well
+        if (!placeOfEmployment)
+        {
+            Destroy(gameObject);
         }
+        if (path == null || path.Count == 0 || changePath == true)
+        {
+            if (!reachedGoal && runningAStar == false)
+            {
+                //path = findPathToStorage();
+                yield return StartCoroutine(findPathToStorage(returnPath =>
+                {
+                    path = returnPath;
+                }));
+                //if there are no storage locations, and the orc isn't at its place of employment,
+                // send it back to its place of employment
+                float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
+                    * (originalLocation.x - gameObject.transform.position.x) + (originalLocation.y - gameObject.transform.position.y)
+                    * (originalLocation.y - gameObject.transform.position.y));
+                if (path != null && path.Count == 0 && distanceBetweenPoints > 0.5f)
+                {
+                    //path = findPathHome();
+                    yield return StartCoroutine(findPathHome(returnPath =>
+                    {
+                        path = returnPath;
+                    }));
+                    headingHome = true;
+                }
+            }
+            else if (reachedGoal && runningAStar == false)
+            {
+                //path = findPathHome();
+                yield return StartCoroutine(findPathHome(returnPath =>
+                {
+                    path = returnPath;
+                }));
+            }
+            if (runningAStar == false)
+            {
+                changePath = false;
+            }
+        }
+        else if (path != null && runningAStar == false)
+        {
+            //use path to go to the next available vector2 in it
+            Vector2 currentLocation = gameObject.transform.position;
+            if (path[0] == currentLocation)
+            {
+                path.RemoveAt(0);
+            }
+            Vector2 nextLocation = path[0];
+            //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
+            if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                && (network[(int)nextLocation.x, (int)nextLocation.y].tag != "Building"
+                || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
+            {
+                //take a step towards the nextLocation
+                Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
+                float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
+                Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
+                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
+                    + unitVector.y * stepSize);
+                gameObject.transform.position = newLocation;
+
+                //if the agent gets to the next vector then delete it from the path
+                // and go to the next available vector
+                float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
+                    * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
+                    * (nextLocation.y - gameObject.transform.position.y));
+                bool nextIsGoal = false;
+                if (nextLocation == goal)
+                {
+                    nextIsGoal = true;
+                }
+                if (distanceBetweenPoints < stepSize)
+                {
+                    path.RemoveAt(0);
+                }
+                if (path.Count == 0)
+                {
+                    //if the orc is at the storage goal, deliver resources
+                    if (nextIsGoal)
+                    {
+                        //at the goal, collect any available goods
+                        Storage storage = goalObject.GetComponent<Storage>();
+                        if (resourcesToCollect.Equals("Food") && storage.getFoodCount() > 0)
+                        {
+                            if (storage.getMeatCount() > 0)
+                            {
+                                int meatCount = storage.getMeatCount();
+                                if (meatCount > remainingCapacity)
+                                {
+                                    resources.Add("Meat", remainingCapacity);
+                                    storage.removeResource("Meat", remainingCapacity);
+                                    remainingCapacity = 0;
+                                }
+                                else
+                                {
+                                    resources.Add("Meat", meatCount);
+                                    storage.removeResource("Meat", meatCount);
+                                    remainingCapacity -= meatCount;
+                                }
+                            }
+                            //TODO: when more types of food are added, account for those here
+                        }
+                        //if this unit has acquired resources, it should return to its place of employment
+                        if (resources.Count > 0)
+                        {
+                            reachedGoal = true;
+                        }
+                        //path = findPathHome();
+                        yield return StartCoroutine(findPathHome(returnPath =>
+                        {
+                            path = returnPath;
+                        }));
+                    }
+                    //if the orc has arrived back at its employment from collecting resources, let the employment know
+                    // and update the employment's resource count
+                    else if (reachedGoal)
+                    {
+                        Employment employment = placeOfEmployment.GetComponent<Employment>();
+                        employment.setWorkerDeliveringGoods(false);
+                        Storage employmentStorage = placeOfEmployment.GetComponent<Storage>();
+                        foreach (KeyValuePair<string, int> kvp in resources)
+                        {
+                            employmentStorage.addResource(kvp.Key, kvp.Value);
+                        }
+                        Destroy(gameObject);
+                    }
+                    //if the previous delivery location was destroyed and the orc had to return home, it should
+                    // be updated to no longer be considering "heading home" and it should look for new places
+                    // to deliver resources to
+                    else
+                    {
+                        headingHome = false;
+                        changePath = true;
+                    }
+                }
+            }
+            else
+            {
+                changePath = true;
+            }
+            //If I want the orc to check for other storage places as it's going home, I should have a check
+            // inside of this if statement to see if any still exist
+            if (runningAStar == false && goalObject == null && !reachedGoal && !headingHome)
+            {
+                changePath = true;
+            }
+        }
+        yield return null;
     }
 
     /**
      * Finds a place for the collector orc to go to and creates a path to it.
      * @return the path to the closest storage facility
      */
-    private List<Vector2> findPathToStorage()
+    private IEnumerator findPathToStorage(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
         for (int i = 0; i < network.GetLength(0); i++)
@@ -250,12 +414,22 @@ public class Collect : MonoBehaviour {
                         AstarSearch aStarSearch = new AstarSearch();
                         Vector2 currentLocation = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x),
                             Mathf.RoundToInt(gameObject.transform.position.y));
-                        List<Vector2> tempPath = aStarSearch.aStar(currentLocation, structureArr[(int)originalLocation.x - searchRadius + i,
-                            (int)originalLocation.y - searchRadius + j], network);
-                        if (tempPath.Count > 0)
+                        //List<Vector2> tempPath = aStarSearch.aStar(currentLocation, structureArr[(int)originalLocation.x - searchRadius + i,
+                        //    (int)originalLocation.y - searchRadius + j], network);
+                        //if (tempPath.Count > 0)
+                        //{
+                        //    possiblePaths.Add(tempPath);
+                        //}
+                        runningAStar = true;
+                        yield return StartCoroutine(aStarSearch.aStar(tempPath =>
                         {
-                            possiblePaths.Add(tempPath);
-                        }
+                            runningAStar = false;
+                            if (tempPath != null && tempPath.Count > 0)
+                            {
+                                possiblePaths.Add(tempPath);
+                            }
+                        }, currentLocation, structureArr[(int)originalLocation.x - searchRadius + i,
+                            (int)originalLocation.y - searchRadius + j], network));
                     }
                 }
             }
@@ -263,7 +437,8 @@ public class Collect : MonoBehaviour {
         //check for other storage-type buildings if there are no available warehouses (grainery, etc)
         if (possiblePaths.Count == 0)
         {
-
+            returnPath(new List<Vector2>());
+            yield break;
         }
         //if there are any possible storage buildings to deliver to, select the one with the shortest path
         if (possiblePaths.Count > 0)
@@ -281,16 +456,19 @@ public class Collect : MonoBehaviour {
             goal = shortestPath[shortestPathCount - 1];
             goalObject = network[(int)goal.x, Mathf.RoundToInt(goal.y)];
             gameObject.GetComponent<SpriteRenderer>().enabled = true;
-            return shortestPath;
+            //return shortestPath;
+            returnPath(shortestPath);
+            yield break;
         }
-        return new List<Vector2>();
+        //return new List<Vector2>();
+        yield return null;
     }
 
     /**
      * Finds a way back to the building that spawned the delivery orc.
      * @return the path back to the original location
      */
-    private List<Vector2> findPathHome()
+    private IEnumerator findPathHome(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
         for (int i = 0; i < network.GetLength(0); i++)
@@ -310,8 +488,23 @@ public class Collect : MonoBehaviour {
         AstarSearch aStarSearch = new AstarSearch();
         //going from the goal destination back to the original location
         Vector2 location = gameObject.transform.position;
-        return aStarSearch.aStar(new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)),
-            network[(int)originalLocation.x, (int)originalLocation.y], network);
+        //return aStarSearch.aStar(new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)),
+        //    network[(int)originalLocation.x, (int)originalLocation.y], network);
+        //List<Vector2> pathHome = null;
+        runningAStar = true;
+        yield return StartCoroutine(aStarSearch.aStar(tempPath =>
+        {
+            runningAStar = false;
+            //pathHome = tempPath;
+            returnPath(tempPath);
+        }, new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)),
+            network[(int)originalLocation.x, (int)originalLocation.y], network));
+        if (runningAStar == false)
+        {
+            yield break;
+        }
+        //return pathHome;
+        yield return new WaitForSeconds(0.05f);
     }
 
     /**
