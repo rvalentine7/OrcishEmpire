@@ -89,6 +89,7 @@
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
     <Compile Include="Assets\Scripts\Town\Collect.cs" />
     <Compile Include="Assets\Scripts\Town\Delivery.cs" />
+    <Compile Include="Assets\Scripts\Town\Distribute.cs" />
     <Compile Include="Assets\Scripts\Town\Employment.cs" />
     <Compile Include="Assets\Scripts\Town\HouseInformation.cs" />
     <Compile Include="Assets\Scripts\Town\Immigrate.cs" />

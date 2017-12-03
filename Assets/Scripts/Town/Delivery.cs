@@ -47,213 +47,24 @@ public class Delivery : MonoBehaviour {
      */
     void Start () {
         //if there is nowhere to go, wait some time before trying again?
-        //path = findPathToStorage();
-        //Debug.Log("start");
         StartCoroutine(findPathToStorage(returnPath =>
         {
             path = returnPath;
-            if (path != null)
-            {
-                //Debug.Log("path is not null");
-            } else
-            {
-                //Debug.Log("path is null");
-            }
         }));
     }
 	
 	/**
-     * Plans out the movement and delivery of resources for the delivery orc
+     * Runs the delivery orc
      */
 	void Update () {
         if (runningAStar == false)
         {
             StartCoroutine(runDelivery());
         }
-        /*//if the place of employment is destroyed, this gameobject should be as well
-        if (!placeOfEmployment)
-        {
-            Destroy(gameObject);
-        }
-        if (runningAStar == false && goalObject == null && !reachedGoal)
-        {
-            //
-        }
-        if (path == null || path.Count == 0 || changePath == true)
-        {
-            //Go to to a storage location
-            if (!reachedGoal && runningAStar == false)
-            {
-                //Debug.Log("start A*");
-                //path = findPathToStorage();
-                //if (path.Count > 0)
-                //{
-                //    Debug.Log("path count > 0");
-                //}
-                StartCoroutine(findPathToStorage(returnPath =>
-                {
-                    path = returnPath;
-                    //if there are no storage locations, and the orc isn't at its place of employment,
-                    // send it back to its place of employment
-                    if (path.Count == 0)
-                    {
-                        float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
-                        * (originalLocation.x - gameObject.transform.position.x) + (originalLocation.y - gameObject.transform.position.y)
-                        * (originalLocation.y - gameObject.transform.position.y));
-                        if (distanceBetweenPoints > 0.5f)
-                        {
-                            StartCoroutine(findPathHome(pathToHome =>
-                            {
-                                path = pathToHome;
-                            }));
-                            headingHome = true;
-                        }
-                    }
-                }));
-                //if there are no storage locations, and the orc isn't at its place of employment,
-                // send it back to its place of employment
-                //if (runningAStar == false)
-                //{
-                //    Debug.Log("1st");
-                //    float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
-                //        * (originalLocation.x - gameObject.transform.position.x) + (originalLocation.y - gameObject.transform.position.y)
-                //        * (originalLocation.y - gameObject.transform.position.y));
-                //    if (path.Count == 0 && distanceBetweenPoints > 0.5f)
-                //    {
-                //       //path = findPathHome();
-                //        StartCoroutine(findPathHome(returnPath =>
-                //        {
-                //            path = returnPath;
-                //        }));
-                //        headingHome = true;
-                //    }
-                //}
-            }
-            //Go to the home location
-            else if (reachedGoal && runningAStar == false)
-            {
-                //Debug.Log("2nd");
-                //path = findPathHome();
-                StartCoroutine(findPathHome(returnPath =>
-                {
-                    path = returnPath;
-                }));
-            }
-            if (runningAStar == false)
-            {
-                changePath = false;
-                //Debug.Log("made it out");
-            }
-            //Debug.Log("Heading home: " + headingHome);
-        }
-        else if (path != null && runningAStar == false)
-        {
-            //use path to go to the next available vector2 in it
-            Vector2 currentLocation = gameObject.transform.position;
-            if (path[0] == currentLocation)
-            {
-                path.RemoveAt(0);
-            }
-            Vector2 nextLocation = path[0];
-            //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
-            if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                && (network[(int)nextLocation.x, (int)nextLocation.y].tag != "Building"
-                || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
-            {
-                //take a step towards the nextLocation
-                Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
-                float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
-                Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
-                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
-                    + unitVector.y * stepSize);
-                gameObject.transform.position = newLocation;
-
-                //if the agent gets to the next vector then delete it from the path
-                // and go to the next available vector
-                float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
-                    * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
-                    * (nextLocation.y - gameObject.transform.position.y));
-                bool nextIsGoal = false;
-                if (nextLocation == goal)
-                {
-                    nextIsGoal = true;
-                }
-                if (distanceBetweenPoints < stepSize)
-                {
-                    path.RemoveAt(0);
-                }
-                if (path.Count == 0)
-                {
-                    //if the orc is at the storage goal, deliver resources
-                    if (nextIsGoal)
-                    {
-                        //at the goal, deliver any available goods and then plan a path back
-                        Storage storage = goalObject.GetComponent<Storage>();
-                        List<string> removeTheseResources = new List<string>();
-                        foreach (KeyValuePair<string, int> kvp in resources)
-                        {
-                            if (storage.acceptsResource(kvp.Key, kvp.Value))
-                            {
-                                storage.addResource(kvp.Key, kvp.Value);
-                                removeTheseResources.Add(kvp.Key);
-                            }
-                        }
-                        //update resources to remove any resources that were given to a storage building
-                        foreach (string resourceToRemove in removeTheseResources)
-                        {
-                            resources.Remove(resourceToRemove);
-                        }
-                        //if this unit still has resources, it should try to get rid of them
-                        if (resources.Count > 0)
-                        {
-                            changePath = true;
-                        }
-                        //if the unit is out of resources, it should head back to its place of employment
-                        else
-                        {
-                            reachedGoal = true;
-                        }
-                        //path = findPathHome();
-                        StartCoroutine(findPathHome(returnPath =>
-                        {
-                            path = returnPath;
-                        }));
-                    }
-                    //if the orc has arrived back at its employment from delivering resources, let the employment know
-                    else if (reachedGoal)
-                    {
-                        Employment employment = placeOfEmployment.GetComponent<Employment>();
-                        employment.setWorkerDeliveringGoods(false);
-                        Destroy(gameObject);
-                    }
-                    //if the previous delivery location was destroyed and the orc had to return home, it should
-                    // be updated to no longer be considering "heading home" and it should look for new places
-                    // to deliver resources to
-                    else
-                    {
-                        headingHome = false;
-                        changePath = true;
-                    }
-                }
-            }
-            else
-            {
-                changePath = true;
-            }
-            //if (goalObject == null)
-            //{
-            //    Debug.Log("going home");
-            //    path = null;
-            //    headingHome = true;
-            //    changePath = true;
-            //}
-        }*/
 	}
 
-    /*
-    Need to make it so if I delete the storage place on the way there, the orc delivery worker should change course appropriately (
-        if there are more storage locations, go to one, otherwise go home)... worked before I introduced coroutines
-        Also, if it starts on the coroutine to begin movement and I delete the storage facility in the process of that, the orc does not move
+    /**
+     * Plans out the movement and delivery of resources for the delivery orc
      */
     private IEnumerator runDelivery()
     {
@@ -262,21 +73,11 @@ public class Delivery : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-        if (runningAStar == false && goalObject == null && !reachedGoal)
-        {
-            //
-        }
         if (path == null || path.Count == 0 || changePath == true)
         {
             //Go to to a storage location
             if (!reachedGoal && runningAStar == false)
             {
-                //Debug.Log("start A*");
-                //path = findPathToStorage();
-                //if (path.Count > 0)
-                //{
-                //    Debug.Log("path count > 0");
-                //}
                 yield return StartCoroutine(findPathToStorage(returnPath =>
                 {
                     path = returnPath;
@@ -286,23 +87,18 @@ public class Delivery : MonoBehaviour {
                 float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
                     * (originalLocation.x - gameObject.transform.position.x) + (originalLocation.y - gameObject.transform.position.y)
                     * (originalLocation.y - gameObject.transform.position.y));
-                //Debug.Log("Path.count: " + path.Count);
                 if (path != null && path.Count == 0 && distanceBetweenPoints > 0.5f)
                 {
-                    //path = findPathHome();
-                    //Debug.Log("trying to find path home");
                     yield return StartCoroutine(findPathHome(returnPath =>
                     {
                         path = returnPath;
                     }));
-                    //Debug.Log("home path count: " + path.Count);
                     headingHome = true;
                 }
             }
             //Go to the home location
             else if (reachedGoal && runningAStar == false)
             {
-                //path = findPathHome();
                 yield return StartCoroutine(findPathHome(returnPath =>
                 {
                     path = returnPath;
@@ -379,14 +175,11 @@ public class Delivery : MonoBehaviour {
                         else
                         {
                             reachedGoal = true;
-                            //Debug.Log("reached the goal");
                         }
                         //path = findPathHome();
                         yield return StartCoroutine(findPathHome(returnPath =>
                         {
                             path = returnPath;
-                            //Debug.Log("reachedGoal? " + reachedGoal);
-                            //Debug.Log("going home #2");
                         }));
                     }
                     //if the orc has arrived back at its employment from delivering resources, let the employment know
@@ -410,12 +203,10 @@ public class Delivery : MonoBehaviour {
             {
                 changePath = true;
             }
-            //If I want the orc to check for other storage places as it's going home, I should have a check
+            //TODO?: If I want the orc to check for other storage places as it's going home, I should have a check
             // inside of this if statement to see if any still exist
             if (runningAStar == false && goalObject == null && !reachedGoal && !headingHome)
             {
-                //Debug.Log("storage destroyed, find new place");
-                //path = null;
                 changePath = true;
             }
         }
@@ -424,6 +215,7 @@ public class Delivery : MonoBehaviour {
 
     /**
      * Finds a place for the delivery orc to go to and creates a path to it.
+     * @parameter returnPath a callback returning the path to the closest storage facility
      */
     private IEnumerator findPathToStorage(System.Action<List<Vector2>> returnPath)
     {
@@ -483,25 +275,16 @@ public class Delivery : MonoBehaviour {
                         AstarSearch aStarSearch = new AstarSearch();
                         Vector2 currentLocation = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x),
                             Mathf.RoundToInt(gameObject.transform.position.y));
-                        //List<Vector2> tempPath = aStarSearch.aStar(currentLocation, structureArr[(int)originalLocation.x - searchRadius + i,
-                        //    (int)originalLocation.y - searchRadius + j], network);
-                        //if (tempPath.Count > 0)
-                        //{
-                        //    possiblePaths.Add(tempPath);
-                        //}
                         runningAStar = true;
-                        //Debug.Log("running A*");
                         yield return StartCoroutine(aStarSearch.aStar(tempPath =>
                         {
                             runningAStar = false;
-                            //Debug.Log("finished A*");
                             if (tempPath != null && tempPath.Count > 0)
                             {
                                 possiblePaths.Add(tempPath);
                             }
                         }, currentLocation, structureArr[(int)originalLocation.x - searchRadius + i,
                             (int)originalLocation.y - searchRadius + j], network));
-                        //Debug.Log("continuing after coroutine");
                     }
                 }
             }
@@ -509,14 +292,12 @@ public class Delivery : MonoBehaviour {
         //check for other storage-type buildings if there are no available warehouses (market, grainery, etc)
         if (possiblePaths.Count == 0)
         {
-            //Debug.Log("no possible paths");
             returnPath(new List<Vector2>());
             yield break;
         }
         //if there are any possible storage buildings to deliver to, select the one with the shortest path
         if (possiblePaths.Count > 0)
         {
-            //Debug.Log("count greater than 1");
             List<Vector2> shortestPath = new List<Vector2>();
             int shortestPathCount = int.MaxValue;
             foreach (List<Vector2> possiblePath in possiblePaths)
@@ -529,19 +310,15 @@ public class Delivery : MonoBehaviour {
             }
             goal = shortestPath[shortestPathCount - 1];
             goalObject = network[(int)goal.x, Mathf.RoundToInt(goal.y)];
-            //return shortestPath;
             returnPath(shortestPath);
-            //Debug.Log("returned a path");
             yield break;
         }
-        //Debug.Log("trying to return a path");
-        //return new List<Vector2>();
         yield return null;
     }
 
     /**
      * Finds a way back to the building that spawned the delivery orc.
-     * @return the path back to the original location
+     * @parameter returnPath a callback returning the path to the original location
      */
     private IEnumerator findPathHome(System.Action<List<Vector2>> returnPath)
     {
@@ -563,19 +340,13 @@ public class Delivery : MonoBehaviour {
         AstarSearch aStarSearch = new AstarSearch();
         //going from the goal destination back to the original location
         Vector2 location = gameObject.transform.position;
-        //return aStarSearch.aStar(new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)),
-        //    network[(int)originalLocation.x, (int)originalLocation.y], network);
-        //List<Vector2> pathHome = null;
         runningAStar = true;
         yield return StartCoroutine(aStarSearch.aStar(tempPath =>
         {
             runningAStar = false;
-            //pathHome = tempPath;
             returnPath(tempPath);
-            //Debug.Log("tempPath count: " + tempPath.Count);//it recognizes this path and then it disappears and the problem starts
         }, new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)),
             network[(int)originalLocation.x, (int)originalLocation.y], network));
-        //return pathHome;
         if (runningAStar == false)
         {
             yield break;
