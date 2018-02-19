@@ -164,7 +164,7 @@ public class AstarSearch {
             }
         }
         //return new List<Vector2>();
-        yield return new WaitForSeconds(0.05f);
+        yield return new WaitForSeconds(0.02f);
     }
 
     /**

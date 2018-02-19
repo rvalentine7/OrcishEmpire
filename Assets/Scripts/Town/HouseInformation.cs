@@ -9,6 +9,7 @@ using UnityEngine;
 public class HouseInformation : MonoBehaviour {
     public float timeInterval;
     public int inhabitantWaterConsumption;
+    public int inhabitantFoodConsumption;
     public int jobSearchRadius;
     public GameObject housePopupObject;
     public Sprite sign;
@@ -64,15 +65,26 @@ public class HouseInformation : MonoBehaviour {
             populationChange = false;
         }
         //updates the resources of the household
+        Storage storage = gameObject.GetComponent<Storage>();
         if (Time.time > checkTime)
         {
             checkTime = Time.time + timeInterval;
-            if (water >= numInhabitants * inhabitantWaterConsumption)
+            if (storage.getWaterCount() >= numInhabitants * inhabitantWaterConsumption)
             {
-                water -= numInhabitants * inhabitantWaterConsumption;
-            } else
+                storage.removeResource("Water", numInhabitants * inhabitantWaterConsumption);
+            }
+            else
             {
-                water = 0;
+                storage.removeResource("Water", storage.getWaterCount());
+            }
+
+            if (storage.getMeatCount() >= numInhabitants * inhabitantFoodConsumption)
+            {
+                storage.removeResource("Meat", numInhabitants * inhabitantFoodConsumption);
+            }
+            else
+            {
+                storage.removeResource("Meat", storage.getMeatCount());
             }
         }
         //find places for unemployed inhabitants to work

@@ -9,6 +9,11 @@ using UnityEngine;
 public class Storage : MonoBehaviour {
     public string storageType;
     private int meatCount;
+    private int wheatCount;
+    private int waterCount;
+    private int furnitureCount;
+    private int weaponsCount;
+    private int armorCount;
     public int storageMax;
 
     /**
@@ -16,6 +21,11 @@ public class Storage : MonoBehaviour {
      */
     void Start () {
         meatCount = 0;
+        wheatCount = 0;
+        waterCount = 0;
+        furnitureCount = 0;
+        weaponsCount = 0;
+        armorCount = 0;
     }
 
     /**
@@ -34,7 +44,7 @@ public class Storage : MonoBehaviour {
     public int getCurrentAmountStored()
     {
         //TODO: add up other resources as they are added to the game
-        return meatCount;
+        return meatCount + wheatCount + waterCount + furnitureCount + weaponsCount + armorCount;
     }
 
     /**
@@ -46,9 +56,17 @@ public class Storage : MonoBehaviour {
     public bool acceptsResource(string name, int num)
     {
         bool accepts = false;
-        if (storageType.Equals("Market") || storageType.Equals("Warehouse"))
+        if (storageType.Equals("Market") || storageType.Equals("Warehouse") || storageType.Equals("House"))
         {
             if (name.Equals("Meat") && num <= (storageMax - meatCount))
+            {
+                accepts = true;
+            }
+        }
+        if (storageType.Equals("House"))
+        {
+            HouseInformation houseInfo = GetComponent<HouseInformation>();
+            if (name.Equals("Water") && num <= (storageMax - waterCount) && houseInfo.getNumInhabitants() > 0)
             {
                 accepts = true;
             }
@@ -67,6 +85,17 @@ public class Storage : MonoBehaviour {
         {
             addMeat(num);
         }
+        else if (name.Equals("Water"))
+        {
+            if (waterCount + num <= 100)
+            {
+                waterCount += num;
+            }
+            else
+            {
+                waterCount = 100;
+            }
+        }
     }
 
     /**
@@ -79,6 +108,10 @@ public class Storage : MonoBehaviour {
         if (name.Equals("Meat"))
         {
             removeMeat(num);
+        }
+        else if (name.Equals("Water"))
+        {
+            waterCount -= num;
         }
     }
 
@@ -101,7 +134,7 @@ public class Storage : MonoBehaviour {
     }
 
     /**
-     * Returns both the total amount of meat in storage
+     * Returns the total amount of meat in storage
      * @return meatCount the amount of meat in storage
      */
     public int getMeatCount()
@@ -117,5 +150,14 @@ public class Storage : MonoBehaviour {
     {
         //TODO: add other food types to this count as they are added to the game
         return meatCount;
+    }
+    
+    /**
+     * Returns the total amount of water in storage
+     * @return waterCount the amount of water in storage
+     */
+    public int getWaterCount()
+    {
+        return waterCount;
     }
 }

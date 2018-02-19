@@ -41,9 +41,15 @@ public class Well : MonoBehaviour {
                         && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j] != null
                         && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].tag == "House")
                     {
-                        HouseInformation houseInfo = constructArr[(int)wellPosition.x - waterRadius + i,
-                            (int)wellPosition.y - waterRadius + j].GetComponent<HouseInformation>();
-                        houseInfo.addWater(waterPerTick);
+                        //HouseInformation houseInfo = constructArr[(int)wellPosition.x - waterRadius + i,
+                        //    (int)wellPosition.y - waterRadius + j].GetComponent<HouseInformation>();
+                        Storage storage = constructArr[(int)wellPosition.x - waterRadius + i,
+                            (int)wellPosition.y - waterRadius + j].GetComponent<Storage>();
+                        if (storage.acceptsResource("Water", waterPerTick))
+                        {
+                            storage.addResource("Water", waterPerTick);
+                        }
+                        //houseInfo.addWater(waterPerTick);
                     }
                 }
             }

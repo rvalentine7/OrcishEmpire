@@ -17,6 +17,7 @@ public class Marketplace : MonoBehaviour {
     private bool orcOutForDelivery;
     private Employment employment;
     public GameObject collectorOrc;
+    public GameObject distributionOrc;
     public GameObject marketPopupObject;
     public int collectorCarryCapacity;
 
@@ -170,11 +171,11 @@ public class Marketplace : MonoBehaviour {
     }
 
     /**
-     * Creates an orc to deliver products from the marketplace to nearby houses
+     * Creates an orc to distribute products from the marketplace to nearby houses
      */
     public void createDistributionOrc()
     {
-        /*GameObject world = GameObject.Find("WorldInformation");
+        GameObject world = GameObject.Find("WorldInformation");
         World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
@@ -232,10 +233,13 @@ public class Marketplace : MonoBehaviour {
                 foundSpawn = true;
             }
             j++;
-        }*/
+        }
 
         //distribution orc will need to set distriubtion status to false when it returns
-        //GameObject newDistributionOrc = Instantiate(distributionOrc, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
+        GameObject newDistributionOrc = Instantiate(distributionOrc, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
+        Distribute distribute = newDistributionOrc.GetComponent<Distribute>();
+        distribute.setOriginalLocation(spawnPosition);
+        distribute.setOrcEmployment(gameObject);
     }
 
     /**

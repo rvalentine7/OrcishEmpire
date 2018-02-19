@@ -21,11 +21,12 @@ public class HousePopup : MonoBehaviour {
      */
 	void Update () {
         HouseInformation houseInfo = house.GetComponent<HouseInformation>();
+        Storage storage = house.GetComponent<Storage>();
         inhabitantCount.text = "" + houseInfo.getNumInhabitants();
         houseSize.text = "" + houseInfo.getHouseSize();
         employedInhabCount.text = "" + houseInfo.getNumEmployedInhabs();
-        foodCount.text = "" + houseInfo.getFoodCount();
-        waterCount.text = "" + houseInfo.getWaterCount();
+        foodCount.text = "" + storage.getFoodCount();
+        waterCount.text = "" + storage.getWaterCount();
 	}
 
     /**
