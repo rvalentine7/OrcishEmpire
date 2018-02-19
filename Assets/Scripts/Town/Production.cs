@@ -144,10 +144,10 @@ public class Production : MonoBehaviour {
         }
 
         GameObject newDeliveryOrc = Instantiate(deliveryOrc, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
-        Delivery delivery = newDeliveryOrc.GetComponent<Delivery>();
-        delivery.addResources(resourceName, resourceProduced);
-        delivery.setOriginalLocation(spawnPosition);
-        delivery.setOrcEmployment(gameObject);
+        Deliver deliver = newDeliveryOrc.GetComponent<Deliver>();
+        deliver.addResources(resourceName, resourceProduced);
+        deliver.setOriginalLocation(spawnPosition);
+        deliver.setOrcEmployment(gameObject);
     }
 
     /**

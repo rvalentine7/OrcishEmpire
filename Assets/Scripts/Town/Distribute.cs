@@ -51,7 +51,6 @@ public class Distribute : MonoBehaviour {
          * Get a list of all squares in the worker's travel radius that have houses in a proximity of two
          * Key = House, Value = Closest Road
          */
-        //Dictionary<GameObject, GameObject> locationsToVisit = new Dictionary<GameObject, GameObject>();
         for (int i = (int)gameObject.transform.position.x - searchRadius; i <= (int)gameObject.transform.position.x + searchRadius; i++)
         {
             for (int j = (int)gameObject.transform.position.y - searchRadius; j <= (int)gameObject.transform.position.y + searchRadius; j++)
@@ -135,12 +134,10 @@ public class Distribute : MonoBehaviour {
         //if the place of employment has no more goods to distribute, set locationsToVisit
         // to an empty dictionary and set it to change the path
         Storage employmentStorage = placeOfEmployment.GetComponent<Storage>();
-        //TODO: if numToDistribute is 0, ignore the resource
         if ((locationsToVisit.Count == 0 && !headingHome) || 
-            (!headingHome && employmentStorage.getFoodCount() == 0//< foodNumToDistribute
-            && employmentStorage.getWaterCount() == 0/*< waterNumToDistribute*/))
+            (!headingHome && employmentStorage.getFoodCount() == 0
+            && employmentStorage.getWaterCount() == 0))
         {
-            Debug.Log("no more locations to visit or resources are depleted");
             locationsToVisit = new Dictionary<GameObject, GameObject>();
             changePath = true;
             headingHome = true;
@@ -201,14 +198,15 @@ public class Distribute : MonoBehaviour {
             if (path != null)
             {
                 changePath = false;
+                SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+                if (spriteRenderer.enabled == false)
+                {
+                    spriteRenderer.enabled = true;
+                }
             }
         }
         if (path != null && path.Count > 0)
         {
-            if (locationsToVisit.Count == 0 && !headingHome)
-            {
-                Debug.Log("how on earth did i get in here?");
-            }
             Vector2 currentLocation = gameObject.transform.position;
             //If the orc starts in the goal spot
             if (network[(int)originalLocation.x, Mathf.RoundToInt(originalLocation.y)] != null
@@ -222,7 +220,6 @@ public class Distribute : MonoBehaviour {
                 {
                     Marketplace market = placeOfEmployment.GetComponent<Marketplace>();
                     market.setDistributorStatus(false);
-                    Debug.Log("ended with first one");
                     Destroy(gameObject);
                 }
             }
@@ -286,7 +283,6 @@ public class Distribute : MonoBehaviour {
                             {
                                 Marketplace market = placeOfEmployment.GetComponent<Marketplace>();
                                 market.setDistributorStatus(false);
-                                Debug.Log("ended with second one");
                                 Destroy(gameObject);
                             }
                         }
@@ -310,44 +306,6 @@ public class Distribute : MonoBehaviour {
         }
 
         yield return null;
-    }
-
-    /**
-     * Finds a way back to the building that spawned the delivery orc.
-     * @parameter returnPath a callback returning the path to the original location
-     */
-    private IEnumerator findPathHome(System.Action<List<Vector2>> returnPath)
-    {
-        network = new GameObject[myWorld.mapSize, myWorld.mapSize];
-        for (int i = 0; i < network.GetLength(0); i++)
-        {
-            for (int j = 0; j < network.GetLength(1); j++)
-            {
-                if (structureArr[i, j] == null)
-                {
-                    network[i, j] = terrainArr[i, j];
-                }
-                else if (structureArr[i, j].tag != "House")
-                {
-                    network[i, j] = structureArr[i, j];
-                }
-            }
-        }
-        AstarSearch aStarSearch = new AstarSearch();
-        //going from the goal destination back to the original location
-        Vector2 location = gameObject.transform.position;
-        runningAStar = true;
-        yield return StartCoroutine(aStarSearch.aStar(tempPath =>
-        {
-            runningAStar = false;
-            returnPath(tempPath);
-        }, new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)),
-            network[(int)originalLocation.x, (int)originalLocation.y], network));
-        if (runningAStar == false)
-        {
-            yield break;
-        }
-        yield return new WaitForSeconds(0.05f);
     }
 
     /**
@@ -414,7 +372,6 @@ public class Distribute : MonoBehaviour {
                 locationsToVisit = new Dictionary<GameObject, GameObject>();
                 goalObject = placeOfEmployment;
                 housesToDistributeTo = new ArrayList();
-                //break;
             }
         }
     }

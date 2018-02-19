@@ -310,6 +310,11 @@ public class Collect : MonoBehaviour {
         //if there are any possible storage buildings to deliver to, select the one with the shortest path
         if (possiblePaths.Count > 0)
         {
+            SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+            if (spriteRenderer.enabled == false)
+            {
+                spriteRenderer.enabled = true;
+            }
             List<Vector2> shortestPath = new List<Vector2>();
             int shortestPathCount = int.MaxValue;
             foreach (List<Vector2> possiblePath in possiblePaths)

@@ -6,7 +6,7 @@ using UnityEngine;
  * Sends a delivery orc from its current location to the goal where it will deliver goods
  * before returning to its original location.
  */
-public class Delivery : MonoBehaviour {
+public class Deliver : MonoBehaviour {
     private Dictionary<string, int> resources;
     private GameObject[,] network;
     private Vector2 originalLocation;
@@ -26,7 +26,7 @@ public class Delivery : MonoBehaviour {
     public int searchRadius;
 
     /**
-     * Initializes the delivery class
+     * Initializes the deliver class
      */
     void Awake ()
     {
@@ -59,14 +59,14 @@ public class Delivery : MonoBehaviour {
 	void Update () {
         if (runningAStar == false)
         {
-            StartCoroutine(runDelivery());
+            StartCoroutine(runDeliver());
         }
 	}
 
     /**
-     * Plans out the movement and delivery of resources for the delivery orc
+     * Plans out the movement and deliver of resources for the delivery orc
      */
-    private IEnumerator runDelivery()
+    private IEnumerator runDeliver()
     {
         //if the place of employment is destroyed, this gameobject should be as well
         if (!placeOfEmployment)
@@ -189,7 +189,7 @@ public class Delivery : MonoBehaviour {
                         employment.setWorkerDeliveringGoods(false);
                         Destroy(gameObject);
                     }
-                    //if the previous delivery location was destroyed and the orc had to return home, it should
+                    //if the previous deliver location was destroyed and the orc had to return home, it should
                     // be updated to no longer be considering "heading home" and it should look for new places
                     // to deliver resources to
                     else
@@ -238,7 +238,7 @@ public class Delivery : MonoBehaviour {
         }
         List<List<Vector2>> possiblePaths = new List<List<Vector2>>();
         //checks for the closest warehouse
-        List<GameObject> discoveredDeliveryLocs = new List<GameObject>();
+        List<GameObject> discoveredDeliverLocs = new List<GameObject>();
         for (int i = 0; i <= searchRadius * 2; i++)
         {
             for (int j = 0; j <= searchRadius * 2; j++)
@@ -249,7 +249,7 @@ public class Delivery : MonoBehaviour {
                         (int)originalLocation.y - searchRadius + j] != null
                         && structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j].tag == "Building"
-                        && !discoveredDeliveryLocs.Contains(structureArr[(int)originalLocation.x - searchRadius + i,
+                        && !discoveredDeliverLocs.Contains(structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j])
                         && structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j].GetComponent<Employment>().getNumWorkers() > 0
@@ -270,7 +270,7 @@ public class Delivery : MonoBehaviour {
                     }
                     if (acceptsMyResources)
                     {
-                        discoveredDeliveryLocs.Add(structureArr[(int)originalLocation.x - searchRadius + i,
+                        discoveredDeliverLocs.Add(structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j]);
                         AstarSearch aStarSearch = new AstarSearch();
                         Vector2 currentLocation = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x),
@@ -389,7 +389,7 @@ public class Delivery : MonoBehaviour {
     }
 
     /**
-     * Sets the place the delivery orc starts at.
+     * Sets the place the deliver orc starts at.
      * @param position is the position the delivery orc spawned in at
      */
     public void setOriginalLocation(Vector2 position)

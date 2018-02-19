@@ -75,6 +75,11 @@ public class Immigrate : MonoBehaviour {
                             // it is created and if no path, try again in 10-15s... if no path again, delete the house.)
                             Destroy(gameObject);
                         }
+                        SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+                        if (spriteRenderer.enabled == false)
+                        {
+                            spriteRenderer.enabled = true;
+                        }
                     }
                 }, start, goalObject, network));
                 //if (path.Count == 0)
@@ -86,7 +91,8 @@ public class Immigrate : MonoBehaviour {
                 //    Destroy(gameObject);
                 //}
                 changePath = false;
-            } else
+            }
+            else
             {
                 //use path to go to the next available vector2 in it
                 Vector2 nextLocation = path[0];
@@ -120,7 +126,8 @@ public class Immigrate : MonoBehaviour {
                     Destroy(gameObject);
                 }
             }
-        } else if (goalObject == null)//house was deleted, find a new place to go to
+        }
+        else if (goalObject == null)//house was deleted, find a new place to go to
         {
             Debug.Log("goal object was deleted, making new goal object");
             GameObject world = GameObject.Find("WorldInformation");
