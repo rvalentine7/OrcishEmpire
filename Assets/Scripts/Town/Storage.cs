@@ -8,12 +8,22 @@ using UnityEngine;
  */
 public class Storage : MonoBehaviour {
     public string storageType;
+    //foods
     private int meatCount;
     private int wheatCount;
+    private int fishCount;
+    //water
     private int waterCount;
+    //crafting resources
+    private int lumberCount;
+    private int ironCount;
+    //sellable goods
     private int furnitureCount;
     private int weaponsCount;
     private int armorCount;
+    //non-tangible resources (have their own max limit)
+    private int entertainment;
+    //maximum amount of tangible resources this storage building can hold
     public int storageMax;
 
     /**
@@ -22,7 +32,10 @@ public class Storage : MonoBehaviour {
     void Start () {
         meatCount = 0;
         wheatCount = 0;
+        fishCount = 0;
         waterCount = 0;
+        lumberCount = 0;
+        ironCount = 0;
         furnitureCount = 0;
         weaponsCount = 0;
         armorCount = 0;
@@ -44,7 +57,7 @@ public class Storage : MonoBehaviour {
     public int getCurrentAmountStored()
     {
         //TODO: add up other resources as they are added to the game
-        return meatCount + wheatCount + waterCount + furnitureCount + weaponsCount + armorCount;
+        return meatCount + wheatCount + fishCount + waterCount + lumberCount + ironCount + furnitureCount + weaponsCount + armorCount;
     }
 
     /**
@@ -58,17 +71,44 @@ public class Storage : MonoBehaviour {
         bool accepts = false;
         if (storageType.Equals("Market") || storageType.Equals("Warehouse") || storageType.Equals("House"))
         {
-            if (name.Equals("Meat") && num <= (storageMax - meatCount))
+            //foods
+            if (name.Equals("Meat") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
+            }
+            if (name.Equals("Wheat") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+            if (name.Equals("Fish") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+            //crafting resources
+            if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
+            {
+
+            }
+            if (name.Equals("Iron") && num <= storageMax - getCurrentAmountStored())
+            {
+
+            }
+            //sellable goods
+            if (name.Equals("Furniture") && num <= storageMax - getCurrentAmountStored())
+            {
+                
             }
         }
         if (storageType.Equals("House"))
         {
             HouseInformation houseInfo = GetComponent<HouseInformation>();
-            if (name.Equals("Water") && num <= (storageMax - waterCount) && houseInfo.getNumInhabitants() > 0)
+            if (name.Equals("Water") && num <= storageMax && houseInfo.getNumInhabitants() > 0)
             {
                 accepts = true;
+            }
+            if (houseInfo.getNumInhabitants() == 0)
+            {
+                accepts = false;
             }
         }
         return accepts;
@@ -83,7 +123,11 @@ public class Storage : MonoBehaviour {
     {
         if (name.Equals("Meat"))
         {
-            addMeat(num);
+            meatCount += num;
+        }
+        else if (name.Equals("Wheat"))
+        {
+            wheatCount += num;
         }
         else if (name.Equals("Water"))
         {
@@ -107,30 +151,16 @@ public class Storage : MonoBehaviour {
     {
         if (name.Equals("Meat"))
         {
-            removeMeat(num);
+            meatCount -= num;
+        }
+        else if (name.Equals("Wheat"))
+        {
+            wheatCount -= num;
         }
         else if (name.Equals("Water"))
         {
             waterCount -= num;
         }
-    }
-
-    /**
-     * Adds meat to the storage.
-     * @param num the number of meat to add
-     */
-    private void addMeat(int num)
-    {
-        meatCount += num;
-    }
-
-    /**
-     * Removes meat from the storage.
-     * @param num the number of meat to remove
-     */
-    private void removeMeat(int num)
-    {
-        meatCount -= num;
     }
 
     /**
@@ -143,13 +173,22 @@ public class Storage : MonoBehaviour {
     }
 
     /**
+     * Returns the total amount of wheat in storage
+     * @return wheatCount the amount of wheat in storage
+     */
+    public int getWheatCount()
+    {
+        return wheatCount;
+    }
+
+    /**
      * Gets the total amount of food at this storage facility.
      * @return the total amount of food in storage
      */
     public int getFoodCount()
     {
         //TODO: add other food types to this count as they are added to the game
-        return meatCount;
+        return meatCount + wheatCount + fishCount;
     }
     
     /**

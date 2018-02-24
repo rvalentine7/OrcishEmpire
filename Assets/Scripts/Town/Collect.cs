@@ -174,6 +174,22 @@ public class Collect : MonoBehaviour {
                                     remainingCapacity -= meatCount;
                                 }
                             }
+                            if (storage.getWheatCount() > 0)
+                            {
+                                int wheatCount = storage.getWheatCount();
+                                if (wheatCount > remainingCapacity)
+                                {
+                                    resources.Add("Wheat", remainingCapacity);
+                                    storage.removeResource("Wheat", remainingCapacity);
+                                    remainingCapacity = 0;
+                                }
+                                else
+                                {
+                                    resources.Add("Wheat", wheatCount);
+                                    storage.removeResource("Wheat", wheatCount);
+                                    remainingCapacity -= wheatCount;
+                                }
+                            }
                             //TODO: when more types of food are added, account for those here
                         }
                         //if this unit has acquired resources, it should return to its place of employment

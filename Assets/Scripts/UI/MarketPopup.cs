@@ -38,6 +38,7 @@ public class MarketPopup : MonoBehaviour {
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         meatNum.text = "" + storage.getMeatCount();
+        wheatNum.text = "" + storage.getWheatCount();
     }
 
     /**
