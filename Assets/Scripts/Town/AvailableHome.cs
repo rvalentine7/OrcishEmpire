@@ -8,7 +8,7 @@ using UnityEngine;
 public class AvailableHome : MonoBehaviour {
     //when desirability is in, this will need to check the desirability of house.
     //  if it is high enough, a new orc will spawn
-    public GameObject immigrant;
+    public GameObject immigrant;//TODO: when I create this script again, it does not have this gameobject
 	
 	/**
      * Spawns orc immigrants if the house has high enough desirability.
@@ -30,19 +30,21 @@ public class AvailableHome : MonoBehaviour {
             immigrate.goalObject = gameObject;
             OrcInformation orcInfo = newImmigrant.GetComponent<OrcInformation>();
 
-            if (houseSize - (numInhabitants + numIncomingOrcs) >= 3)
-            {
-                houseInfo.orcsMovingIn(3);
-                orcInfo.setOrcCount(3);
-            } else if (houseSize - (numInhabitants + numIncomingOrcs) == 2)
-            {
-                houseInfo.orcsMovingIn(2);
-                orcInfo.setOrcCount(2);
-            } else
-            {
-                houseInfo.orcsMovingIn(1);
-                orcInfo.setOrcCount(1);
-            }
+            houseInfo.orcsMovingIn(houseSize - (numInhabitants + numIncomingOrcs));
+            orcInfo.setOrcCount(houseSize - (numInhabitants + numIncomingOrcs));
+            //if (houseSize - (numInhabitants + numIncomingOrcs) >= 3)
+            //{
+            //    houseInfo.orcsMovingIn(3);
+            //    orcInfo.setOrcCount(3);
+            //} else if (houseSize - (numInhabitants + numIncomingOrcs) == 2)
+            //{
+            //    houseInfo.orcsMovingIn(2);
+            //    orcInfo.setOrcCount(2);
+            //} else
+            //{
+            //    houseInfo.orcsMovingIn(1);
+            //    orcInfo.setOrcCount(1);
+            //}
         }
         
     }

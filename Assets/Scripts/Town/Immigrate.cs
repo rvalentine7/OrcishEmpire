@@ -6,7 +6,7 @@ using UnityEngine;
  * Uses A* to form a path which the orc immigrant will then use to move in to a house.
  */
 public class Immigrate : MonoBehaviour {
-    //TODO: If a part of it's path is destroyed at any point in time, it should find a new path.
+    //TODO: If a part of its path is destroyed at any point in time, it should find a new path.
     private GameObject[,] network;
     public GameObject goalObject;
     private List<Vector2> path;
@@ -122,6 +122,7 @@ public class Immigrate : MonoBehaviour {
                         HouseInformation houseInfo = goalObject.GetComponent<HouseInformation>();
                         OrcInformation orcInfo = gameObject.GetComponent<OrcInformation>();
                         houseInfo.addInhabitants(orcInfo.getOrcCount());
+                        houseInfo.orcsMovingIn(houseInfo.getNumOrcsMovingIn() - orcInfo.getOrcCount());
                     }
                     Destroy(gameObject);
                 }

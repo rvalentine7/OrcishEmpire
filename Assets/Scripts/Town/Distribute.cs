@@ -194,6 +194,11 @@ public class Distribute : MonoBehaviour {
                         goal = path[path.Count - 1];
                     }
                 }, new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)), goalObject, network));
+                //if the place of employment is destroyed, this gameobject should be as well
+                if (!placeOfEmployment)
+                {
+                    Destroy(gameObject);
+                }
             }
             if (path != null)
             {
@@ -302,6 +307,11 @@ public class Distribute : MonoBehaviour {
         {
             runningAStar = true;//Stopping the Update() method from  calling a new runDistribute()
             yield return new WaitForSeconds(1.0f);
+            //if the place of employment is destroyed, this gameobject should be as well
+            if (!placeOfEmployment)
+            {
+                Destroy(gameObject);
+            }
             runningAStar = false;
         }
 

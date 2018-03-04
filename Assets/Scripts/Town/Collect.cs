@@ -98,6 +98,11 @@ public class Collect : MonoBehaviour {
                     {
                         path = returnPath;
                     }));
+                    //if the place of employment is destroyed, this gameobject should be as well
+                    if (!placeOfEmployment)
+                    {
+                        Destroy(gameObject);
+                    }
                     headingHome = true;
                 }
             }
@@ -107,6 +112,11 @@ public class Collect : MonoBehaviour {
                 {
                     path = returnPath;
                 }));
+                //if the place of employment is destroyed, this gameobject should be as well
+                if (!placeOfEmployment)
+                {
+                    Destroy(gameObject);
+                }
             }
             if (runningAStar == false)
             {
@@ -201,6 +211,11 @@ public class Collect : MonoBehaviour {
                         {
                             path = returnPath;
                         }));
+                        //if the place of employment is destroyed, this gameobject should be as well
+                        if (!placeOfEmployment)
+                        {
+                            Destroy(gameObject);
+                        }
                     }
                     //if the orc has arrived back at its employment from collecting resources, let the employment know
                     // and update the employment's resource count

@@ -82,6 +82,11 @@ public class Deliver : MonoBehaviour {
                 {
                     path = returnPath;
                 }));
+                //if the place of employment is destroyed, this gameobject should be as well
+                if (!placeOfEmployment)
+                {
+                    Destroy(gameObject);
+                }
                 //if there are no storage locations, and the orc isn't at its place of employment,
                 // send it back to its place of employment
                 float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
@@ -93,6 +98,11 @@ public class Deliver : MonoBehaviour {
                     {
                         path = returnPath;
                     }));
+                    //if the place of employment is destroyed, this gameobject should be as well
+                    if (!placeOfEmployment)
+                    {
+                        Destroy(gameObject);
+                    }
                     headingHome = true;
                 }
             }
@@ -103,6 +113,11 @@ public class Deliver : MonoBehaviour {
                 {
                     path = returnPath;
                 }));
+                //if the place of employment is destroyed, this gameobject should be as well
+                if (!placeOfEmployment)
+                {
+                    Destroy(gameObject);
+                }
             }
             if (runningAStar == false)
             {
@@ -181,6 +196,11 @@ public class Deliver : MonoBehaviour {
                         {
                             path = returnPath;
                         }));
+                        //if the place of employment is destroyed, this gameobject should be as well
+                        if (!placeOfEmployment)
+                        {
+                            Destroy(gameObject);
+                        }
                     }
                     //if the orc has arrived back at its employment from delivering resources, let the employment know
                     else if (reachedGoal)
@@ -285,6 +305,11 @@ public class Deliver : MonoBehaviour {
                             }
                         }, currentLocation, structureArr[(int)originalLocation.x - searchRadius + i,
                             (int)originalLocation.y - searchRadius + j], network));
+                        //if the place of employment is destroyed, this gameobject should be as well
+                        if (!placeOfEmployment)
+                        {
+                            Destroy(gameObject);
+                        }
                     }
                 }
             }

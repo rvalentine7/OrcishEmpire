@@ -133,8 +133,12 @@ public class Employment : MonoBehaviour {
         if (numWorkers >= num)
         {
             numWorkers -= num;
-            workerHouses.Remove(workerHouse);
-        } else
+            if (workerHouses[workerHouse] == num)
+            {
+                workerHouses.Remove(workerHouse);
+            }
+        }
+        else
         {
             Debug.Log("An employment is having issues with the removeWorkers method.");
         }

@@ -8,21 +8,27 @@ using UnityEngine;
  */
 public class HouseInformation : MonoBehaviour {
     public float timeInterval;
+    public GameObject orcImmigrant;
     public int inhabitantWaterConsumption;
     public int inhabitantFoodConsumption;
     public int jobSearchRadius;
     public GameObject housePopupObject;
     public Sprite sign;
     public Sprite firstLevelHouse;
-    //add future house sprites here
+    public Sprite secondLevelHouse;
+    //add future house sprites here (aiming for at least 5 house levels)
 
     private int numInhabitants;
     private int numIncomingOrcs;
     private Dictionary<GameObject, int> inhabWorkLocations;
     private int numEmployedInhabitants;
     private int houseSize;
-    private bool populationChange;
+    private int houseLevel;
+    private bool upgrading;
+    private bool downgrading;
+    //private bool populationChange;
     private int desirability;
+    private bool multipleFoodTypes;
     private float checkTime;
     //private int taxAmount;
     private int food;//will need different types of food later on (meat, bread, etc)
@@ -41,10 +47,14 @@ public class HouseInformation : MonoBehaviour {
         food = 0;
         water = 0;
         houseSize = 3;//houseSize updates based on factors such as food/water/luxury products
+        houseLevel = 1;
+        upgrading = false;
+        downgrading = false;
         //AvailableHome will spawn orcs if the house desirability
         // is high enough and there is still room in the house (compare to houseSize)
-        populationChange = false;
+        //populationChange = false;
         desirability = 100;
+        multipleFoodTypes = false;
         checkTime = 0.0f;
         //taxAmount = 0;
     }
@@ -54,16 +64,17 @@ public class HouseInformation : MonoBehaviour {
      *  the resources the house has stored/used.
      */
 	void Update () {
-		if (populationChange)
-        {
-            if (numInhabitants > 0 && numInhabitants <= 3)
-            {
-                SpriteRenderer spriteRender = gameObject.GetComponent<SpriteRenderer>();
-                spriteRender.sprite = firstLevelHouse;
-            }
+		//if (populationChange)
+        //{
+        //    if (numInhabitants > 0 && numInhabitants <= 3)
+        //    {
+                //SpriteRenderer spriteRender = gameObject.GetComponent<SpriteRenderer>();
+                //spriteRender.sprite = firstLevelHouse;
+        //    }
             //checks for further house upgrades will go here
-            populationChange = false;
-        }
+        //    populationChange = false;
+        //}
+        
         //updates the resources of the household
         Storage storage = gameObject.GetComponent<Storage>();
         if (Time.time > checkTime)
@@ -77,16 +88,93 @@ public class HouseInformation : MonoBehaviour {
             {
                 storage.removeResource("Water", storage.getWaterCount());
             }
-
-            if (storage.getMeatCount() >= numInhabitants * inhabitantFoodConsumption)
+            
+            //TODO: update food information
+            if (storage.getFoodCount() > 0 && storage.getFoodCount() >= numInhabitants * inhabitantFoodConsumption)
             {
-                storage.removeResource("Meat", numInhabitants * inhabitantFoodConsumption);
+                int numFoodTypes = 0;
+                if (storage.getMeatCount() > 0)
+                {
+                    numFoodTypes++;
+                }
+                if (storage.getMeatCount() > 0)
+                {
+                    numFoodTypes++;
+                }
+                if (numFoodTypes > 1)
+                {
+                    multipleFoodTypes = true;
+                }
+                else
+                {
+                    multipleFoodTypes = false;
+                }
+                storage.removeResource("Meat", numInhabitants * inhabitantFoodConsumption * (storage.getMeatCount() / storage.getFoodCount()));
+                if (storage.getFoodCount() > 0)
+                {
+                    storage.removeResource("Wheat", numInhabitants * inhabitantFoodConsumption * (storage.getWheatCount() / storage.getFoodCount()));
+                }
             }
-            else
+            else if (storage.getFoodCount() > 0)
             {
                 storage.removeResource("Meat", storage.getMeatCount());
+                storage.removeResource("Wheat", storage.getWheatCount());
+            }
+
+            //TODO: Add text here for the house popup to pull on the describe why a house is upgrading/downgrading
+            //Upgrading and downgrading based on food and water counts
+            if (storage.getFoodCount() > 0 && storage.getWaterCount() > 0 && houseLevel == 1)
+            {
+                if (upgrading)
+                {
+                    houseLevel = 2;
+                    updateHouseSprite();
+                    houseSize *= 2;
+                    gameObject.AddComponent<AvailableHome>();
+                    AvailableHome availableHome = gameObject.GetComponent<AvailableHome>();
+                    availableHome.immigrant = orcImmigrant;
+                    upgrading = false;
+                }
+                else
+                {
+                    upgrading = true;
+                }
+                downgrading = false;
+            }
+            else if ((storage.getFoodCount() == 0 || storage.getWaterCount() == 0) && houseLevel > 1)
+            {
+                if (downgrading)
+                {
+                    houseLevel--;
+                    updateHouseSprite();
+                    houseSize /= 2;
+                    if (numInhabitants > houseSize)
+                    {
+                        removeInhabitants(numInhabitants - houseSize);
+                    }
+                }
+                else
+                {
+                    downgrading = true;
+                }
+                upgrading = false;
+            }
+            else if (storage.getFoodCount() > 0 && storage.getWaterCount() > 0 && downgrading)
+            {
+                downgrading = false;
+            }
+
+            //TODO: should not be able to downgrade twice in one time tick
+            if (multipleFoodTypes && houseLevel == 2)
+            {
+                //will be used for upgrading to tier 3
+            }
+            else if (!multipleFoodTypes && houseLevel > 2)
+            {
+
             }
         }
+
         //find places for unemployed inhabitants to work
         if (numEmployedInhabitants < numInhabitants)
         {
@@ -163,13 +251,33 @@ public class HouseInformation : MonoBehaviour {
     }
 
     /**
+     * Updates the sprite for the house based on the house level
+     */
+    public void updateHouseSprite()
+    {
+        SpriteRenderer spriteRender = gameObject.GetComponent<SpriteRenderer>();
+        if (houseLevel == 1)
+        {
+            spriteRender.sprite = firstLevelHouse;
+        }
+        else if (houseLevel == 2)
+        {
+            spriteRender.sprite = secondLevelHouse;
+        }
+    }
+
+    /**
      * Adds to the inhabitant count in the house.
      * @param num the number of inhabitants to add
      */
     public void addInhabitants(int num)
     {
+        if (numInhabitants == 0)
+        {
+            updateHouseSprite();
+        }
         numInhabitants += num;
-        populationChange = true;
+        //populationChange = true;
     }
 
     /**
@@ -178,7 +286,7 @@ public class HouseInformation : MonoBehaviour {
      */
     public void orcsMovingIn(int num)
     {
-        numIncomingOrcs += num;
+        numIncomingOrcs = num;
     }
 
     /**
@@ -191,12 +299,35 @@ public class HouseInformation : MonoBehaviour {
     }
 
     /**
-     * Removes an inhabitant from the house.
+     * Removes inhabitants from the house.
      */
-    public void removeInhabitant()
+    public void removeInhabitants(int num)
     {
-        numInhabitants--;
-        populationChange = true;
+        numInhabitants -= num;
+        int numRemovedSoFar = 0;
+        List<GameObject> keys = new List<GameObject>(inhabWorkLocations.Keys);
+        foreach (GameObject key in keys)
+        {
+            if (numRemovedSoFar < num)
+            {
+                Employment employment = key.GetComponent<Employment>();
+                int numInhabsAtEmployment = inhabWorkLocations[key];
+                if (numRemovedSoFar + numInhabsAtEmployment <= num)
+                {
+                    employment.removeWorkers(inhabWorkLocations[key], gameObject);
+                    numRemovedSoFar += inhabWorkLocations[key];
+                    removeWorkLocation(key);
+                }
+                else
+                {
+                    employment.removeWorkers(num - numRemovedSoFar, gameObject);
+                    inhabWorkLocations[key] -= num - numRemovedSoFar;
+                    numRemovedSoFar = num;
+                }
+            }
+        }
+        //populationChange = true;
+        //TODO: create orc gameobjects leaving the house and exiting the map
     }
 
     /**
