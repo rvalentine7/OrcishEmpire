@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 /**
@@ -130,7 +131,7 @@ public class BuildingPlacement : MonoBehaviour {
         }
 
         //Place the object in the world upon left mouse click
-        if (Input.GetMouseButton(0) && validPlacement)
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0) && validPlacement)
         {
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
             {

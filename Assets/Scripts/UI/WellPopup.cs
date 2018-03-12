@@ -11,8 +11,11 @@ public class WellPopup : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Destroy(gameObject);
+        }
+    }
 
     /**
      * Removes the game object from the game.

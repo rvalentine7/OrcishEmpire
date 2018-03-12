@@ -297,6 +297,7 @@
     <Compile Include="Assets\Scripts\Town\Collect.cs" />
     <Compile Include="Assets\Scripts\Town\Deliver.cs" />
     <Compile Include="Assets\Scripts\Town\Distribute.cs" />
+    <Compile Include="Assets\Scripts\Town\Emigrate.cs" />
     <Compile Include="Assets\Scripts\Town\Employment.cs" />
     <Compile Include="Assets\Scripts\Town\HouseInformation.cs" />
     <Compile Include="Assets\Scripts\Town\Immigrate.cs" />

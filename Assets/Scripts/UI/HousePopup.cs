@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class HousePopup : MonoBehaviour {
@@ -20,6 +21,10 @@ public class HousePopup : MonoBehaviour {
      * Updates the information displayed on the popup.
      */
 	void Update () {
+        if ((!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(1)) || Input.GetKey(KeyCode.Escape))
+        {
+            Destroy(gameObject);
+        }
         HouseInformation houseInfo = house.GetComponent<HouseInformation>();
         Storage storage = house.GetComponent<Storage>();
         inhabitantCount.text = "" + houseInfo.getNumInhabitants();

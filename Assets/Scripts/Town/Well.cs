@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /**
  * Provides water to nearby houses.
@@ -61,7 +62,7 @@ public class Well : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        if (GameObject.FindWithTag("Popup") == null)
+        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
         {
             Instantiate(wellPopupObject);
         }

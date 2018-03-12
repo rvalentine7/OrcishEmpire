@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /**
  * Keeps track of information regarding an orc that the player might be interested
@@ -39,7 +40,7 @@ public class OrcInformation : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        if (GameObject.FindWithTag("Popup") == null)
+        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
         {
             //might want the object creating this to determine if the orc is emmigrating/immigrating for
             // the popup status to change and to avoid creating even more popups

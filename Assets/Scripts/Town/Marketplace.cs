@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /**
  * Marketplaces distribute food to the houses around it.
@@ -78,7 +79,7 @@ public class Marketplace : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        if (GameObject.FindWithTag("Popup") == null)
+        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
         {
             GameObject popup = Instantiate(marketPopupObject) as GameObject;
             MarketPopup marketPopup = popup.GetComponent<MarketPopup>();

@@ -22,6 +22,10 @@ public class WarehousePopup : MonoBehaviour {
      * Updates the status and number of goods for the warehouse.
      */
     void Update () {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Destroy(gameObject);
+        }
         Storage storage = warehouse.GetComponent<Storage>();
         Employment employment = warehouse.GetComponent<Employment>();
         if (employment.getNumWorkers() == 0)

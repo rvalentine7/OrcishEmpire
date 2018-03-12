@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /**
  * Contains information about the house this is attached to such as
@@ -9,6 +10,7 @@ using UnityEngine;
 public class HouseInformation : MonoBehaviour {
     public float timeInterval;
     public GameObject orcImmigrant;
+    public GameObject orcEmigrant;
     public int inhabitantWaterConsumption;
     public int inhabitantFoodConsumption;
     public int jobSearchRadius;
@@ -242,7 +244,7 @@ public class HouseInformation : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        if (GameObject.FindWithTag("Popup") == null)
+        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
         {
             GameObject popup = Instantiate(housePopupObject) as GameObject;
             HousePopup housePopup = popup.GetComponent<HousePopup>();
@@ -341,6 +343,8 @@ public class HouseInformation : MonoBehaviour {
             Employment employment = entry.Key.GetComponent<Employment>();
             employment.removeWorkers(entry.Value, gameObject);
         }
+        Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
+            gameObject.transform.position.y + 0.4f), Quaternion.identity);
         Destroy(gameObject);
     }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /**
  * Production creates goods from a production type building (farm, lumbermill, blacksmith, etc.) and then
@@ -66,9 +67,7 @@ public class Production : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        /*Debug.Log("Number of workers: " + numWorkers + "/" + employment.getWorkerCap());
-        Debug.Log("Production Progress: " + progress);*/
-        if (GameObject.FindWithTag("Popup") == null)
+        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
         {
             GameObject popup = Instantiate(farmPopupObject) as GameObject;
             FarmPopup farmPopup = popup.GetComponent<FarmPopup>();

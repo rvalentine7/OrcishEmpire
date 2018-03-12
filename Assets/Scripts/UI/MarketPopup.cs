@@ -22,6 +22,10 @@ public class MarketPopup : MonoBehaviour {
      * Updates the status and number of goods for the marketplace.
      */
 	void Update () {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Destroy(gameObject);
+        }
         Storage storage = marketplace.GetComponent<Storage>();
         Employment employment = marketplace.GetComponent<Employment>();
         if (employment.getNumWorkers() == 0)

@@ -16,6 +16,10 @@ public class FarmPopup : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            Destroy(gameObject);
+        }
         Production thisFarm = farm.GetComponent<Production>();
         progressNum.text = "" + thisFarm.getProgressNum() + "/100";
         Employment employment = farm.GetComponent<Employment>();

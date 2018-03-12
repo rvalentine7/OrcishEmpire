@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 /**
@@ -117,7 +118,7 @@ public class RoadPlacement : MonoBehaviour {
         }
 
         //If the road is in a valid location and the left mouse is clicked, place it in the world
-        if (Input.GetMouseButton(0) && validPlacement)
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0) && validPlacement)
         {
             //when mouse down, can place road in any viable location the mouse moves to
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
