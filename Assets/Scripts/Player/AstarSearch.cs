@@ -29,7 +29,6 @@ public class AstarSearch {
         List<Vector2> openSet = new List<Vector2>();
         openSet.Add(start);
         Dictionary<Vector2, Vector2> cameFrom = new Dictionary<Vector2, Vector2>();
-        //Debug.Log("starting A*");
 
         Dictionary<Vector2, int> gScore = new Dictionary<Vector2, int>();
         Dictionary<Vector2, int> fScore = new Dictionary<Vector2, int>();
@@ -73,19 +72,6 @@ public class AstarSearch {
             if (current.Equals(goal) || network[(int)current.x, (int)current.y] == goalObject)
             {
                 List<Vector2> path = aStarPath(cameFrom, current, start, goal);
-                /*if (objectToMove.GetComponent<Immigrate>() != null)
-                {
-                    Immigrate immigrate = objectToMove.GetComponent<Immigrate>();
-                    immigrate.setPath(path);
-                }
-                else if (objectToMove.GetComponent<Delivery>() != null)
-                {
-                    Delivery delivery = objectToMove.GetComponent<Delivery>();
-                }
-                else if (objectToMove.GetComponent<Collect>() != null)
-                {
-                    Collect collect = objectToMove.GetComponent<Collect>();
-                }*/
                 //return path;
                 finalPath(path);
                 yield break;

@@ -84,15 +84,6 @@ public class Storage : MonoBehaviour {
             {
                 accepts = true;
             }
-            //crafting resources
-            if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
-            {
-
-            }
-            if (name.Equals("Iron") && num <= storageMax - getCurrentAmountStored())
-            {
-
-            }
             //sellable goods
             if (name.Equals("Furniture") && num <= storageMax - getCurrentAmountStored())
             {
@@ -109,6 +100,18 @@ public class Storage : MonoBehaviour {
             if (houseInfo.getNumInhabitants() == 0)
             {
                 accepts = false;
+            }
+        }
+        if (storageType.Equals("Warehouse"))
+        {
+            //crafting resources
+            if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
+            {
+
+            }
+            if (name.Equals("Iron") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
             }
         }
         return accepts;
@@ -140,6 +143,10 @@ public class Storage : MonoBehaviour {
                 waterCount = 100;
             }
         }
+        if (name.Equals("Iron"))
+        {
+            ironCount += num;
+        }
     }
 
     /**
@@ -160,6 +167,10 @@ public class Storage : MonoBehaviour {
         else if (name.Equals("Water"))
         {
             waterCount -= num;
+        }
+        else if (name.Equals("Iron"))
+        {
+            ironCount -= num;
         }
     }
 
@@ -198,5 +209,14 @@ public class Storage : MonoBehaviour {
     public int getWaterCount()
     {
         return waterCount;
+    }
+
+    /**
+     * Returns the total amount of iron in storage
+     * @return waterCount the amount of iron in storage
+     */
+    public int getIronCount()
+    {
+        return ironCount;
     }
 }

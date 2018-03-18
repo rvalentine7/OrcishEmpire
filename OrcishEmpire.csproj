@@ -309,7 +309,9 @@
     <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FarmPopup.cs" />
     <Compile Include="Assets\Scripts\UI\HousePopup.cs" />
+    <Compile Include="Assets\Scripts\UI\IronMinePopup.cs" />
     <Compile Include="Assets\Scripts\UI\MarketPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\PopupRemoval.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\WarehousePopup.cs" />
     <Compile Include="Assets\Scripts\UI\WellPopup.cs" />

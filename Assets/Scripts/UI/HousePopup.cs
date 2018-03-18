@@ -21,7 +21,7 @@ public class HousePopup : MonoBehaviour {
      * Updates the information displayed on the popup.
      */
 	void Update () {
-        if ((!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(1)) || Input.GetKey(KeyCode.Escape))
+        if (Input.GetKey(KeyCode.Escape))
         {
             Destroy(gameObject);
         }

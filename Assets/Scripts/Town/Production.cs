@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
  */
 public class Production : MonoBehaviour {
     public GameObject deliveryOrc;
-    public GameObject farmPopupObject;
+    public GameObject productionPopupObject;
     public float timeInterval;
     public string resourceName;
     public int resourceProduced;
@@ -69,7 +69,7 @@ public class Production : MonoBehaviour {
     {
         if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
         {
-            GameObject popup = Instantiate(farmPopupObject) as GameObject;
+            GameObject popup = Instantiate(productionPopupObject) as GameObject;
             FarmPopup farmPopup = popup.GetComponent<FarmPopup>();
             farmPopup.setFarm(gameObject);
         }

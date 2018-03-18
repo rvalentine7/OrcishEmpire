@@ -94,6 +94,33 @@ public class BuildingPlacement : MonoBehaviour {
                 validPlacement = false;
             }
         }
+        //iron mines need to be next to "Rocks" terrain
+        if (validPlacement && gameObject.name == "BuildIronMine(Clone)")
+        {
+            if (terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "Rocks"//below bottom left corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//above top left corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "Rocks"//below bottom right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//above top right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//to the right of bottom right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "Rocks"//to the right of the top right corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//to the left of the bottom left corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "Rocks")//to the left of the top left corner
+            {
+                validPlacement = false;
+            }
+        }
+        //lumberyards need to be built next to "Trees" terrain
+
+        //farms need to be built in "Farmland" terrain
+
         //can't place a building on other constructs or water
         int r = 0;
         while (validPlacement && r < height)
@@ -111,7 +138,9 @@ public class BuildingPlacement : MonoBehaviour {
                     validPlacement = false;
                 }
                 if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Water")
+                    && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Water"
+                    || terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Rocks"
+                    || terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Trees"))
                 {
                     validPlacement = false;
                 }

@@ -31,7 +31,8 @@ public class Immigrate : MonoBehaviour {
         {
             for (int j = 0; j < network.GetLength(1); j++)
             {
-                if (structureArr[i, j] == null && terrainArr[i, j].tag != "Water")
+                if (structureArr[i, j] == null && terrainArr[i, j].tag != "Water"
+                    && terrainArr[i, j].tag != "Rocks" && terrainArr[i, j].tag != "Trees")
                 {
                     network[i, j] = terrainArr[i, j];
                 }
