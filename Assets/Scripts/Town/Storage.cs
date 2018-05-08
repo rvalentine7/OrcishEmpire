@@ -12,11 +12,15 @@ public class Storage : MonoBehaviour {
     private int meatCount;
     private int wheatCount;
     private int fishCount;
+    //private int eggCount;
     //water
     private int waterCount;
     //crafting resources
     private int lumberCount;
     private int ironCount;
+    //private int gemsCount;
+    //private int clayCount;
+    //private int hopsCount;
     //sellable goods
     private int furnitureCount;
     private int weaponsCount;
@@ -33,9 +37,16 @@ public class Storage : MonoBehaviour {
         meatCount = 0;
         wheatCount = 0;
         fishCount = 0;
+        //eggCount = 0;
+
         waterCount = 0;
+
         lumberCount = 0;
         ironCount = 0;
+        //gemsCount = 0;
+        //clayCount = 0;
+        //hopsCount = 0;
+
         furnitureCount = 0;
         weaponsCount = 0;
         armorCount = 0;
@@ -87,7 +98,11 @@ public class Storage : MonoBehaviour {
             //sellable goods
             if (name.Equals("Furniture") && num <= storageMax - getCurrentAmountStored())
             {
-                
+                accepts = true;
+            }
+            if (name.Equals("Weapon") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
             }
         }
         if (storageType.Equals("House"))
@@ -107,13 +122,25 @@ public class Storage : MonoBehaviour {
             //crafting resources
             if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
             {
-
+                accepts = true;
             }
             if (name.Equals("Iron") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
+            if (name.Equals("Weapon") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
         }
+        if (storageType.Equals("Weaponsmith"))
+        {
+            if (name.Equals("Iron") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+        }
+        //TODO: add other ItemProduction buildings here and check their required raw resources
         return accepts;
     }
 
@@ -143,9 +170,13 @@ public class Storage : MonoBehaviour {
                 waterCount = 100;
             }
         }
-        if (name.Equals("Iron"))
+        else if (name.Equals("Iron"))
         {
             ironCount += num;
+        }
+        else if (name.Equals("Weapon"))
+        {
+            weaponsCount += num;
         }
     }
 
@@ -171,7 +202,40 @@ public class Storage : MonoBehaviour {
         else if (name.Equals("Iron"))
         {
             ironCount -= num;
+        } else if (name.Equals("Weapon"))
+        {
+            weaponsCount -= num;
         }
+    }
+
+    /**
+     * Gets the number of a specified resource type that this storage holds
+     * @param resourceName the name of the resource to check the count of
+     * @return the amount of the specified resource
+     */
+    public int getResourceCount(string resourceName)
+    {
+        if (resourceName.Equals("Meat"))
+        {
+            return getMeatCount();
+        }
+        else if (resourceName.Equals("Wheat"))
+        {
+            return getWheatCount();
+        }
+        else if (resourceName.Equals("Water"))
+        {
+            return getWaterCount();
+        }
+        else if (resourceName.Equals("Iron"))
+        {
+            return getIronCount();
+        }
+        else if (resourceName.Equals("Weapon"))
+        {
+            return getWeaponCount();
+        }
+        return 0;
     }
 
     /**
@@ -218,5 +282,14 @@ public class Storage : MonoBehaviour {
     public int getIronCount()
     {
         return ironCount;
+    }
+
+    /**
+     * Returns the total amount of weapons in storage
+     * @return weaponsCount the amount of weapons in storage
+     */
+    public int getWeaponCount()
+    {
+        return weaponsCount;
     }
 }

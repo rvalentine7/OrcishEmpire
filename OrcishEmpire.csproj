@@ -294,6 +294,9 @@
     <Compile Include="Assets\Scripts\Player\Citizen.cs" />
     <Compile Include="Assets\Scripts\Player\OrcInformation.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\FarmClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\IronMineClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\WeaponsmithClick.cs" />
     <Compile Include="Assets\Scripts\Town\Collect.cs" />
     <Compile Include="Assets\Scripts\Town\Deliver.cs" />
     <Compile Include="Assets\Scripts\Town\Distribute.cs" />
@@ -301,6 +304,7 @@
     <Compile Include="Assets\Scripts\Town\Employment.cs" />
     <Compile Include="Assets\Scripts\Town\HouseInformation.cs" />
     <Compile Include="Assets\Scripts\Town\Immigrate.cs" />
+    <Compile Include="Assets\Scripts\Town\ItemProduction.cs" />
     <Compile Include="Assets\Scripts\Town\Marketplace.cs" />
     <Compile Include="Assets\Scripts\Town\Production.cs" />
     <Compile Include="Assets\Scripts\Town\Storage.cs" />
@@ -314,6 +318,7 @@
     <Compile Include="Assets\Scripts\UI\PopupRemoval.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\WarehousePopup.cs" />
+    <Compile Include="Assets\Scripts\UI\WeaponsmithPopup.cs" />
     <Compile Include="Assets\Scripts\UI\WellPopup.cs" />
     <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />
     <Compile Include="Assets\Scripts\World\TerrainSegment.cs" />

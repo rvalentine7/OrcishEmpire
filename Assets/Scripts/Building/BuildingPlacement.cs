@@ -120,7 +120,10 @@ public class BuildingPlacement : MonoBehaviour {
         //lumberyards need to be built next to "Trees" terrain
 
         //farms need to be built in "Farmland" terrain
-
+        if (validPlacement && gameObject.GetComponent<FarmClick>() != null)
+        {
+            //just need to check the four corners because I plan on having all of the farmable land connect rather than random little pockets where you can't build
+        }
         //can't place a building on other constructs or water
         int r = 0;
         while (validPlacement && r < height)

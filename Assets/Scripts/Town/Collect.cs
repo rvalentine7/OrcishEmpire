@@ -202,6 +202,22 @@ public class Collect : MonoBehaviour {
                             }
                             //TODO: when more types of food are added, account for those here
                         }
+                        if (resourcesToCollect.Equals("Iron") && storage.getIronCount() > 0)
+                        {
+                            int ironCount = storage.getIronCount();
+                            if (ironCount > remainingCapacity)
+                            {
+                                resources.Add("Iron", remainingCapacity);
+                                storage.removeResource("Iron", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("Iron", ironCount);
+                                storage.removeResource("Iron", ironCount);
+                                remainingCapacity -= ironCount;
+                            }
+                        }
                         //if this unit has acquired resources, it should return to its place of employment
                         if (resources.Count > 0)
                         {
@@ -307,6 +323,16 @@ public class Collect : MonoBehaviour {
                         (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
                         //only use this warehouse as a possibility if it has of food
                         if (warehouseStorage.getFoodCount() > 0)
+                        {
+                            hasNeededResources = true;
+                        }
+                    }
+                    if (resourcesToCollect.Equals("Iron"))
+                    {
+                        Storage warehouseStorage = structureArr[(int)originalLocation.x - searchRadius + i,
+                        (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
+                        //only use this warehouse as a possibility if it has of food
+                        if (warehouseStorage.getIronCount() > 0)
                         {
                             hasNeededResources = true;
                         }

@@ -4,12 +4,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /**
- * Production creates goods from a production type building (farm, lumbermill, blacksmith, etc.) and then
+ * Production creates goods from a raw resource production type building (farm, lumbermill, iron mine, etc.) and then
  * creates a delivery worker to deliver the goods upon completion of the goods.
  */
 public class Production : MonoBehaviour {
     public GameObject deliveryOrc;
-    public GameObject productionPopupObject;
     public float timeInterval;
     public string resourceName;
     public int resourceProduced;
@@ -61,19 +60,6 @@ public class Production : MonoBehaviour {
             createDeliveryOrc();
         }
 	}
-
-    /**
-     * Click the object to see information about it.
-     */
-    void OnMouseDown()
-    {
-        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
-        {
-            GameObject popup = Instantiate(productionPopupObject) as GameObject;
-            FarmPopup farmPopup = popup.GetComponent<FarmPopup>();
-            farmPopup.setFarm(gameObject);
-        }
-    }
 
     /**
      * Creates an orc to carry resources from the production site to a storage location.
