@@ -18,6 +18,8 @@ public class Production : MonoBehaviour {
     private int workerValue;
     private Employment employment;
     private bool orcOutForDelivery;
+    //private bool nearTrees;//TODO: use nearTrees to update the status of the building in the UI popup
+    private bool active;
 
     /**
      * Initializes the production site.
@@ -29,6 +31,8 @@ public class Production : MonoBehaviour {
         numWorkers = employment.getNumWorkers();
         workerValue = employment.getWorkerValue();
         orcOutForDelivery = false;
+        //nearTrees = true;
+        active = true;
     }
 	
 	/**
@@ -38,7 +42,40 @@ public class Production : MonoBehaviour {
 	void Update () {
         orcOutForDelivery = employment.getWorkerDeliveringGoods();
         numWorkers = employment.getNumWorkers();
-		if (numWorkers > 0 && Time.time > checkTime)
+        if (active)
+        {
+            //Lumber mills need to be near trees in order to function
+            if (gameObject.GetComponent<LumberMillClick>() != null)
+            {
+                //nearTrees = true;
+
+                GameObject world = GameObject.Find("WorldInformation");
+                World myWorld = world.GetComponent<World>();
+                GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+                Vector2 millPos = gameObject.transform.position;
+                if (terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag != "Trees"//below bottom left corner
+                    && terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//above top left corner
+                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag != "Trees"//below bottom right corner
+                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//above top right corner
+                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//to the right of bottom right corner
+                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag != "Trees"//to the right of the top right corner
+                    && terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//to the left of the bottom left corner
+                    && terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag != "Trees")//to the left of the top left corner
+                {
+                    //nearTrees = false;
+                    active = false;
+                }
+            }
+        }
+		if (numWorkers > 0 && Time.time > checkTime && active)
         {
             checkTime = Time.time + timeInterval;
             if (progress < 100)

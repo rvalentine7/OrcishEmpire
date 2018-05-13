@@ -118,12 +118,30 @@ public class BuildingPlacement : MonoBehaviour {
             }
         }
         //lumberyards need to be built next to "Trees" terrain
-
-        //farms need to be built in "Farmland" terrain
-        if (validPlacement && gameObject.GetComponent<FarmClick>() != null)
+        if (validPlacement && gameObject.name == "BuildLumberMill(Clone)")
         {
-            //just need to check the four corners because I plan on having all of the farmable land connect rather than random little pockets where you can't build
+            if (terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "Trees"//below bottom left corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "Trees"//above top left corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "Trees"//below bottom right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "Trees"//above top right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "Trees"//to the right of bottom right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "Trees"//to the right of the top right corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "Trees"//to the left of the bottom left corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "Trees")//to the left of the top left corner
+            {
+                validPlacement = false;
+            }
         }
+        //docks need to be built next to water (Tag: "Water")
+
         //can't place a building on other constructs or water
         int r = 0;
         while (validPlacement && r < height)
@@ -146,6 +164,15 @@ public class BuildingPlacement : MonoBehaviour {
                     || terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Trees"))
                 {
                     validPlacement = false;
+                }
+                //farms need to be built on fertile land
+                if (validPlacement && gameObject.GetComponent<Farm>() != null)
+                {
+                    if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
+                        && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag != "FertileLand")
+                    {
+                        validPlacement = false;
+                    }
                 }
                 c++;
             }

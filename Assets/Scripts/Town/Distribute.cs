@@ -385,6 +385,10 @@ public class Distribute : MonoBehaviour {
                 //TODO: add other types of food
             }
             //TODO: add other types of resources
+            //Need to set public variables for how much any given house can hold special goods
+            //Need to make it so houses will consume the goods over time
+            //Need to make a way so I can turn off distribution to houses (option in UI popup?)
+
             locationsToVisit.Remove(house);
             if (!(employmentStorage.getFoodCount() > 0))
             {

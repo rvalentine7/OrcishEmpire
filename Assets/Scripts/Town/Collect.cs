@@ -218,6 +218,54 @@ public class Collect : MonoBehaviour {
                                 remainingCapacity -= ironCount;
                             }
                         }
+                        if (resourcesToCollect.Equals("Weapon") && storage.getWeaponCount() > 0)
+                        {
+                            int weaponCount = storage.getWeaponCount();
+                            if (weaponCount > remainingCapacity)
+                            {
+                                resources.Add("Weapon", remainingCapacity);
+                                storage.removeResource("Weapon", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("Weapon", weaponCount);
+                                storage.removeResource("Weapon", weaponCount);
+                                remainingCapacity -= weaponCount;
+                            }
+                        }
+                        if (resourcesToCollect.Equals("Lumber") && storage.getLumberCount() > 0)
+                        {
+                            int lumberCount = storage.getLumberCount();
+                            if (lumberCount > remainingCapacity)
+                            {
+                                resources.Add("Lumber", remainingCapacity);
+                                storage.removeResource("Lumber", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("Lumber", lumberCount);
+                                storage.removeResource("Lumber", lumberCount);
+                                remainingCapacity -= lumberCount;
+                            }
+                        }
+                        if (resourcesToCollect.Equals("Furniture") && storage.getFurnitureCount() > 0)
+                        {
+                            int furnitureCount = storage.getFurnitureCount();
+                            if (furnitureCount > remainingCapacity)
+                            {
+                                resources.Add("Furniture", remainingCapacity);
+                                storage.removeResource("Furniture", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("Furniture", furnitureCount);
+                                storage.removeResource("Furniture", furnitureCount);
+                                remainingCapacity -= furnitureCount;
+                            }
+                        }
                         //if this unit has acquired resources, it should return to its place of employment
                         if (resources.Count > 0)
                         {
@@ -327,12 +375,24 @@ public class Collect : MonoBehaviour {
                             hasNeededResources = true;
                         }
                     }
+                    //Used by the Weaponsmith
                     if (resourcesToCollect.Equals("Iron"))
                     {
                         Storage warehouseStorage = structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
                         //only use this warehouse as a possibility if it has of food
                         if (warehouseStorage.getIronCount() > 0)
+                        {
+                            hasNeededResources = true;
+                        }
+                    }
+                    //Used by the FurnitureWorkshop
+                    if (resourcesToCollect.Equals("Lumber"))
+                    {
+                        Storage warehouseStorage = structureArr[(int)originalLocation.x - searchRadius + i,
+                        (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
+                        //only use this warehouse as a possibility if it has of food
+                        if (warehouseStorage.getLumberCount() > 0)
                         {
                             hasNeededResources = true;
                         }

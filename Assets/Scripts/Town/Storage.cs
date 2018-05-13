@@ -128,14 +128,17 @@ public class Storage : MonoBehaviour {
             {
                 accepts = true;
             }
-            if (name.Equals("Weapon") && num <= storageMax - getCurrentAmountStored())
+        }
+        if (storageType.Equals("Weaponsmith"))
+        {
+            if (name.Equals("Iron") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
         }
         if (storageType.Equals("Weaponsmith"))
         {
-            if (name.Equals("Iron") && num <= storageMax - getCurrentAmountStored())
+            if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -178,6 +181,14 @@ public class Storage : MonoBehaviour {
         {
             weaponsCount += num;
         }
+        else if (name.Equals("Lumber"))
+        {
+            lumberCount += num;
+        }
+        else if (name.Equals("Furniture"))
+        {
+            furnitureCount += num;
+        }
     }
 
     /**
@@ -202,9 +213,18 @@ public class Storage : MonoBehaviour {
         else if (name.Equals("Iron"))
         {
             ironCount -= num;
-        } else if (name.Equals("Weapon"))
+        }
+        else if (name.Equals("Weapon"))
         {
             weaponsCount -= num;
+        }
+        else if (name.Equals("Lumber"))
+        {
+            lumberCount -= num;
+        }
+        else if (name.Equals("Furniture"))
+        {
+            furnitureCount -= num;
         }
     }
 
@@ -234,6 +254,14 @@ public class Storage : MonoBehaviour {
         else if (resourceName.Equals("Weapon"))
         {
             return getWeaponCount();
+        }
+        else if (resourceName.Equals("Lumber"))
+        {
+            return getLumberCount();
+        }
+        else if (resourceName.Equals("Furniture"))
+        {
+            return getFurnitureCount();
         }
         return 0;
     }
@@ -291,5 +319,23 @@ public class Storage : MonoBehaviour {
     public int getWeaponCount()
     {
         return weaponsCount;
+    }
+
+    /**
+     * Returns the total amount of lumber in storage
+     * @return lumberCount the amount of lumber in storage
+     */
+    public int getLumberCount()
+    {
+        return lumberCount;
+    }
+
+    /**
+     * Returns the toal amount of furniture in storage
+     * @return furnitureCount the amount of furniture in storage
+     */
+    public int getFurnitureCount()
+    {
+        return furnitureCount;
     }
 }

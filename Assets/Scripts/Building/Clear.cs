@@ -36,6 +36,7 @@ public class Clear : MonoBehaviour {
         mousePos.z = 0;
 
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+        GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
 
         if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)//swap 39 with mapSize
         {
@@ -94,6 +95,14 @@ public class Clear : MonoBehaviour {
 
             //myControls.buildArr.removeFromBuildArr((int)mousePos.y, (int)mousePos.x);
             Destroy(structureToClear);
+        }
+        //allow the user to destroy trees
+        if (Input.GetMouseButton(0) && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
+            && (terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Trees"))
+        {
+            GameObject terrainToClear = terrainArr[(int)mousePos.x, (int)mousePos.y];
+            TreeRemoval treeToClear = terrainToClear.GetComponent<TreeRemoval>();
+            treeToClear.removeTree();
         }
     }
 

@@ -147,7 +147,7 @@ public class Immigrate : MonoBehaviour {
         }
         else if (goalObject == null)//house was deleted, find a new place to go to
         {
-            Debug.Log("goal object was deleted, making new goal object");
+            //Debug.Log("goal object was deleted, making new goal object");
             GameObject world = GameObject.Find("WorldInformation");
             World myWorld = world.GetComponent<World>();
             Vector2 goal = myWorld.exitLocation;
