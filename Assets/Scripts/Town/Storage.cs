@@ -18,15 +18,16 @@ public class Storage : MonoBehaviour {
     //crafting resources
     private int lumberCount;
     private int ironCount;
+    //private int hopsCount;
     //private int gemsCount;
     //private int clayCount;
-    //private int hopsCount;
     //sellable goods
     private int furnitureCount;
     private int weaponsCount;
     private int armorCount;
+    //private int beerCount;
     //non-tangible resources (have their own max limit)
-    private int entertainment;
+    private int entertainmentLevel;
     //maximum amount of tangible resources this storage building can hold
     public int storageMax;
 
@@ -50,6 +51,8 @@ public class Storage : MonoBehaviour {
         furnitureCount = 0;
         weaponsCount = 0;
         armorCount = 0;
+
+        entertainmentLevel = 0;
     }
 
     /**
@@ -67,7 +70,7 @@ public class Storage : MonoBehaviour {
      */
     public int getCurrentAmountStored()
     {
-        //TODO: add up other resources as they are added to the game
+        //TODO: add up other tangible resources as they are added to the game
         return meatCount + wheatCount + fishCount + waterCount + lumberCount + ironCount + furnitureCount + weaponsCount + armorCount;
     }
 
@@ -115,6 +118,11 @@ public class Storage : MonoBehaviour {
             if (houseInfo.getNumInhabitants() == 0)
             {
                 accepts = false;
+            }
+            //Entertainment doesn't care about storage count because it is not tangible
+            if (name.Equals("Entertainment") && houseInfo.getNumInhabitants() > 0)
+            {
+                accepts = true;
             }
         }
         if (storageType.Equals("Warehouse"))
@@ -189,6 +197,10 @@ public class Storage : MonoBehaviour {
         {
             furnitureCount += num;
         }
+        else if (name.Equals("Entertainment"))
+        {
+            entertainmentLevel += num;
+        }
     }
 
     /**
@@ -226,6 +238,10 @@ public class Storage : MonoBehaviour {
         {
             furnitureCount -= num;
         }
+        else if (name.Equals("Entertainment"))
+        {
+            entertainmentLevel -= num;
+        }
     }
 
     /**
@@ -262,6 +278,10 @@ public class Storage : MonoBehaviour {
         else if (resourceName.Equals("Furniture"))
         {
             return getFurnitureCount();
+        }
+        else if (resourceName.Equals("Entertainment"))
+        {
+            return getEntertainmentLevel();
         }
         return 0;
     }
@@ -337,5 +357,14 @@ public class Storage : MonoBehaviour {
     public int getFurnitureCount()
     {
         return furnitureCount;
+    }
+
+    /**
+     * Returns the current entertainment level
+     * @return entertainmentLevel the current entertainment level
+     */
+    public int getEntertainmentLevel()
+    {
+        return entertainmentLevel;
     }
 }

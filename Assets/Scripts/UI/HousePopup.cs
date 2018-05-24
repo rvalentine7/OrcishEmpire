@@ -11,6 +11,8 @@ public class HousePopup : MonoBehaviour {
     public Text employedInhabCount;
     public Text foodCount;
     public Text waterCount;
+    public Text entertainmentLevel;
+    public Text goldCount;
 
 	// Use this for initialization
 	void Start () {
@@ -32,6 +34,8 @@ public class HousePopup : MonoBehaviour {
         employedInhabCount.text = "" + houseInfo.getNumEmployedInhabs();
         foodCount.text = "" + storage.getFoodCount();
         waterCount.text = "" + storage.getWaterCount();
+        entertainmentLevel.text = "" + storage.getEntertainmentLevel();
+        //use houseinformation to get the gold the house has
 	}
 
     /**
