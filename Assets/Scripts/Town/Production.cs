@@ -18,7 +18,7 @@ public class Production : MonoBehaviour {
     private int workerValue;
     private Employment employment;
     private bool orcOutForDelivery;
-    //private bool nearTrees;//TODO: use nearTrees to update the status of the building in the UI popup
+    //private bool nearTrees;//TODO: use nearTrees to update the status of the building in the UI popup for lumbermills
     private bool active;
 
     /**
@@ -83,7 +83,8 @@ public class Production : MonoBehaviour {
                 if (progress + numWorkers * workerValue > 100)
                 {
                     progress = 100;
-                } else
+                }
+                else
                 {
                     progress += numWorkers * workerValue;
                 }

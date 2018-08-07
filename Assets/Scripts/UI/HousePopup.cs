@@ -34,7 +34,7 @@ public class HousePopup : MonoBehaviour {
         employedInhabCount.text = "" + houseInfo.getNumEmployedInhabs();
         foodCount.text = "" + storage.getFoodCount();
         waterCount.text = "" + storage.getWaterCount();
-        entertainmentLevel.text = "" + storage.getEntertainmentLevel();
+        entertainmentLevel.text = "" + houseInfo.getEntertainmentLevel();
         //use houseinformation to get the gold the house has
 	}
 

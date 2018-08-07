@@ -7,6 +7,9 @@ public class ArenaPopup : MonoBehaviour {
     public GameObject arena;
     public Text status;
     public Text employeeNum;
+    public Text gladiatorsNum;
+    public Text progressNum;
+    public Text fightDurationNum;
 
     // Use this for initialization
     void Start()
@@ -35,6 +38,26 @@ public class ArenaPopup : MonoBehaviour {
         {
             status.text = "This arena has fights occuring on a regular basis.";
         }
+        Arena arenaScript = arena.GetComponent<Arena>();
+        gladiatorsNum.text = arenaScript.getNumGladiators() + "/" + arenaScript.getNumGladiatorsRequired();
+        string setupProgress = "" + arenaScript.getSetupProgress() + "/100";
+        if (arenaScript.getSetupProgress() >= 100
+            && arenaScript.getNumGladiators() < arenaScript.getNumGladiatorsRequired())
+        {
+            setupProgress = "Need gladiators";
+        }
+        else if (arenaScript.getSetupProgress() >= 100
+            && arenaScript.getNumGladiators() == arenaScript.getNumGladiatorsRequired())
+        {
+            setupProgress = "Fight in progress";
+        }
+        progressNum.text = setupProgress;
+        string fightDurationTime = "Waiting on next fight";
+        if (arenaScript.getRemainingFightTime() > 0)
+        {
+            fightDurationTime = "" + Mathf.RoundToInt(arenaScript.getRemainingFightTime()) + "s";
+        }
+        fightDurationNum.text = fightDurationTime;
     }
 
     /**

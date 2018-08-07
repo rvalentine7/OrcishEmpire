@@ -46,7 +46,7 @@ public class Deliver : MonoBehaviour {
      * Attempts to find the first place to go to
      */
     void Start () {
-        //if there is nowhere to go, wait some time before trying again?
+        //TODO: if there is nowhere to go, wait some time before trying again?
         StartCoroutine(findPathToStorage(returnPath =>
         {
             path = returnPath;

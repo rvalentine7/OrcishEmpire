@@ -94,7 +94,8 @@ public class RoadPlacement : MonoBehaviour {
         }
         if (valid && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
             && terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Water"
-            || terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Trees")
+            || terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Trees"
+            || terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Rocks")
         {
             valid = false;
         }

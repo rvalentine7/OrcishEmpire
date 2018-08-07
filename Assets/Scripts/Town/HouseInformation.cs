@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
  */
 public class HouseInformation : MonoBehaviour {
     public float timeInterval;
+    public float timeBeforeEntertainmentDecay;
     public GameObject orcImmigrant;
     public GameObject orcEmigrant;
     public int inhabitantWaterConsumption;
@@ -35,6 +36,9 @@ public class HouseInformation : MonoBehaviour {
     //private int taxAmount;
     private int food;//will need different types of food later on (meat, bread, etc)
     private int water;
+    private int entertainmentLevel;//this can be 0, 1, or 2.  If it just experiences a change,
+                                   // there will need to be some sort of delay before the house reacts
+    private float timeOfLastEntertainment;
     //add future resources here (weapons/furniture/currency)
 
 	/**
@@ -59,6 +63,8 @@ public class HouseInformation : MonoBehaviour {
         multipleFoodTypes = false;
         checkTime = 0.0f;
         //taxAmount = 0;
+        entertainmentLevel = 0;
+        timeOfLastEntertainment = 0.0f;
     }
 	
 	/**
@@ -76,6 +82,13 @@ public class HouseInformation : MonoBehaviour {
             //checks for further house upgrades will go here
         //    populationChange = false;
         //}
+
+        //Reduces the enteratinment level if it hasn't been given entertainment in the timeBeforeEntertainmentDecay time window
+        if (Time.time > timeOfLastEntertainment + timeBeforeEntertainmentDecay && entertainmentLevel > 0)
+        {
+            entertainmentLevel--;
+            timeOfLastEntertainment = Time.time;
+        }
         
         //updates the resources of the household
         Storage storage = gameObject.GetComponent<Storage>();
@@ -434,5 +447,27 @@ public class HouseInformation : MonoBehaviour {
     public int getFoodCount()
     {
         return food;
+    }
+
+    /**
+     * Sets the current entertainment level of the house
+     * @param level the lowest entertainment level this house should be at
+     */
+    public void setEntertainmentLevel(int level)
+    {
+        if (level > entertainmentLevel)
+        {
+            entertainmentLevel = level;
+            timeOfLastEntertainment = Time.time;
+        }
+    }
+
+    /**
+     * Gets the current entertainment level of the household
+     * @return entertainmentLevel the current entertainment level of the household
+     */
+    public int getEntertainmentLevel()
+    {
+        return entertainmentLevel;
     }
 }

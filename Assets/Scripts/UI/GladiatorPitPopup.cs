@@ -7,6 +7,8 @@ public class GladiatorPitPopup : MonoBehaviour {
     public GameObject gladiatorPit;
     public Text status;
     public Text employeeNum;
+    public Text gladiatorsNumText;
+    public Text trainingProgressNumText;
 
     // Use this for initialization
     void Start()
@@ -35,6 +37,9 @@ public class GladiatorPitPopup : MonoBehaviour {
         {
             status.text = "This pit is training gladiators at peak efficiency.";
         }
+        GladiatorPit gladiatorPitScript = gladiatorPit.GetComponent<GladiatorPit>();
+        gladiatorsNumText.text = "" + gladiatorPitScript.getNumReadyGladiators();
+        trainingProgressNumText.text = "" + gladiatorPitScript.getTrainingProgress() + "/100";
     }
 
     /**
