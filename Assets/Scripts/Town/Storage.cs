@@ -18,14 +18,14 @@ public class Storage : MonoBehaviour {
     //crafting resources
     private int lumberCount;
     private int ironCount;
-    //private int hopsCount;
+    private int hopsCount;
     //private int gemsCount;
     //private int clayCount;
     //sellable goods
     private int furnitureCount;
     private int weaponsCount;
     private int armorCount;
-    //private int beerCount;
+    private int beerCount;
     //non-tangible resources (have their own max limit)
     private int entertainmentLevel;
     //maximum amount of tangible resources this storage building can hold
@@ -46,11 +46,14 @@ public class Storage : MonoBehaviour {
         ironCount = 0;
         //gemsCount = 0;
         //clayCount = 0;
-        //hopsCount = 0;
+        hopsCount = 0;
 
         furnitureCount = 0;
         weaponsCount = 0;
         armorCount = 0;
+        beerCount = 0;
+        //trinketCount = 0;
+        //treasureCount = 0;
 
         entertainmentLevel = 0;
     }
@@ -71,7 +74,9 @@ public class Storage : MonoBehaviour {
     public int getCurrentAmountStored()
     {
         //TODO: add up other tangible resources as they are added to the game
-        return meatCount + wheatCount + fishCount + waterCount + lumberCount + ironCount + furnitureCount + weaponsCount + armorCount;
+        return meatCount + wheatCount + hopsCount + fishCount
+            + waterCount + lumberCount + ironCount + furnitureCount
+            + weaponsCount + armorCount + beerCount;
     }
 
     /**
@@ -136,6 +141,14 @@ public class Storage : MonoBehaviour {
             {
                 accepts = true;
             }
+            if (name.Equals("Hops") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+            if (name.Equals("Beer") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
         }
         if (storageType.Equals("Weaponsmith"))
         {
@@ -147,6 +160,20 @@ public class Storage : MonoBehaviour {
         if (storageType.Equals("Weaponsmith"))
         {
             if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+        }
+        if (storageType.Equals("Brewery"))
+        {
+            if (name.Equals("Hops") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+        }
+        if (storageType.Equals("Pub"))
+        {
+            if (name.Equals("Beer") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -169,6 +196,14 @@ public class Storage : MonoBehaviour {
         else if (name.Equals("Wheat"))
         {
             wheatCount += num;
+        }
+        else if (name.Equals("Hops"))
+        {
+            hopsCount += num;
+        }
+        else if (name.Equals("Beer"))
+        {
+            beerCount += num;
         }
         else if (name.Equals("Water"))
         {
@@ -218,6 +253,14 @@ public class Storage : MonoBehaviour {
         {
             wheatCount -= num;
         }
+        else if (name.Equals("Hops"))
+        {
+            hopsCount -= num;
+        }
+        else if (name.Equals("Beer"))
+        {
+            beerCount -= num;
+        }
         else if (name.Equals("Water"))
         {
             waterCount -= num;
@@ -258,6 +301,14 @@ public class Storage : MonoBehaviour {
         else if (resourceName.Equals("Wheat"))
         {
             return getWheatCount();
+        }
+        else if (resourceName.Equals("Hops"))
+        {
+            return getHopsCount();
+        }
+        else if (resourceName.Equals("Beer"))
+        {
+            return getBeerCount();
         }
         else if (resourceName.Equals("Water"))
         {
@@ -302,6 +353,24 @@ public class Storage : MonoBehaviour {
     public int getWheatCount()
     {
         return wheatCount;
+    }
+
+    /**
+     * Returns the total amount of hops in storage
+     * @return hopsCount the amount of hops in storage
+     */
+    public int getHopsCount()
+    {
+        return hopsCount;
+    }
+
+    /**
+     * Returns the total amount of beer in storage
+     * @return beerCount the amount of beer in storage
+     */
+    public int getBeerCount()
+    {
+        return beerCount;
     }
 
     /**

@@ -73,11 +73,13 @@
     <Compile Include="Assets\Scripts\Town\Arena.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\BreweryClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FarmClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FurnitureWorkshopClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\GladiatorPitClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\IronMineClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\LumberMillClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\PubClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\WeaponsmithClick.cs" />
     <Compile Include="Assets\Scripts\Town\Collect.cs" />
     <Compile Include="Assets\Scripts\Town\Deliver.cs" />
@@ -92,10 +94,12 @@
     <Compile Include="Assets\Scripts\Town\ItemProduction.cs" />
     <Compile Include="Assets\Scripts\Town\Marketplace.cs" />
     <Compile Include="Assets\Scripts\Town\Production.cs" />
+    <Compile Include="Assets\Scripts\Town\Pub.cs" />
     <Compile Include="Assets\Scripts\Town\Storage.cs" />
     <Compile Include="Assets\Scripts\Town\Warehouse.cs" />
     <Compile Include="Assets\Scripts\Town\Well.cs" />
     <Compile Include="Assets\Scripts\UI\ArenaPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\BreweryPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FarmPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FurnitureWorkshopPopup.cs" />
@@ -105,6 +109,7 @@
     <Compile Include="Assets\Scripts\UI\LumberMillPopup.cs" />
     <Compile Include="Assets\Scripts\UI\MarketPopup.cs" />
     <Compile Include="Assets\Scripts\UI\PopupRemoval.cs" />
+    <Compile Include="Assets\Scripts\UI\PubPopup.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\WarehousePopup.cs" />
     <Compile Include="Assets\Scripts\UI\WeaponsmithPopup.cs" />

@@ -9,11 +9,14 @@ public class WarehousePopup : MonoBehaviour {
     public Text employeeNum;
     public Text meatNum;
     public Text wheatNum;
+    public Text eggsNum;
     public Text fishNum;
     public Text furnitureNum;
     public Text weaponsNum;
     public Text ironNum;
     public Text lumberNum;
+    public Text hopsNum;
+    public Text beerNum;
 
     // Use this for initialization
     void Start () {
@@ -49,6 +52,8 @@ public class WarehousePopup : MonoBehaviour {
         lumberNum.text = "" + storage.getLumberCount();
         weaponsNum.text = "" + storage.getWeaponCount();
         furnitureNum.text = "" + storage.getFurnitureCount();
+        hopsNum.text = "" + storage.getHopsCount();
+        beerNum.text = "" + storage.getBeerCount();
     }
 
     /**

@@ -69,7 +69,7 @@ public class ArenaPopup : MonoBehaviour {
     }
 
     /**
-     * Sets the farm object this popup is displaying information on.
+     * Sets the arena object this popup is displaying information on.
      */
     public void setArena(GameObject arena)
     {

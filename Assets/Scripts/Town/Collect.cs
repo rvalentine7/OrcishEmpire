@@ -266,6 +266,38 @@ public class Collect : MonoBehaviour {
                                 remainingCapacity -= furnitureCount;
                             }
                         }
+                        if (resourcesToCollect.Equals("Hops") && storage.getHopsCount() > 0)
+                        {
+                            int hopsCount = storage.getHopsCount();
+                            if (hopsCount > remainingCapacity)
+                            {
+                                resources.Add("Hops", remainingCapacity);
+                                storage.removeResource("Hops", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("Hops", hopsCount);
+                                storage.removeResource("Hops", hopsCount);
+                                remainingCapacity -= hopsCount;
+                            }
+                        }
+                        if (resourcesToCollect.Equals("Beer") && storage.getBeerCount() > 0)
+                        {
+                            int beerCount = storage.getBeerCount();
+                            if (beerCount > remainingCapacity)
+                            {
+                                resources.Add("Beer", remainingCapacity);
+                                storage.removeResource("Beer", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("Beer", beerCount);
+                                storage.removeResource("Beer", beerCount);
+                                remainingCapacity -= beerCount;
+                            }
+                        }
                         //if this unit has acquired resources, it should return to its place of employment
                         if (resources.Count > 0)
                         {
@@ -397,6 +429,29 @@ public class Collect : MonoBehaviour {
                             hasNeededResources = true;
                         }
                     }
+                    //Used by the Brewery
+                    if (resourcesToCollect.Equals("Hops"))
+                    {
+                        Storage warehouseStorage = structureArr[(int)originalLocation.x - searchRadius + i,
+                        (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
+                        //only use this warehouse as a possibility if it has of food
+                        if (warehouseStorage.getHopsCount() > 0)
+                        {
+                            hasNeededResources = true;
+                        }
+                    }
+                    //Used by the Pub
+                    if (resourcesToCollect.Equals("Beer"))
+                    {
+                        Storage warehouseStorage = structureArr[(int)originalLocation.x - searchRadius + i,
+                        (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
+                        //only use this warehouse as a possibility if it has of food
+                        if (warehouseStorage.getBeerCount() > 0)
+                        {
+                            hasNeededResources = true;
+                        }
+                    }
+
                     if (hasNeededResources)
                     {
                         discoveredDeliveryLocs.Add(structureArr[(int)originalLocation.x - searchRadius + i,

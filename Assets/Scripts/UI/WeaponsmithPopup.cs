@@ -52,7 +52,8 @@ public class WeaponsmithPopup : MonoBehaviour {
     }
 
     /**
-     * Sets the farm object this popup is displaying information on.
+     * Sets the weaponsmith object this popup is displaying information on.
+     * @param weaponsmith the weaponsmith the popup is displaying information on
      */
     public void setWeaponsmith(GameObject weaponsmith)
     {

@@ -129,17 +129,17 @@ public class Arena : MonoBehaviour {
                     {
                         for (int j = 0; j < housingSearchRadius * 2; j++)
                         {
-                            if (Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i >= 0
-                                && Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j >= 0
-                                && Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i <= 39
-                                && Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j <= 39
-                                && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
-                                Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j] != null
-                                && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
-                                Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j].tag == "House")
+                            if (Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i >= 0
+                                && Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j >= 0
+                                && Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i <= 39
+                                && Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j <= 39
+                                && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
+                                Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j] != null
+                                && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
+                                Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j].tag == "House")
                             {
-                                GameObject house = structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
-                                    Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j];
+                                GameObject house = structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
+                                    Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j];
                                 house.GetComponent<HouseInformation>().setEntertainmentLevel(1);
                             }
                         }
