@@ -11,6 +11,11 @@ public class World : MonoBehaviour {
     public int mapSize;
     public Vector2 spawnLocation;//location where immigrants will spawn in
     public Vector2 exitLocation;//locations where emmigrants will exit the world
+    public List<string> walkableTerrain;
+    public List<string> nonWalkableTerrain;
+    public List<string> buildableTerrain;
+    public List<string> mountainousTerrain;
+    public List<string> wateryTerrain;
 
     /**
      * Initializes the necessary information for a world.

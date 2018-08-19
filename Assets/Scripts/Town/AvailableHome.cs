@@ -36,19 +36,6 @@ public class AvailableHome : MonoBehaviour {
 
             houseInfo.orcsMovingIn(houseSize - (numInhabitants + numIncomingOrcs));
             orcInfo.setOrcCount(houseSize - (numInhabitants + numIncomingOrcs));
-            //if (houseSize - (numInhabitants + numIncomingOrcs) >= 3)
-            //{
-            //    houseInfo.orcsMovingIn(3);
-            //    orcInfo.setOrcCount(3);
-            //} else if (houseSize - (numInhabitants + numIncomingOrcs) == 2)
-            //{
-            //    houseInfo.orcsMovingIn(2);
-            //    orcInfo.setOrcCount(2);
-            //} else
-            //{
-            //    houseInfo.orcsMovingIn(1);
-            //    orcInfo.setOrcCount(1);
-            //}
         }
         
     }

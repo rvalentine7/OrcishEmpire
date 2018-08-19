@@ -22,8 +22,8 @@ public class LumberMillPopup : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-        Production thisIronMine = lumberMill.GetComponent<Production>();
-        progressNum.text = "" + thisIronMine.getProgressNum() + "/100";
+        Production lumberMillProduction = lumberMill.GetComponent<Production>();
+        progressNum.text = "" + lumberMillProduction.getProgressNum() + "/100";
         Employment employment = lumberMill.GetComponent<Employment>();
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         if (employment.getNumWorkers() == 0)
@@ -49,7 +49,7 @@ public class LumberMillPopup : MonoBehaviour {
     }
 
     /**
-     * Sets the farm object this popup is displaying information on.
+     * Sets the lumber mill object this popup is displaying information on.
      */
     public void setLumberMill(GameObject lumberMill)
     {

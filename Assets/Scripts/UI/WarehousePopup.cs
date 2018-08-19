@@ -17,6 +17,9 @@ public class WarehousePopup : MonoBehaviour {
     public Text lumberNum;
     public Text hopsNum;
     public Text beerNum;
+    public Text ochreNum;
+    public Text warPaintNum;
+    public Text treasureNum;
 
     // Use this for initialization
     void Start () {
@@ -54,6 +57,9 @@ public class WarehousePopup : MonoBehaviour {
         furnitureNum.text = "" + storage.getFurnitureCount();
         hopsNum.text = "" + storage.getHopsCount();
         beerNum.text = "" + storage.getBeerCount();
+        ochreNum.text = "" + storage.getOchreCount();
+        warPaintNum.text = "" + storage.getWarPaintCount();
+        treasureNum.text = "";
     }
 
     /**

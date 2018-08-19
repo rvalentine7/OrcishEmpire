@@ -217,7 +217,7 @@ public class Gladiator : MonoBehaviour {
                 {
                     network[i, j] = terrainArr[i, j];
                 }
-                //delivery workers should not travel over houses during their trip.  as such,
+                //gladiators should not travel over houses during their trip.  as such,
                 // houses are not included in the network
                 else if (structureArr[i, j].tag != "House")
                 {

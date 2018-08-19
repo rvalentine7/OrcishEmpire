@@ -9,6 +9,7 @@ public class Immigrate : MonoBehaviour {
     //TODO: If a part of its path is destroyed at any point in time, it should find a new path.
     private GameObject[,] network;
     private GameObject[,] structureArr;
+    private World myWorld;
     public GameObject goalObject;
     private List<Vector2> path;
     public float stepSize;
@@ -23,7 +24,7 @@ public class Immigrate : MonoBehaviour {
         changePath = false;
         runningAStar = false;
         GameObject world = GameObject.Find("WorldInformation");
-        World myWorld = world.GetComponent<World>();
+        myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -31,8 +32,7 @@ public class Immigrate : MonoBehaviour {
         {
             for (int j = 0; j < network.GetLength(1); j++)
             {
-                if (structureArr[i, j] == null && terrainArr[i, j].tag != "Water"
-                    && terrainArr[i, j].tag != "Rocks" && terrainArr[i, j].tag != "Trees")
+                if (structureArr[i, j] == null && myWorld.walkableTerrain.Contains(terrainArr[i, j].tag))
                 {
                     network[i, j] = terrainArr[i, j];
                 }
@@ -97,8 +97,7 @@ public class Immigrate : MonoBehaviour {
             else
             {
                 if ((network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)] == null)
-                    || (network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag != "Ground"
-                    && network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag != "Road"
+                    || (!myWorld.walkableTerrain.Contains(network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag)
                     && network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag != "House"))
                 {
                     changePath = true;

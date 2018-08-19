@@ -120,6 +120,7 @@ public class Arena : MonoBehaviour {
                 {
                     numGladiators = 0;
                     ongoingFight = false;
+                    setupProgress = 0;
                 }
                 //whenever a fight happens, give entertainment to nearby houses
                 //this is a tier 1 entertainment building so it can only increase entertainment in nearby houses to tier 1.  plan is to have 2 tiers

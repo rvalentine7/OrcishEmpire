@@ -356,8 +356,11 @@ public class HouseInformation : MonoBehaviour {
             Employment employment = entry.Key.GetComponent<Employment>();
             employment.removeWorkers(entry.Value, gameObject);
         }
-        Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
-            gameObject.transform.position.y + 0.4f), Quaternion.identity);
+        if (numInhabitants > 0)
+        {
+            Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
+                gameObject.transform.position.y + 0.4f), Quaternion.identity);
+        }
         Destroy(gameObject);
     }
 

@@ -86,16 +86,12 @@ public class RoadPlacement : MonoBehaviour {
         }
         //can't place a road on other constructs
         if (valid && structureArr[(int)mousePos.x, (int)mousePos.y] != null
-            && (structureArr[(int) mousePos.x, (int) mousePos.y].tag == "Road"
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House"))
+            && (!myWorld.buildableTerrain.Contains(structureArr[(int) mousePos.x, (int) mousePos.y].tag)))
         {
             valid = false;
         }
         if (valid && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
-            && terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Water"
-            || terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Trees"
-            || terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Rocks")
+            && !myWorld.buildableTerrain.Contains(terrainArr[(int)mousePos.x, (int)mousePos.y].tag))
         {
             valid = false;
         }

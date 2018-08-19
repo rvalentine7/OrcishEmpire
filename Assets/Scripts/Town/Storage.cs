@@ -18,14 +18,15 @@ public class Storage : MonoBehaviour {
     //crafting resources
     private int lumberCount;
     private int ironCount;
+    private int ochreCount;
     private int hopsCount;
-    //private int gemsCount;
-    //private int clayCount;
     //sellable goods
     private int furnitureCount;
     private int weaponsCount;
     private int armorCount;
     private int beerCount;
+    private int warPaintCount;
+    //private int treasureCount;
     //non-tangible resources (have their own max limit)
     private int entertainmentLevel;
     //maximum amount of tangible resources this storage building can hold
@@ -44,15 +45,14 @@ public class Storage : MonoBehaviour {
 
         lumberCount = 0;
         ironCount = 0;
-        //gemsCount = 0;
-        //clayCount = 0;
+        ochreCount = 0;
         hopsCount = 0;
 
         furnitureCount = 0;
         weaponsCount = 0;
         armorCount = 0;
         beerCount = 0;
-        //trinketCount = 0;
+        warPaintCount = 0;
         //treasureCount = 0;
 
         entertainmentLevel = 0;
@@ -76,7 +76,8 @@ public class Storage : MonoBehaviour {
         //TODO: add up other tangible resources as they are added to the game
         return meatCount + wheatCount + hopsCount + fishCount
             + waterCount + lumberCount + ironCount + furnitureCount
-            + weaponsCount + armorCount + beerCount;
+            + weaponsCount + armorCount + beerCount + ochreCount
+            + warPaintCount;
     }
 
     /**
@@ -149,6 +150,14 @@ public class Storage : MonoBehaviour {
             {
                 accepts = true;
             }
+            if (name.Equals("Ochre") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+            if (name.Equals("WarPaint") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
         }
         if (storageType.Equals("Weaponsmith"))
         {
@@ -174,6 +183,13 @@ public class Storage : MonoBehaviour {
         if (storageType.Equals("Pub"))
         {
             if (name.Equals("Beer") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+        }
+        if (storageType.Equals("WarPaintWorkshop"))
+        {
+            if (name.Equals("Ochre") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -232,6 +248,14 @@ public class Storage : MonoBehaviour {
         {
             furnitureCount += num;
         }
+        else if (name.Equals("Ochre"))
+        {
+            ochreCount += num;
+        }
+        else if (name.Equals("WarPaint"))
+        {
+            warPaintCount += num;
+        }
         else if (name.Equals("Entertainment"))
         {
             entertainmentLevel += num;
@@ -281,6 +305,14 @@ public class Storage : MonoBehaviour {
         {
             furnitureCount -= num;
         }
+        else if (name.Equals("Ochre"))
+        {
+            ochreCount -= num;
+        }
+        else if (name.Equals("WarPaint"))
+        {
+            warPaintCount -= num;
+        }
         else if (name.Equals("Entertainment"))
         {
             entertainmentLevel -= num;
@@ -329,6 +361,14 @@ public class Storage : MonoBehaviour {
         else if (resourceName.Equals("Furniture"))
         {
             return getFurnitureCount();
+        }
+        else if (resourceName.Equals("Ochre"))
+        {
+            return getOchreCount();
+        }
+        else if (resourceName.Equals("WarPaint"))
+        {
+            return getWarPaintCount();
         }
         else if (resourceName.Equals("Entertainment"))
         {
@@ -420,13 +460,31 @@ public class Storage : MonoBehaviour {
     }
 
     /**
-     * Returns the toal amount of furniture in storage
+     * Returns the total amount of furniture in storage
      * @return furnitureCount the amount of furniture in storage
      */
     public int getFurnitureCount()
     {
         return furnitureCount;
     }
+
+    /**
+     * Returns the total amount of ochre in storage
+     * @return ochreCount the amount of ochre in storage
+     */
+     public int getOchreCount()
+     {
+         return ochreCount;
+     }
+
+    /**
+     * Returns the total amount of war paint in storage
+     * @return warPaintCount the amount of war paint in storage
+     */
+     public int getWarPaintCount()
+     {
+         return warPaintCount;
+     }
 
     /**
      * Returns the current entertainment level

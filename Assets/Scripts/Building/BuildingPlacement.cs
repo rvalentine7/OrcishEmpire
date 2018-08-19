@@ -97,22 +97,68 @@ public class BuildingPlacement : MonoBehaviour {
         //iron mines need to be next to "Rocks" terrain
         if (validPlacement && gameObject.name == "BuildIronMine(Clone)")
         {
+            if (!myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag)//below bottom left corner
+                && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag)//above top left corner
+                && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag)//below bottom right corner
+                && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag)//above top right corner
+                && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag)//to the right of bottom right corner
+                && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag)//to the right of the top right corner
+                && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag)//to the left of the bottom left corner
+                && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag))//to the left of the top left corner
+            {
+                validPlacement = false;
+            }
+        }
+        //gem mines need to be built next to "GemVein" terrain
+        if (validPlacement && gameObject.name == "BuildGemMine(Clone)")
+        {
             if (terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
-                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "Rocks"//below bottom left corner
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "GemVein"//below bottom left corner
                 && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
-                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//above top left corner
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "GemVein"//above top left corner
                 && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
-                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "Rocks"//below bottom right corner
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "GemVein"//below bottom right corner
                 && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
-                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//above top right corner
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "GemVein"//above top right corner
                 && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
-                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//to the right of bottom right corner
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "GemVein"//to the right of bottom right corner
                 && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
-                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "Rocks"//to the right of the top right corner
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "GemVein"//to the right of the top right corner
                 && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
-                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "Rocks"//to the left of the bottom left corner
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "GemVein"//to the left of the bottom left corner
                 && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
-                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "Rocks")//to the left of the top left corner
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "GemVein")//to the left of the top left corner
+            {
+                validPlacement = false;
+            }
+        }
+        //ochre pits need to be built next to "OchreHills" terrain
+        if (validPlacement && gameObject.name == "BuildOchrePit(Clone)")
+        {
+            if (terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "OchreHills"//below bottom left corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "OchreHills"//above top left corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "OchreHills"//below bottom right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2)),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 1)].tag != "OchreHills"//above top right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "OchreHills"//to the right of bottom right corner
+                && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2) + 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "OchreHills"//to the right of the top right corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y - Mathf.FloorToInt(height / 2) + 1)].tag != "OchreHills"//to the left of the bottom left corner
+                && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (int)(mousePos.y + Mathf.FloorToInt(height / 2))].tag != "OchreHills")//to the left of the top left corner
             {
                 validPlacement = false;
             }
@@ -152,16 +198,12 @@ public class BuildingPlacement : MonoBehaviour {
                 //Mathf.CeilToInt(width / 2.0f - 1) finds the middle square and then that is subtracted from x to get to the edge to start checking the structure array
                 //TODO: change the following to be areas that can be built on because the areas that can't be built on are more numerous
                 if (structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                    && (structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Road"
-                    || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Building"
-                    || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "House"))
+                    && (!myWorld.buildableTerrain.Contains(structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
                 {
                     validPlacement = false;
                 }
                 if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                    && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Water"
-                    || terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Rocks"
-                    || terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag == "Trees"))
+                    && (!myWorld.buildableTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
                 {
                     validPlacement = false;
                 }
