@@ -52,7 +52,7 @@ public class FurnitureWorkshopPopup : MonoBehaviour {
     }
 
     /**
-     * Sets the farm object this popup is displaying information on.
+     * Sets the furniture workshop object this popup is displaying information on.
      */
     public void setFurnitureWorkshop(GameObject furnitureWorkshop)
     {

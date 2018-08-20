@@ -298,6 +298,38 @@ public class Collect : MonoBehaviour {
                                 remainingCapacity -= beerCount;
                             }
                         }
+                        if (resourcesToCollect.Equals("Ochre") && storage.getOchreCount() > 0)
+                        {
+                            int ochreCount = storage.getOchreCount();
+                            if (ochreCount > remainingCapacity)
+                            {
+                                resources.Add("Ochre", ochreCount);
+                                storage.removeResource("Ochre", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("Ochre", ochreCount);
+                                storage.removeResource("Ochre", ochreCount);
+                                remainingCapacity -= ochreCount;
+                            }
+                        }
+                        if (resourcesToCollect.Equals("WarPaint") && storage.getWarPaintCount() > 0)
+                        {
+                            int warPaintCount = storage.getWarPaintCount();
+                            if (warPaintCount > remainingCapacity)
+                            {
+                                resources.Add("WarPaint", warPaintCount);
+                                storage.removeResource("WarPaint", remainingCapacity);
+                                remainingCapacity = 0;
+                            }
+                            else
+                            {
+                                resources.Add("WarPaint", warPaintCount);
+                                storage.removeResource("WarPaint", warPaintCount);
+                                remainingCapacity -= warPaintCount;
+                            }
+                        }
                         //if this unit has acquired resources, it should return to its place of employment
                         if (resources.Count > 0)
                         {
@@ -447,6 +479,17 @@ public class Collect : MonoBehaviour {
                         (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
                         //only use this warehouse as a possibility if it has of food
                         if (warehouseStorage.getBeerCount() > 0)
+                        {
+                            hasNeededResources = true;
+                        }
+                    }
+                    //Used by the War Paint Workshop
+                    if (resourcesToCollect.Equals("Ochre"))
+                    {
+                        Storage warehouseStorage = structureArr[(int)originalLocation.x - searchRadius + i,
+                        (int)originalLocation.y - searchRadius + j].GetComponent<Storage>();
+                        //only use this warehouse as a possibility if it has of food
+                        if (warehouseStorage.getOchreCount() > 0)
                         {
                             hasNeededResources = true;
                         }

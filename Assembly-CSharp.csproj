@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\Town\Clicking Objects\LumberMillClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\OchrePitClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\PubClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\WarPaintWorkshopClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\WeaponsmithClick.cs" />
     <Compile Include="Assets\Scripts\Town\Collect.cs" />
     <Compile Include="Assets\Scripts\Town\Deliver.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Assets\Scripts\UI\PubPopup.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\WarehousePopup.cs" />
+    <Compile Include="Assets\Scripts\UI\WarPaintWorkshopPopup.cs" />
     <Compile Include="Assets\Scripts\UI\WeaponsmithPopup.cs" />
     <Compile Include="Assets\Scripts\UI\WellPopup.cs" />
     <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />

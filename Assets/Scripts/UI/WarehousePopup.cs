@@ -59,7 +59,7 @@ public class WarehousePopup : MonoBehaviour {
         beerNum.text = "" + storage.getBeerCount();
         ochreNum.text = "" + storage.getOchreCount();
         warPaintNum.text = "" + storage.getWarPaintCount();
-        treasureNum.text = "";
+        treasureNum.text = "0";
     }
 
     /**

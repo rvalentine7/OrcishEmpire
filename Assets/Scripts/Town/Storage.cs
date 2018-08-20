@@ -166,7 +166,7 @@ public class Storage : MonoBehaviour {
                 accepts = true;
             }
         }
-        if (storageType.Equals("Weaponsmith"))
+        if (storageType.Equals("FurnitureWorkshop"))
         {
             if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
             {
@@ -189,6 +189,7 @@ public class Storage : MonoBehaviour {
         }
         if (storageType.Equals("WarPaintWorkshop"))
         {
+            Debug.Log("war paint workshop storage");
             if (name.Equals("Ochre") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
