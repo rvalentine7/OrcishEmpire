@@ -9,7 +9,9 @@ public class BuildingPlacement : MonoBehaviour {
     public int width;
     public int height;
     public Sprite possibleSprite;
+    public Sprite possibleSprite2;
     public Sprite impossibleSprite;
+    public Sprite impossibleSprite2;
     public GameObject building;
     private bool validPlacement;
     private GameObject world;
@@ -97,6 +99,17 @@ public class BuildingPlacement : MonoBehaviour {
         //iron mines need to be next to "Rocks" terrain
         if (validPlacement && gameObject.name == "BuildIronMine(Clone)")
         {
+            for (int i = 0; i < 2; i++)
+            {
+                //Left Side
+
+                //Right Side
+
+                //Top Side
+
+                //Bottom Side
+
+            }
             if (!myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
                 (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag)//below bottom left corner
                 && !myWorld.mountainousTerrain.Contains(terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
@@ -120,6 +133,17 @@ public class BuildingPlacement : MonoBehaviour {
         //gem mines need to be built next to "GemVein" terrain
         if (validPlacement && gameObject.name == "BuildGemMine(Clone)")
         {
+            for (int i = 0; i < 2; i++)
+            {
+                //Left Side
+
+                //Right Side
+
+                //Top Side
+
+                //Bottom Side
+
+            }
             if (terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
                 (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "GemVein"//below bottom left corner
                 && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
@@ -143,6 +167,17 @@ public class BuildingPlacement : MonoBehaviour {
         //ochre pits need to be built next to "OchreHills" terrain
         if (validPlacement && gameObject.name == "BuildOchrePit(Clone)")
         {
+            for (int i = 0; i < 2; i++)
+            {
+                //Left Side
+
+                //Right Side
+
+                //Top Side
+
+                //Bottom Side
+
+            }
             if (terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
                 (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "OchreHills"//below bottom left corner
                 && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
@@ -166,6 +201,47 @@ public class BuildingPlacement : MonoBehaviour {
         //lumberyards need to be built next to "Trees" terrain
         if (validPlacement && gameObject.name == "BuildLumberMill(Clone)")
         {
+            /*int i = 0;
+            while (validPlacement && i < 2)
+            {
+                //Left Side
+                if ((int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) - 1) > 0
+                    && (int)(mousePos.y - Mathf.FloorToInt(height / 2 - 0.5f) + i) > 0
+                    && (int)(mousePos.y - Mathf.FloorToInt(height / 2 - 0.5f) + i) < myWorld.mapSize - 1
+                    && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) - 1),
+                    (int)(mousePos.y - Mathf.FloorToInt(height / 2 - 0.5f) + i)].tag != "Trees")
+                {
+                    validPlacement = false;
+                }
+                //Right Side
+                else if ((int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) + 1) < myWorld.mapSize - 1
+                    && (int)(mousePos.y - Mathf.FloorToInt(height / 2 - 0.5f) + i) > 0
+                    && (int)(mousePos.y - Mathf.FloorToInt(height / 2 - 0.5f) + i) < myWorld.mapSize - 1
+                    && terrainArr[(int)(mousePos.x + Mathf.FloorToInt(width / 2 + 0.5f)),
+                    (int)(mousePos.y - Mathf.FloorToInt(height / 2 - 0.5f) + i)].tag != "Trees")
+                {
+                    validPlacement = false;
+                }
+                //Top Side
+                else if ((int)(mousePos.y - Mathf.FloorToInt(height / 2) + 0.5f) < myWorld.mapSize - 1
+                    && (int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) + i) > 0
+                    && (int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) + i) < myWorld.mapSize - 1
+                    && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) + i),
+                    (int)(mousePos.y + Mathf.FloorToInt(height / 2) + 0.5f)].tag != "Trees")
+                {
+                    validPlacement = false;
+                }
+                //Bottom Side
+                if ((int)(mousePos.y - Mathf.FloorToInt(height / 2) - 0.5f) < myWorld.mapSize - 1
+                    && (int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) + i) > 0
+                    && (int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) + i) < myWorld.mapSize - 1
+                    && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 0.5f) + i),
+                    (int)(mousePos.y - Mathf.FloorToInt(height / 2) - 0.5f)].tag != "Trees")
+                {
+                    validPlacement = false;
+                }
+                i++;
+            }*/
             if (terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
                 (int)(mousePos.y - Mathf.FloorToInt(height / 2))].tag != "Trees"//below bottom left corner
                 && terrainArr[(int)(mousePos.x - Mathf.CeilToInt(width / 2.0f - 1)),
@@ -196,7 +272,6 @@ public class BuildingPlacement : MonoBehaviour {
             while (validPlacement && c < width)
             {
                 //Mathf.CeilToInt(width / 2.0f - 1) finds the middle square and then that is subtracted from x to get to the edge to start checking the structure array
-                //TODO: change the following to be areas that can be built on because the areas that can't be built on are more numerous
                 if (structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
                     && (!myWorld.buildableTerrain.Contains(structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
                 {
@@ -221,14 +296,79 @@ public class BuildingPlacement : MonoBehaviour {
             r++;
         }
 
+        //reservoirs appear filled when next to water
+        bool useFirstSprites = true;
+        bool nextToWater = false;
+        if (gameObject.name == "BuildReservoir(Clone)")
+        {
+            for (int i = 0; i < width; i++)
+            {
+                //Mathf.CeilToInt(width / 2.0f - 1) finds the middle square and then that is subtracted from x to get to the edge to start checking the structure array
+                //Left side
+                if ((int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1 > 0
+                    && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i < myWorld.mapSize - 1
+                    && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i > 0
+                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
+                    && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == "Water"))
+                {
+                    nextToWater = true;
+                }
+                //Right side
+                else if ((int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width < myWorld.mapSize - 1
+                    && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i < myWorld.mapSize - 1
+                    && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i > 0
+                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
+                    && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == "Water"))
+                {
+                    nextToWater = true;
+                }
+                //Top side
+                else if ((int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i < myWorld.mapSize - 1
+                    && (int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i > 0
+                    && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height < myWorld.mapSize - 1
+                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height] != null
+                    && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height].tag == "Water"))
+                {
+                    nextToWater = true;
+                }
+                //Bottom side
+                else if ((int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i < myWorld.mapSize - 1
+                    && (int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i > 0
+                    && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1 > 0
+                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1] != null
+                    && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1].tag == "Water"))
+                {
+                    nextToWater = true;
+                }
+            }
+            if (!nextToWater)
+            {
+                useFirstSprites = false;
+            }
+        }
+
         //make sure sprite is correct based on if the location is possible or not to build on
         if (validPlacement)
         {
-            GetComponent<SpriteRenderer>().sprite = possibleSprite;
+            if (useFirstSprites)
+            {
+                GetComponent<SpriteRenderer>().sprite = possibleSprite;
+            }
+            else
+            {
+                GetComponent<SpriteRenderer>().sprite = possibleSprite2;
+            }
         }
         else
         {
-            GetComponent<SpriteRenderer>().sprite = impossibleSprite;
+            if (useFirstSprites)
+            {
+                GetComponent<SpriteRenderer>().sprite = impossibleSprite;
+            }
+            else
+            {
+                GetComponent<SpriteRenderer>().sprite = impossibleSprite2;
+            }
         }
 
         //Place the object in the world upon left mouse click

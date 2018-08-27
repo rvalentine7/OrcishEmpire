@@ -97,6 +97,7 @@
     <Compile Include="Assets\Scripts\Town\Marketplace.cs" />
     <Compile Include="Assets\Scripts\Town\Production.cs" />
     <Compile Include="Assets\Scripts\Town\Pub.cs" />
+    <Compile Include="Assets\Scripts\Town\Reservoir.cs" />
     <Compile Include="Assets\Scripts\Town\Storage.cs" />
     <Compile Include="Assets\Scripts\Town\Warehouse.cs" />
     <Compile Include="Assets\Scripts\Town\Well.cs" />
