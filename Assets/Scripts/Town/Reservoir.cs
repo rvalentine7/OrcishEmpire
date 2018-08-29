@@ -7,7 +7,37 @@ using UnityEngine;
  */
 public class Reservoir : MonoBehaviour {
     public Sprite filledSprite;
+    public Sprite filled1N;
+    public Sprite filled1S;
+    public Sprite filled1W;
+    public Sprite filled1E;
+    public Sprite filled2NS;
+    public Sprite filled2NW;
+    public Sprite filled2NE;
+    public Sprite filled2SW;
+    public Sprite filled2SE;
+    public Sprite filled2WE;
+    public Sprite filled3NSE;
+    public Sprite filled3NSW;
+    public Sprite filled3NWE;
+    public Sprite filled3SWE;
+    public Sprite filled4;
     public Sprite emptySprite;
+    public Sprite empty1N;
+    public Sprite empty1S;
+    public Sprite empty1W;
+    public Sprite empty1E;
+    public Sprite empty2NS;
+    public Sprite empty2NW;
+    public Sprite empty2NE;
+    public Sprite empty2SW;
+    public Sprite empty2SE;
+    public Sprite empty2WE;
+    public Sprite empty3NSE;
+    public Sprite empty3NSW;
+    public Sprite empty3NWE;
+    public Sprite empty3SWE;
+    public Sprite empty4;
 
     private GameObject world;
     private World myWorld;
@@ -17,7 +47,7 @@ public class Reservoir : MonoBehaviour {
     private int height;
     private Vector2 reservoirPosition;
     private bool nextToWater;
-    //private List<GameObject> fillSources;//other reservoirs/aqueducts that help fill this one
+    private List<GameObject> fillSources;//other reservoirs/aqueducts that help fill this one
 
     private void Awake()
     {
@@ -29,7 +59,7 @@ public class Reservoir : MonoBehaviour {
         height = (int) gameObject.GetComponent<BoxCollider2D>().size.y;
         reservoirPosition = gameObject.transform.position;
         nextToWater = false;
-        //fillSources = new List<GameObject>();
+        fillSources = new List<GameObject>();
     }
 
     /**
@@ -82,4 +112,40 @@ public class Reservoir : MonoBehaviour {
         //TODO: upon being emptied, this should stop supplying water to all nearby terrain tiles
         //TODO: have public methods for dealing with aqueducts.  use enums for determining which sprite should be displayed?
 	}
+
+    /**
+     * Adds a reservoir to the list of reservoirs helping fill this reservoir with water
+     * @param the reservoir that is helping fill this reservoir
+     */
+    public void addFillSources(GameObject reservoir)
+    {
+        fillSources.Add(reservoir);
+    }
+
+    /**
+     * Removes a reservoir from the list of reservoirs helping fill this reservoir with water
+     * @param the reservoir that is no longer helping to fill this reservoir
+     */
+    public void removeFillSources(GameObject reservoir)
+    {
+        fillSources.Remove(reservoir);
+    }
+
+    /**
+     * Gets whether the reservoir is next to water and can fill other reservoirs/aqueducts
+     * @return whether the reservoir is next to water
+     */
+    public bool getNextToWater()
+    {
+        return nextToWater;
+    }
+
+    /**
+     * Gets whether the reservoir is filled with water for the purposes of filling fountains/reservoirs/aqueducts
+     * @return whether the reservoir is filled
+     */
+    public bool getFilled()
+    {
+        return fillSources.Count > 0;
+    }
 }
