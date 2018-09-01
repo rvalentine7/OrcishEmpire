@@ -6,6 +6,8 @@ using UnityEngine;
  * Used to supply water to fountains and mud baths
  */
 public class Reservoir : MonoBehaviour {
+    public float timeDelay;
+    public int waterRadius;
     public Sprite filledSprite;
     public Sprite filled1N;
     public Sprite filled1S;
@@ -102,15 +104,19 @@ public class Reservoir : MonoBehaviour {
         {
             gameObject.GetComponent<SpriteRenderer>().sprite = emptySprite;
         }
+        else
+        {
+            //Update all nearby tiles with water
+            updatePipes(true);
+        }
     }
 	
 	/**
      * Updates the appearance of the reservoir and determines if it is filled
      */
 	void Update () {
-		//TODO: upon being filled, this should also supply water to all nearby terrain tiles
-        //TODO: upon being emptied, this should stop supplying water to all nearby terrain tiles
         //TODO: have public methods for dealing with aqueducts.  use enums for determining which sprite should be displayed?
+        //make sure to be calling add and remove fill sources to update water supply
 	}
 
     /**
@@ -119,6 +125,11 @@ public class Reservoir : MonoBehaviour {
      */
     public void addFillSources(GameObject reservoir)
     {
+        if (fillSources.Count == 0 && !nextToWater)
+        {
+            //Update all nearby tiles with water
+            updatePipes(true);
+        }
         fillSources.Add(reservoir);
     }
 
@@ -128,6 +139,11 @@ public class Reservoir : MonoBehaviour {
      */
     public void removeFillSources(GameObject reservoir)
     {
+        if (fillSources.Count == 1 && !nextToWater)
+        {
+            //Update all nearby tiles to no longer have water from this reservoir
+            updatePipes(false);
+        }
         fillSources.Remove(reservoir);
     }
 
@@ -146,6 +162,38 @@ public class Reservoir : MonoBehaviour {
      */
     public bool getFilled()
     {
-        return fillSources.Count > 0;
+        return fillSources.Count > 0 || nextToWater;
+    }
+
+    /**
+     * Update water in nearby tiles
+     * @param supplying whether this reservoir should be supplying water to nearby tiles
+     */
+    public void updatePipes(bool supplying)
+    {
+        for (int i = 0; i < waterRadius * 2; i++)
+        {
+            for (int j = 0; j < waterRadius * 2; j++)
+            {
+                if (Mathf.RoundToInt(gameObject.transform.position.x) - waterRadius + i >= 0
+                        && Mathf.RoundToInt(gameObject.transform.position.y) - waterRadius + j >= 0
+                        && Mathf.RoundToInt(gameObject.transform.position.x) - waterRadius + i <= 40
+                        && Mathf.RoundToInt(gameObject.transform.position.y) - waterRadius + j <= 40
+                        && terrainArr[Mathf.RoundToInt(gameObject.transform.position.x) - waterRadius + i,
+                        Mathf.RoundToInt(gameObject.transform.position.y) - waterRadius + j] != null)
+                {
+                    Tile tile = terrainArr[Mathf.RoundToInt(gameObject.transform.position.x) - waterRadius + i,
+                        Mathf.RoundToInt(gameObject.transform.position.y) - waterRadius + j].GetComponent<Tile>();
+                    if (supplying)
+                    {
+                        tile.addWaterPipes(gameObject);
+                    }
+                    else
+                    {
+                        tile.removeWaterPipes(gameObject);
+                    }
+                }
+            }
+        }
     }
 }

@@ -13,6 +13,9 @@ public class Employment : MonoBehaviour {
     private Dictionary<GameObject, int> workerHouses;
     private bool openForBusiness;
     private bool workerDeliveringGoods;
+    private int numWaterSources;
+    private GameObject world;
+    private World myWorld;
 
     /**
      * Initializes necessary variables
@@ -21,6 +24,24 @@ public class Employment : MonoBehaviour {
         workerHouses = new Dictionary<GameObject, int>();
         openForBusiness = false;
         workerDeliveringGoods = false;
+        numWaterSources = 0;
+        world = GameObject.Find("WorldInformation");
+        myWorld = world.GetComponent<World>();
+        GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        //Check if tiles already have water, update numWaterSources if so
+        int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
+        int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
+        for (int r = 0;  r < height; r++)
+        {
+            for (int c = 0;  c < width; c++)
+            {
+                if (terrainArr[Mathf.RoundToInt(gameObject.transform.position.x) - Mathf.CeilToInt(width / 2.0f - 1) + c,
+                    Mathf.RoundToInt(gameObject.transform.position.y) - Mathf.CeilToInt(height / 2.0f - 1) + r].GetComponent<Tile>().hasPipes())
+                {
+                    addWaterSource();
+                }
+            }
+        }
     }
 
     /**
@@ -172,6 +193,19 @@ public class Employment : MonoBehaviour {
                 houseInfo.removeWorkLocation(gameObject);
             }
         }
+        //Water supplying sources need to stop supplying water
+        if (gameObject.GetComponent<Reservoir>() != null)
+        {
+            gameObject.GetComponent<Reservoir>().updatePipes(false);
+        }
+        else if (gameObject.GetComponent<Fountain>() != null)
+        {
+            gameObject.GetComponent<Fountain>().updateWaterSupplying(false);
+        }
+        else if (gameObject.GetComponent<Well>() != null)
+        {
+            gameObject.GetComponent<Well>().updateWaterSupplying(false);
+        }
         Destroy(gameObject);
     }
 
@@ -218,5 +252,31 @@ public class Employment : MonoBehaviour {
     public bool getWorkerDeliveringGoods()
     {
         return workerDeliveringGoods;
+    }
+
+    /**
+     * Adds a source of water to the building
+     * @param waterSource the source the water is coming from
+     */
+    public void addWaterSource()
+    {
+        numWaterSources++;
+        if (gameObject.GetComponent<Fountain>() != null && numWaterSources == 1)
+        {
+            gameObject.GetComponent<Fountain>().updateFilled(true);
+        }
+    }
+
+    /**
+     * Removes a source of water to the building
+     * @param waterSource the source of water to remove
+     */
+    public void removeWaterSource()
+    {
+        numWaterSources--;
+        if (gameObject.GetComponent<Fountain>() != null && numWaterSources == 0)
+        {
+            gameObject.GetComponent<Fountain>().updateFilled(false);
+        }
     }
 }

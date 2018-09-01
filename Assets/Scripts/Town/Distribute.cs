@@ -238,7 +238,15 @@ public class Distribute : MonoBehaviour {
                 {
                     path.RemoveAt(0);
                 }
-                Vector2 nextLocation = path[0];
+                Vector2 nextLocation = originalLocation;//TODO: this will need to be updated to make sure the location still exists
+                if (path.Count > 0)
+                {
+                    nextLocation = path[0];
+                }
+                else
+                {
+                    changePath = true;
+                }
                 //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
                 if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
                     && (network[(int)nextLocation.x, (int)nextLocation.y].tag != "Building"

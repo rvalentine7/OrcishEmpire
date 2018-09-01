@@ -35,23 +35,25 @@ public class HouseInformation : MonoBehaviour {
     private float checkTime;
     //private int taxAmount;
     private int food;//will need different types of food later on (meat, bread, etc)
-    private int water;
+    private int numWaterSources;
     private int entertainmentLevel;//this can be 0, 1, or 2.  If it just experiences a change,
                                    // there will need to be some sort of delay before the house reacts
     private float timeOfLastEntertainment;
     //add future resources here (weapons/furniture/currency)
+    private GameObject world;
+    private World myWorld;
 
-	/**
+    /**
      * Initializes the variables involving the house.
      */
-	void Start () {
+    void Start () {
         numInhabitants = 0;
         numIncomingOrcs = 0;
         inhabWorkLocations = new Dictionary<GameObject, int>();//keeps a list of the gameObjects where inhabitants
         // are working
         numEmployedInhabitants = 0;
         food = 0;
-        water = 0;
+        numWaterSources = 0;
         houseSize = 3;//houseSize updates based on factors such as food/water/luxury products
         houseLevel = 1;
         upgrading = false;
@@ -65,6 +67,14 @@ public class HouseInformation : MonoBehaviour {
         //taxAmount = 0;
         entertainmentLevel = 0;
         timeOfLastEntertainment = 0.0f;
+        world = GameObject.Find("WorldInformation");
+        myWorld = world.GetComponent<World>();
+        GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        //Check if tile already has water, update numWaterSources if so
+        if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasPipes())
+        {
+            addWaterSource();
+        }
     }
 	
 	/**
@@ -95,14 +105,6 @@ public class HouseInformation : MonoBehaviour {
         if (Time.time > checkTime)
         {
             checkTime = Time.time + timeInterval;
-            if (storage.getWaterCount() >= numInhabitants * inhabitantWaterConsumption)
-            {
-                storage.removeResource("Water", numInhabitants * inhabitantWaterConsumption);
-            }
-            else
-            {
-                storage.removeResource("Water", storage.getWaterCount());
-            }
             
             //TODO: update food information
             if (storage.getFoodCount() > 0 && storage.getFoodCount() >= numInhabitants * inhabitantFoodConsumption)
@@ -138,7 +140,7 @@ public class HouseInformation : MonoBehaviour {
 
             //TODO: Add text here for the house popup to pull on the describe why a house is upgrading/downgrading
             //Upgrading and downgrading based on food and water counts
-            if (storage.getFoodCount() > 0 && storage.getWaterCount() > 0 && houseLevel == 1)
+            if (storage.getFoodCount() > 0 && numWaterSources > 0 && houseLevel == 1)
             {
                 if (upgrading)
                 {
@@ -156,7 +158,7 @@ public class HouseInformation : MonoBehaviour {
                 }
                 downgrading = false;
             }
-            else if ((storage.getFoodCount() == 0 || storage.getWaterCount() == 0) && houseLevel > 1)
+            else if ((storage.getFoodCount() == 0 || numWaterSources == 0) && houseLevel > 1)
             {
                 if (downgrading)
                 {
@@ -174,7 +176,7 @@ public class HouseInformation : MonoBehaviour {
                 }
                 upgrading = false;
             }
-            else if (storage.getFoodCount() > 0 && storage.getWaterCount() > 0 && downgrading)
+            else if (storage.getFoodCount() > 0 && numWaterSources > 0 && downgrading)
             {
                 downgrading = false;
             }
@@ -421,7 +423,7 @@ public class HouseInformation : MonoBehaviour {
      */
     public void addWater(int num)
     {
-        if (numInhabitants > 0)
+        /*if (numInhabitants > 0)
         {
             if (water + num <= 100)
             {
@@ -431,7 +433,23 @@ public class HouseInformation : MonoBehaviour {
             {
                 water = 100;
             }
-        }
+        }*/
+    }
+
+    /**
+     * Adds a source supplying water to the house
+     */
+    public void addWaterSource()
+    {
+        numWaterSources++;
+    }
+
+    /**
+     * Removes a source supplying water to the house
+     */
+    public void removeWaterSource()
+    {
+        numWaterSources--;
     }
 
     /**
@@ -440,7 +458,7 @@ public class HouseInformation : MonoBehaviour {
      */
     public int getWaterCount()
     {
-        return water;
+        return (numWaterSources > 0 ? 100 : 0);//TODO: change this when fully removed water count
     }
 
     /**

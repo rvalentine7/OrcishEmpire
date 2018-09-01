@@ -27,7 +27,8 @@ public class AvailableHome : MonoBehaviour {
             World myWorld = world.GetComponent<World>();
             if (immigrant == null)
             {
-                immigrant = Instantiate(Resources.Load("Orc Immigrant")) as GameObject;
+                //immigrant = Instantiate(Resources.Load("Orc Immigrant")) as GameObject;
+                immigrant = gameObject.GetComponent<ImmigrantPrefab>().getImmigrant();
             }
             GameObject newImmigrant = Instantiate(immigrant, myWorld.spawnLocation, Quaternion.identity);
             Immigrate immigrate = newImmigrant.GetComponent<Immigrate>();

@@ -71,18 +71,21 @@
     <Compile Include="Assets\Scripts\Player\AstarResult.cs" />
     <Compile Include="Assets\Scripts\Player\AstarSearch.cs" />
     <Compile Include="Assets\Scripts\Player\Citizen.cs" />
+    <Compile Include="Assets\Scripts\Player\ImmigrantPrefab.cs" />
     <Compile Include="Assets\Scripts\Player\OrcInformation.cs" />
     <Compile Include="Assets\Scripts\Town\Arena.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BreweryClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FarmClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\FountainClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FurnitureWorkshopClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\GladiatorPitClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\IronMineClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\LumberMillClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\OchrePitClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\PubClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\ReservoirClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\WarPaintWorkshopClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\WeaponsmithClick.cs" />
     <Compile Include="Assets\Scripts\Town\Collect.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="Assets\Scripts\Town\Emigrate.cs" />
     <Compile Include="Assets\Scripts\Town\Employment.cs" />
     <Compile Include="Assets\Scripts\Town\Farm.cs" />
+    <Compile Include="Assets\Scripts\Town\Fountain.cs" />
     <Compile Include="Assets\Scripts\Town\Gladiator.cs" />
     <Compile Include="Assets\Scripts\Town\GladiatorPit.cs" />
     <Compile Include="Assets\Scripts\Town\HouseInformation.cs" />
@@ -107,6 +111,7 @@
     <Compile Include="Assets\Scripts\UI\BreweryPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FarmPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\FountainPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FurnitureWorkshopPopup.cs" />
     <Compile Include="Assets\Scripts\UI\GladiatorPitPopup.cs" />
     <Compile Include="Assets\Scripts\UI\HousePopup.cs" />
@@ -116,6 +121,7 @@
     <Compile Include="Assets\Scripts\UI\OchrePitPopup.cs" />
     <Compile Include="Assets\Scripts\UI\PopupRemoval.cs" />
     <Compile Include="Assets\Scripts\UI\PubPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\ReservoirPopup.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\WarehousePopup.cs" />
     <Compile Include="Assets\Scripts\UI\WarPaintWorkshopPopup.cs" />

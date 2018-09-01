@@ -201,6 +201,11 @@ public class BuildingPlacement : MonoBehaviour {
         {
             useFirstSprites = checkForRawResources("Water", mousePos, terrainArr);
         }
+        if (gameObject.name == "BuildFountain(Clone)"
+            && !terrainArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Tile>().hasPipes())
+        {
+            useFirstSprites = false;
+        }
 
         //make sure sprite is correct based on if the location is possible or not to build on
         if (validPlacement)

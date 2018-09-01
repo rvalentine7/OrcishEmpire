@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Tile : MonoBehaviour {
-    private List<GameObject> waterSources;
+    private GameObject world;
+    private World myWorld;
+    private GameObject[,] structureArr;
+    private int numWaterPipes;
     private int desirability;
 
 	// Use this for initialization
 	void Start () {
-        waterSources = new List<GameObject>();
+        world = GameObject.Find("WorldInformation");
+        myWorld = world.GetComponent<World>();
+        structureArr = myWorld.constructNetwork.getConstructArr();
+        numWaterPipes = 0;
 	}
 	
 	// Update is called once per frame
@@ -21,9 +27,22 @@ public class Tile : MonoBehaviour {
      * the water source information to determine if the building has access to water
      * @param waterSource the reservoir supplying water to the tile
      */
-    public void addWaterSource(GameObject waterSource)
+    public void addWaterPipes(GameObject waterSource)
     {
-        waterSources.Add(waterSource);
+        if (numWaterPipes == 0)
+        {
+            //updates the building this tile is on to have water
+            structureArr = myWorld.constructNetwork.getConstructArr();
+            if (structureArr[(int) gameObject.transform.position.x, (int) gameObject.transform.position.y] != null)
+            {
+                if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].tag == "Building"
+                    && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Fountain>() != null)
+                {
+                    structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Employment>().addWaterSource();
+                }
+            }
+        }
+        numWaterPipes++;
     }
 
     /**
@@ -31,18 +50,31 @@ public class Tile : MonoBehaviour {
      * from the reservoir.
      * @param waterSource the reservoir that will no longer be supplying water to the tile
      */
-    public void removeWaterSource(GameObject waterSource)
+    public void removeWaterPipes(GameObject waterSource)
     {
-        waterSources.Remove(waterSource);
+        if (numWaterPipes == 1)
+        {
+            //updates the building this tile is on to remove a water source
+            structureArr = myWorld.constructNetwork.getConstructArr();
+            if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y] != null)
+            {
+                if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].tag == "Building"
+                    && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Fountain>() != null)
+                {
+                    structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Employment>().removeWaterSource();
+                }
+            }
+        }
+        numWaterPipes--;
     }
 
     /**
      * Whether the tile has a source of water
      * @return whether the tile has a source of water
      */
-    public bool hasWater()
+    public bool hasPipes()
     {
-        return waterSources.Count > 0;
+        return numWaterPipes > 0;
     }
 
     /**
