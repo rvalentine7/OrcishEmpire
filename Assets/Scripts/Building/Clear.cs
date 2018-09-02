@@ -38,12 +38,14 @@ public class Clear : MonoBehaviour {
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
 
-        if (mousePos.x > 0 && mousePos.x < 39 && mousePos.y > 0 && mousePos.y < 39)//swap 39 with mapSize
+        if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
         {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
         }
 
-        if (Input.GetMouseButton(0) && structureArr[(int)mousePos.x, (int)mousePos.y] != null
+        if (Input.GetMouseButton(0)
+            && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1
+            && structureArr[(int)mousePos.x, (int)mousePos.y] != null
             && (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road"
             || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"
             || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House"))
@@ -67,7 +69,7 @@ public class Clear : MonoBehaviour {
                 //updateRoadConnection(mousePos, structureArr);
                 //go through roads attached to the deleted road to update them visibly
                 //do not update the roads outside building limits
-                if ((int)mousePos.y + 1 < 39 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
+                if ((int)mousePos.y + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
                    && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
                 {
                     //update road above the one you are trying to build
@@ -85,7 +87,7 @@ public class Clear : MonoBehaviour {
                     //update road to the left of the one you are trying to build
                     updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
                 }
-                if ((int)mousePos.x + 1 < 39 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
+                if ((int)mousePos.x + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
                     && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
                 {
                     //update road to the right of the one you are trying to build
@@ -97,7 +99,9 @@ public class Clear : MonoBehaviour {
             Destroy(structureToClear);
         }
         //allow the user to destroy trees
-        if (Input.GetMouseButton(0) && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
+        if (Input.GetMouseButton(0)
+            && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1
+            && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
             && (terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Trees"))
         {
             GameObject terrainToClear = terrainArr[(int)mousePos.x, (int)mousePos.y];

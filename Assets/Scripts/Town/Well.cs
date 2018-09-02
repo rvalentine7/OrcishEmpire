@@ -107,6 +107,20 @@ public class Well : MonoBehaviour {
                         houseInformation.removeWaterSource();
                     }
                 }
+                //add water source to tiles so that new houses know there is water there
+                if (wellPosition.x - waterRadius + i >= 0 && wellPosition.y - waterRadius + j >= 0
+                        && wellPosition.x - waterRadius + i <= 40 && wellPosition.y - waterRadius + j <= 40)
+                {
+                    GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+                    if (supplying)
+                    {
+                        terrainArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].GetComponent<Tile>().addWaterSource();
+                    }
+                    else
+                    {
+                        terrainArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].GetComponent<Tile>().removeWaterSource();
+                    }
+                }
             }
         }
     }

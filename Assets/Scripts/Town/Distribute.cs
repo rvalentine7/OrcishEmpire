@@ -27,7 +27,7 @@ public class Distribute : MonoBehaviour {
     private Dictionary<GameObject, GameObject> locationsToVisit;
     public float stepSize;
     public int searchRadius;
-    public int foodNumToDistribute;
+    public int foodNumToDistribute;//the amount of food distributed based on potential inhabitant count
     public int waterNumToDistribute;
 
     /**
@@ -61,7 +61,7 @@ public class Distribute : MonoBehaviour {
                     if (structureArr[i, j] != null && structureArr[i, j].tag == "House")
                     {
                         Storage houseStorage = structureArr[i, j].GetComponent<Storage>();
-                        if (houseStorage.acceptsResource("Meat", foodNumToDistribute))
+                        if (houseStorage.acceptsResource("Meat", foodNumToDistribute))//only need to check for meat because houses accept all types of food
                         {
                             if (i - 1 > 0 && structureArr[i - 1, j] != null && structureArr[i - 1, j].tag == "Road")
                             {
@@ -127,7 +127,7 @@ public class Distribute : MonoBehaviour {
     private IEnumerator runDistribute()
     {
         //if the place of employment is destroyed, this gameobject should be as well
-        if (!placeOfEmployment)
+        if (placeOfEmployment == null)
         {
             Destroy(gameObject);
         }
@@ -195,7 +195,7 @@ public class Distribute : MonoBehaviour {
                     }
                 }, new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)), goalObject, network));
                 //if the place of employment is destroyed, this gameobject should be as well
-                if (!placeOfEmployment)
+                if (placeOfEmployment == null)
                 {
                     Destroy(gameObject);
                 }
@@ -316,7 +316,7 @@ public class Distribute : MonoBehaviour {
             runningAStar = true;//Stopping the Update() method from  calling a new runDistribute()
             yield return new WaitForSeconds(1.0f);
             //if the place of employment is destroyed, this gameobject should be as well
-            if (!placeOfEmployment)
+            if (placeOfEmployment == null)
             {
                 Destroy(gameObject);
             }
@@ -364,28 +364,30 @@ public class Distribute : MonoBehaviour {
         foreach (GameObject house in housesToDistributeTo)
         {
             Storage houseStorage = house.GetComponent<Storage>();
+            HouseInformation houseInformation = house.GetComponent<HouseInformation>();
+            int houseSize = houseInformation.getHouseSize();
             if (employmentStorage.getFoodCount() > 0)
             {
-                if (employmentStorage.getMeatCount() >= foodNumToDistribute
-                    && houseStorage.acceptsResource("Meat", foodNumToDistribute))
+                if (employmentStorage.getMeatCount() >= foodNumToDistribute * houseSize
+                    && houseStorage.acceptsResource("Meat", foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Meat", foodNumToDistribute);
-                    employmentStorage.removeResource("Meat", foodNumToDistribute);
+                    houseStorage.addResource("Meat", foodNumToDistribute * houseSize);
+                    employmentStorage.removeResource("Meat", foodNumToDistribute * houseSize);
                 }
                 else if (employmentStorage.getMeatCount() > 0
-                    && houseStorage.acceptsResource("Meat", foodNumToDistribute))
+                    && houseStorage.acceptsResource("Meat", foodNumToDistribute * houseSize))
                 {
                     houseStorage.addResource("Meat", employmentStorage.getMeatCount());
                     employmentStorage.removeResource("Meat", employmentStorage.getMeatCount());
                 }
-                if (employmentStorage.getWheatCount() >= foodNumToDistribute
-                    && houseStorage.acceptsResource("Wheat", foodNumToDistribute))
+                if (employmentStorage.getWheatCount() >= foodNumToDistribute * houseSize
+                    && houseStorage.acceptsResource("Wheat", foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Wheat", foodNumToDistribute);
-                    employmentStorage.removeResource("Wheat", foodNumToDistribute);
+                    houseStorage.addResource("Wheat", foodNumToDistribute * houseSize);
+                    employmentStorage.removeResource("Wheat", foodNumToDistribute * houseSize);
                 }
                 else if (employmentStorage.getWheatCount() > 0
-                    && houseStorage.acceptsResource("Wheat", foodNumToDistribute))
+                    && houseStorage.acceptsResource("Wheat", foodNumToDistribute * houseSize))
                 {
                     houseStorage.addResource("Wheat", employmentStorage.getWheatCount());
                     employmentStorage.removeResource("Wheat", employmentStorage.getWheatCount());

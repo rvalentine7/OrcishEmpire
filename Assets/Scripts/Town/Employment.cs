@@ -36,7 +36,7 @@ public class Employment : MonoBehaviour {
             for (int c = 0;  c < width; c++)
             {
                 if (terrainArr[Mathf.RoundToInt(gameObject.transform.position.x) - Mathf.CeilToInt(width / 2.0f - 1) + c,
-                    Mathf.RoundToInt(gameObject.transform.position.y) - Mathf.CeilToInt(height / 2.0f - 1) + r].GetComponent<Tile>().hasPipes())
+                    Mathf.RoundToInt(gameObject.transform.position.y) - Mathf.CeilToInt(height / 2.0f - 1) + r].GetComponent<Tile>().hasWater())
                 {
                     addWaterSource();
                 }

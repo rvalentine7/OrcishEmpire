@@ -6,7 +6,8 @@ public class Tile : MonoBehaviour {
     private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
-    private int numWaterPipes;
+    private int numWaterPipes;//from reservoirs with the purpose of being used by fountains to supply water (numWaterSources)
+    private int numWaterSources;//from wells/fountains
     private int desirability;
 
 	// Use this for initialization
@@ -15,6 +16,7 @@ public class Tile : MonoBehaviour {
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         numWaterPipes = 0;
+        numWaterSources = 0;
 	}
 	
 	// Update is called once per frame
@@ -75,6 +77,31 @@ public class Tile : MonoBehaviour {
     public bool hasPipes()
     {
         return numWaterPipes > 0;
+    }
+
+    /**
+     * Adds a source of water from a fountain/well
+     */
+    public void addWaterSource()
+    {
+        numWaterSources++;
+    }
+    
+    /**
+     * Removes a source of water from a fountain/well
+     */
+    public void removeWaterSource()
+    {
+        numWaterSources--;
+    }
+
+    /**
+     * Whether the tile has water from a fountain/well
+     * @return whether the tile has water from at least 1 fountain/well
+     */
+    public bool hasWater()
+    {
+        return numWaterSources > 0;
     }
 
     /**

@@ -19,6 +19,7 @@ public class HouseInformation : MonoBehaviour {
     public Sprite sign;
     public Sprite firstLevelHouse;
     public Sprite secondLevelHouse;
+    public Sprite thirdLevelHouse;
     //add future house sprites here (aiming for at least 5 house levels)
 
     private int numInhabitants;
@@ -71,25 +72,25 @@ public class HouseInformation : MonoBehaviour {
         myWorld = world.GetComponent<World>();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         //Check if tile already has water, update numWaterSources if so
-        if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasPipes())
+        if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasWater())
         {
             addWaterSource();
         }
     }
-	
-	/**
+
+    /**
      * Updates the house appearance based on the number of inhabitants as well as updates
      *  the resources the house has stored/used.
      */
-	void Update () {
-		//if (populationChange)
+    void Update() {
+        //if (populationChange)
         //{
         //    if (numInhabitants > 0 && numInhabitants <= 3)
         //    {
-                //SpriteRenderer spriteRender = gameObject.GetComponent<SpriteRenderer>();
-                //spriteRender.sprite = firstLevelHouse;
+        //SpriteRenderer spriteRender = gameObject.GetComponent<SpriteRenderer>();
+        //spriteRender.sprite = firstLevelHouse;
         //    }
-            //checks for further house upgrades will go here
+        //checks for further house upgrades will go here
         //    populationChange = false;
         //}
 
@@ -99,13 +100,13 @@ public class HouseInformation : MonoBehaviour {
             entertainmentLevel--;
             timeOfLastEntertainment = Time.time;
         }
-        
+
         //updates the resources of the household
         Storage storage = gameObject.GetComponent<Storage>();
         if (Time.time > checkTime)
         {
             checkTime = Time.time + timeInterval;
-            
+
             //TODO: update food information
             if (storage.getFoodCount() > 0 && storage.getFoodCount() >= numInhabitants * inhabitantFoodConsumption)
             {
@@ -139,27 +140,51 @@ public class HouseInformation : MonoBehaviour {
             }
 
             //TODO: Add text here for the house popup to pull on the describe why a house is upgrading/downgrading
-            //Upgrading and downgrading based on food and water counts
-            if (storage.getFoodCount() > 0 && numWaterSources > 0 && houseLevel == 1)
+            //Upgrade
+            if ((houseLevel >= 1 && storage.getFoodCount() > 0 && numWaterSources > 0))
             {
-                if (upgrading)
+                if (houseLevel == 1)
                 {
-                    houseLevel = 2;
-                    updateHouseSprite();
-                    houseSize *= 2;
-                    gameObject.AddComponent<AvailableHome>();
-                    AvailableHome availableHome = gameObject.GetComponent<AvailableHome>();
-                    availableHome.immigrant = orcImmigrant;
-                    upgrading = false;
+                    if (upgrading)
+                    {
+                        houseLevel = 2;
+                        updateHouseSprite();
+                        houseSize *= 2;
+                        gameObject.AddComponent<AvailableHome>();
+                        AvailableHome availableHome = gameObject.GetComponent<AvailableHome>();
+                        availableHome.immigrant = orcImmigrant;
+                        upgrading = false;
+                    }
+                    else
+                    {
+                        upgrading = true;
+                    }
+                    downgrading = false;
                 }
-                else
+                else if (houseLevel == 2 && entertainmentLevel > 0)
                 {
-                    upgrading = true;
+                    if (upgrading)
+                    {
+                        houseLevel = 3;
+                        updateHouseSprite();
+                        houseSize *= 2;
+                        gameObject.AddComponent<AvailableHome>();
+                        AvailableHome availableHome = gameObject.GetComponent<AvailableHome>();
+                        availableHome.immigrant = orcImmigrant;
+                        upgrading = false;
+                    }
+                    else
+                    {
+                        upgrading = true;
+                    }
+                    downgrading = false;
                 }
-                downgrading = false;
             }
-            else if ((storage.getFoodCount() == 0 || numWaterSources == 0) && houseLevel > 1)
+            //Downgrade
+            else if ((houseLevel > 1 && (storage.getFoodCount() == 0 || numWaterSources == 0))
+                || (houseLevel > 2 && entertainmentLevel == 0))
             {
+
                 if (downgrading)
                 {
                     houseLevel--;
@@ -176,9 +201,17 @@ public class HouseInformation : MonoBehaviour {
                 }
                 upgrading = false;
             }
-            else if (storage.getFoodCount() > 0 && numWaterSources > 0 && downgrading)
+            //Stop downgrading
+            else if (downgrading && (storage.getFoodCount() > 0 && numWaterSources > 0 && houseLevel > 1))
             {
-                downgrading = false;
+                if (entertainmentLevel > 0 && houseLevel > 2)
+                {
+                    downgrading = false;
+                }
+                else
+                {
+                    downgrading = false;
+                }
             }
 
             //TODO: should not be able to downgrade twice in one time tick
@@ -281,6 +314,10 @@ public class HouseInformation : MonoBehaviour {
         {
             spriteRender.sprite = secondLevelHouse;
         }
+        else if (houseLevel == 3)
+        {
+            spriteRender.sprite = thirdLevelHouse;
+        }
     }
 
     /**
@@ -345,6 +382,11 @@ public class HouseInformation : MonoBehaviour {
         }
         //populationChange = true;
         //TODO: create orc gameobjects leaving the house and exiting the map
+        if (numInhabitants > 0)
+        {
+            Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
+                gameObject.transform.position.y + 0.4f), Quaternion.identity);
+        }
     }
 
     /**

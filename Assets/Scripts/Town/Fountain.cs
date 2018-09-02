@@ -108,6 +108,20 @@ public class Fountain : MonoBehaviour {
                         houseInformation.removeWaterSource();
                     }
                 }
+                //add water source to tiles so that new houses know there is water there
+                if (fountainPosition.x - waterRadius + i >= 0 && fountainPosition.y - waterRadius + j >= 0
+                        && fountainPosition.x - waterRadius + i <= 40 && fountainPosition.y - waterRadius + j <= 40)
+                {
+                    terrainArr = myWorld.terrainNetwork.getTerrainArr();
+                    if (supplying)
+                    {
+                        terrainArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].GetComponent<Tile>().addWaterSource();
+                    }
+                    else
+                    {
+                        terrainArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].GetComponent<Tile>().removeWaterSource();
+                    }
+                }
             }
         }
     }
