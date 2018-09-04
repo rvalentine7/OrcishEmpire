@@ -196,4 +196,9 @@ public class Reservoir : MonoBehaviour {
             }
         }
     }
+
+    public void updateConnections()
+    {
+
+    }
 }

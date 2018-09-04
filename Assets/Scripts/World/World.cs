@@ -14,6 +14,7 @@ public class World : MonoBehaviour {
     public List<string> walkableTerrain;
     public List<string> nonWalkableTerrain;
     public List<string> buildableTerrain;
+    public List<string> aqueductTerrain;
     public List<string> mountainousTerrain;
     public List<string> wateryTerrain;
 

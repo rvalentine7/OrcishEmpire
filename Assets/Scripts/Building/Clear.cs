@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /**
  * Used by the ClearLand button in the game UI to clear out obstacles
@@ -11,10 +12,13 @@ public class Clear : MonoBehaviour {
     public GameObject cornerRoad;
     public GameObject tRoad;
     public GameObject crossRoad;
+    private float timeMouseButton;
+    private Dictionary<GameObject, float> delayDeletion;
 
     // Use this for initialization
     void Start() {
-
+        timeMouseButton = 0.0f;
+        delayDeletion = new Dictionary<GameObject, float>();
     }
 
     /**
@@ -26,6 +30,22 @@ public class Clear : MonoBehaviour {
         {
             //exits out of destroy mode if the right mouse button or escape is clicked
             Destroy(gameObject);
+        }
+        //Stops me from deleting a road immediately with an aqueduct
+        if (delayDeletion.Count > 0)
+        {
+            List<GameObject> keysToRemove = new List<GameObject>();
+            foreach (KeyValuePair<GameObject, float> kvp in delayDeletion)
+            {
+                if (kvp.Value < Time.time)
+                {
+                    keysToRemove.Add(kvp.Key);
+                }
+            }
+            foreach (GameObject key in keysToRemove)
+            {
+                delayDeletion.Remove(key);
+            }
         }
 
         GameObject world = GameObject.Find("WorldInformation");
@@ -65,38 +85,49 @@ public class Clear : MonoBehaviour {
             // the fact there is no longer a road where the deleted one was
             if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road")
             {
-                structureArr[(int)mousePos.x, (int)mousePos.y] = null;
-                //updateRoadConnection(mousePos, structureArr);
-                //go through roads attached to the deleted road to update them visibly
-                //do not update the roads outside building limits
-                if ((int)mousePos.y + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
-                   && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
+                if (structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().getAqueduct() == null
+                    && !delayDeletion.ContainsKey(structureArr[(int)mousePos.x, (int)mousePos.y]))
                 {
-                    //update road above the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y + 1], structureArr);
+                    structureArr[(int)mousePos.x, (int)mousePos.y] = null;
+                    //updateRoadConnection(mousePos, structureArr);
+                    //go through roads attached to the deleted road to update them visibly
+                    //do not update the roads outside building limits
+                    if ((int)mousePos.y + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
+                       && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
+                    {
+                        //update road above the one you are trying to build
+                        updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y + 1], structureArr);
+                    }
+                    if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
+                        && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
+                    {
+                        //update road below the one you are trying to build
+                        updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y - 1], structureArr);
+                    }
+                    if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
+                        && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
+                    {
+                        //update road to the left of the one you are trying to build
+                        updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
+                    }
+                    if ((int)mousePos.x + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
+                        && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
+                    {
+                        //update road to the right of the one you are trying to build
+                        updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
+                    }
+                    Destroy(structureToClear);
                 }
-                if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
-                    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
+                else if (!delayDeletion.ContainsKey(structureArr[(int)mousePos.x, (int)mousePos.y]))
                 {
-                    //update road below the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y - 1], structureArr);
-                }
-                if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
-                    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
-                {
-                    //update road to the left of the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
-                }
-                if ((int)mousePos.x + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
-                    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
-                {
-                    //update road to the right of the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
+                    structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().destroyRoad();
+                    //0.3f is an arbitrarily chosen number I feel is long enough to avoid losing the road from a click
+                    delayDeletion.Add(structureArr[(int)mousePos.x, (int)mousePos.y], Time.time + 0.3f);
                 }
             }
 
             //myControls.buildArr.removeFromBuildArr((int)mousePos.y, (int)mousePos.x);
-            Destroy(structureToClear);
+            //Destroy(structureToClear);
         }
         //allow the user to destroy trees
         if (Input.GetMouseButton(0)
@@ -168,6 +199,8 @@ public class Clear : MonoBehaviour {
                 roadObj.transform.rotation = Quaternion.Euler(rotationVector);
             }
             myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+            //Need to set the aqueduct if there is one
+            roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
         }
 
         //straight or corner; depends on if nearby roads are opposite or diagonal
@@ -177,6 +210,8 @@ public class Clear : MonoBehaviour {
             {
                 roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
                 myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+                //Need to set the aqueduct if there is one
+                roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
             }
             else if (top && bot)
             {
@@ -185,6 +220,8 @@ public class Clear : MonoBehaviour {
                 rotationVector.z = 90;
                 roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+                //Need to set the aqueduct if there is one
+                roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
             }
             else if (top)
             {
@@ -197,6 +234,8 @@ public class Clear : MonoBehaviour {
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
                 myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+                //Need to set the aqueduct if there is one
+                roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
             }
             else if (bot)
             {
@@ -214,6 +253,8 @@ public class Clear : MonoBehaviour {
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
                 myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+                //Need to set the aqueduct if there is one
+                roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
             }
         }
 
@@ -236,6 +277,8 @@ public class Clear : MonoBehaviour {
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
                 myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+                //Need to set the aqueduct if there is one
+                roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
             }
             else if (right && left)
             {
@@ -249,6 +292,8 @@ public class Clear : MonoBehaviour {
                     roadObj.transform.rotation = Quaternion.Euler(rotationVector);
                 }
                 myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+                //Need to set the aqueduct if there is one
+                roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
             }
         }
 
@@ -257,6 +302,8 @@ public class Clear : MonoBehaviour {
         {
             roadObj = Instantiate(crossRoad, roadPos, Quaternion.identity) as GameObject;
             myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
+            //Need to set the aqueduct if there is one
+            roadObj.GetComponent<RoadInformation>().setAqueduct(road.GetComponent<RoadInformation>().getAqueduct());
         }
 
         //delete the old road so there aren't two roads in one spot
@@ -265,6 +312,7 @@ public class Clear : MonoBehaviour {
         // its rotation from before
         if (nearbyRoadCount > 0)
         {
+            //road.GetComponent<RoadInformation>().destroyRoad();
             Destroy(road);
         }
     }

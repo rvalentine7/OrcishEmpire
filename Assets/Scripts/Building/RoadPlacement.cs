@@ -12,6 +12,7 @@ public class RoadPlacement : MonoBehaviour {
     private bool validPlacement;
     private GameObject world;
     private World myWorld;
+    //private GameObject aqueduct;
     public Sprite possibleSprite;
     public Sprite possibleXRoadSprite;
     public Sprite possibleTRoadSprite;
@@ -30,6 +31,7 @@ public class RoadPlacement : MonoBehaviour {
         validPlacement = true;
         world = GameObject.Find("WorldInformation");
         myWorld = world.GetComponent<World>();
+        //aqueduct = null;
     }
 	
 	/**
@@ -484,5 +486,39 @@ public class RoadPlacement : MonoBehaviour {
         {
             GetComponent<SpriteRenderer>().sprite = possibleXRoadSprite;
         }
+    }
+
+    /**
+     * Sets the aqueduct that is over this road object
+     * @param the aqueduct to go over this road
+     */
+    public void setAqueduct(GameObject aqueduct)
+    {
+        //this.aqueduct = aqueduct;
+    }
+
+    /**
+     * Gets the aqueduct over this road object
+     * @return the aqueduct over this road object if there is one, null otherwise
+     */
+    public GameObject getAqueduct()
+    {
+        //return this.aqueduct;
+        return null;
+    }
+
+    /**
+     * Destroys the aqueduct if there is one on top of the road, otherwise destroy the road
+     */
+    public void destroyRoad()
+    {
+        //if (this.aqueduct != null)
+        //{
+            //aqueduct.GetComponent<Employment>().destroyEmployment();
+        //}
+        //else
+        //{
+            //Destroy(gameObject);
+        //}
     }
 }
