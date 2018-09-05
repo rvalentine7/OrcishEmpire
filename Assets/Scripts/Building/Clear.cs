@@ -78,12 +78,60 @@ public class Clear : MonoBehaviour {
             }
             if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building")
             {
+                bool clearingAnAqueduct = false;
+                List<GameObject> aqueductConnections = new List<GameObject>();
+                if (structureToClear.GetComponent<Aqueduct>() != null)
+                {
+                    clearingAnAqueduct = true;
+                    //get a list of the current connections
+                    aqueductConnections = structureToClear.GetComponent<Aqueduct>().getConnections();
+                }
+                else if ((structureToClear.GetComponent<RoadInformation>() != null
+                    && structureToClear.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>() != null))//this is in roads...
+                {
+                    clearingAnAqueduct = true;
+                    //get a list of the current connections
+                    aqueductConnections = structureToClear.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().getConnections();
+                }
+                //TODO: will need to do do something similar with reservoirs
+
                 Employment employment = structureToClear.GetComponent<Employment>();
                 employment.destroyEmployment();
+
+                //Clearing the array in that position because even though the object should be removed, it doesn't seem to update properly
+                if (structureArr[(int)mousePos.x, (int)mousePos.y] != null)
+                {
+                    if (structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>() == null)
+                    {
+                        structureArr[(int)mousePos.x, (int)mousePos.y] = null;
+                    }
+                }
+
+                if (clearingAnAqueduct)
+                {
+                    //call update connections on each item in the list of the aqueduct's old connections
+                    foreach (GameObject connection in aqueductConnections) {
+                        if (connection != null)
+                        {
+                            if (connection.GetComponent<Aqueduct>() != null)
+                            {
+                                connection.GetComponent<Aqueduct>().updateConnections();
+                            }
+                            else if (connection.GetComponent<Reservoir>() != null)
+                            {
+                                connection.GetComponent<Reservoir>().updateConnections();
+                            }
+                            else if (connection.GetComponent<RoadInformation>() != null)
+                            {
+                                connection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().updateConnections();
+                            }
+                        }
+                    }
+                }
             }
             //If the deleted object is a road, the surrounding roads need to be updated to reflect
             // the fact there is no longer a road where the deleted one was
-            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road")
+            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road")
             {
                 if (structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().getAqueduct() == null
                     && !delayDeletion.ContainsKey(structureArr[(int)mousePos.x, (int)mousePos.y]))
@@ -120,7 +168,7 @@ public class Clear : MonoBehaviour {
                 }
                 else if (!delayDeletion.ContainsKey(structureArr[(int)mousePos.x, (int)mousePos.y]))
                 {
-                    structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().destroyRoad();
+                    structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().destroyRoad();//TODO: aqueduct over a road gets deleted here... need to update here
                     //0.3f is an arbitrarily chosen number I feel is long enough to avoid losing the road from a click
                     delayDeletion.Add(structureArr[(int)mousePos.x, (int)mousePos.y], Time.time + 0.3f);
                 }

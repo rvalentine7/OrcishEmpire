@@ -50,6 +50,10 @@ public class Reservoir : MonoBehaviour {
     private Vector2 reservoirPosition;
     private bool nextToWater;
     private List<GameObject> fillSources;//other reservoirs/aqueducts that help fill this one
+    private GameObject northConnection;
+    private GameObject southConnection;
+    private GameObject westConnection;
+    private GameObject eastConnection;
 
     private void Awake()
     {
@@ -62,6 +66,10 @@ public class Reservoir : MonoBehaviour {
         reservoirPosition = gameObject.transform.position;
         nextToWater = false;
         fillSources = new List<GameObject>();
+        northConnection = null;
+        southConnection = null;
+        westConnection = null;
+        eastConnection = null;
     }
 
     /**

@@ -198,6 +198,7 @@ public class Aqueduct : MonoBehaviour {
             overRoad = true;
         }
 
+        //TODO: update the 4 and 3 connections to account for when an arch is going north/south or east/west and an aqueduct is placed on the east/west or north/south respectively
         //Update sprite and add the connections.  Need to check if any are arches to see if I need to update based on those... currently adding sprites
         //Four connections
         if (north && south && west && east)
@@ -213,55 +214,59 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
+                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
+                    //{
                         northArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (botArch)
                 {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                    //{
                         southArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (leftArch)
                 {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         westArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (rightArch)
                 {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         eastArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
@@ -412,42 +417,45 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2] == null
+                    //    || (int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2] != null
+                    //    && ((int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2].getcomponent<reservoir>() != null
+                    //    || (int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2].getcomponent<aqueduct>() != null))
+                    //{
                         northArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (botArch)
                 {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                    //{
                         southArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (leftArch)
                 {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         westArchConnectionValid = true;
-                    }
-                    else
-                    {
+                    //}
+                    //else
+                    //{
                         numInvalidConnections++;
-                    }
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
@@ -551,49 +559,52 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
+                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
+                    //{
                         northArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (botArch)
                 {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                    //{
                         southArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (rightArch)
                 {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         eastArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
-            bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
+            bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
@@ -690,49 +701,52 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
+                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
+                    //{
                         northArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (leftArch)
                 {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         westArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (rightArch)
                 {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         eastArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
-            bool westConnectionValid = (botArch ? westArchConnectionValid : true);
-            bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
+            bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
+            bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
@@ -826,50 +840,53 @@ public class Aqueduct : MonoBehaviour {
             if (nearbyArchCount > 0)
             {
                 int numInvalidConnections = 0;
-                if (topArch)
+                if (botArch)
                 {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                        && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                    //    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                    //{
                         southArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (leftArch)
                 {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         westArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (rightArch)
                 {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         eastArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
-            bool southConnectionValid = (topArch ? southArchConnectionValid : true);
-            bool westConnectionValid = (botArch ? westArchConnectionValid : true);
+            bool southConnectionValid = (botArch ? southArchConnectionValid : true);
+            bool westConnectionValid = (rightArch ? westArchConnectionValid : true);
             bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
@@ -968,29 +985,31 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
+                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
+                    //{
                         northArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (botArch)
                 {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                    //{
                         southArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
@@ -1048,35 +1067,37 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
+                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
+                    //{
                         northArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (leftArch)
                 {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         westArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
-            bool westConnectionValid = (botArch ? westArchConnectionValid : true);
+            bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
@@ -1130,35 +1151,37 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
+                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
+                    //{
                         northArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (rightArch)
                 {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         eastArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
-            bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
+            bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
@@ -1209,37 +1232,39 @@ public class Aqueduct : MonoBehaviour {
             if (nearbyArchCount > 0)
             {
                 int numInvalidConnections = 0;
-                if (topArch)
+                if (botArch)
                 {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                        && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                    //    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                    //{
                         southArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (leftArch)
                 {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         westArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
-            bool southConnectionValid = (topArch ? southArchConnectionValid : true);
-            bool westConnectionValid = (botArch ? westArchConnectionValid : true);
+            bool southConnectionValid = (botArch ? southArchConnectionValid : true);
+            bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
@@ -1292,35 +1317,37 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (botArch)
                 {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
+                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                    //{
                         southArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (rightArch)
                 {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         eastArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
-            bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
+            bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
@@ -1373,35 +1400,37 @@ public class Aqueduct : MonoBehaviour {
                 int numInvalidConnections = 0;
                 if (leftArch)
                 {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         westArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 if (rightArch)
                 {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
+                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
+                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                    //{
                         eastArchConnectionValid = true;
-                    }
-                    else
-                    {
-                        numInvalidConnections++;
-                    }
+                    //}
+                    //else
+                    //{
+                    //    numInvalidConnections++;
+                    //}
                 }
                 numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
-            bool westConnectionValid = (botArch ? westArchConnectionValid : true);
-            bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
+            bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
+            bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
@@ -1449,7 +1478,7 @@ public class Aqueduct : MonoBehaviour {
         else if (north)
         {
             topConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
             if (nearbyReservoirCount > 0)
             {
                 if (overRoad)
@@ -1905,6 +1934,19 @@ public class Aqueduct : MonoBehaviour {
                 rightConnection.GetComponent<Aqueduct>().updateConnections();
             }
         }
+    }
+
+    /**
+     * Gets the aqueducts/reservoirs connected to this aqueduct
+     */
+    public List<GameObject> getConnections()
+    {
+        List<GameObject> connections = new List<GameObject>();
+        connections.Add(topConnection);
+        connections.Add(botConnection);
+        connections.Add(leftConnection);
+        connections.Add(rightConnection);
+        return connections;
     }
 
 
