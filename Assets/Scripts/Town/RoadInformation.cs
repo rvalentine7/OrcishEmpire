@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RoadInformation : MonoBehaviour {
+    public Sprite cornerRoad;
+    public Sprite crossRoad;
+    public Sprite tRoad;
+    public Sprite road;
+
     private GameObject aqueduct;
+    private GameObject world;
+    private World myWorld;
+    private SpriteRenderer mySpriteRenderer;
 
     private void Awake()
     {
         aqueduct = null;
+        world = GameObject.Find("WorldInformation");
+        myWorld = world.GetComponent<World>();
+        mySpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
     }
 
     // Use this for initialization
@@ -19,6 +30,190 @@ public class RoadInformation : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    /**
+     * Updates the appearance of the roads as they are added so that they line up with one another
+     */
+    public void updateRoadConnection()
+    {
+        Vector2 roadPos = gameObject.transform.position;
+        var roadRotation = transform.rotation.eulerAngles;
+        roadRotation.z = 0;
+        gameObject.transform.rotation = Quaternion.Euler(roadRotation);
+        GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+
+        //check here for what gameobject I want and add it to the buildArr
+        int nearbyRoadCount = 0;
+        //booleans allow me to where the other roads are
+        bool top = false;
+        if (structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
+        {
+            top = true;
+            nearbyRoadCount++;
+        }
+        bool bot = false;
+        if (structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
+            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == "Road")
+        {
+            bot = true;
+            nearbyRoadCount++;
+        }
+        bool left = false;
+        if (structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == "Road")
+        {
+            left = true;
+            nearbyRoadCount++;
+        }
+        bool right = false;
+        if (structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
+            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
+        {
+            right = true;
+            nearbyRoadCount++;
+        }
+
+
+        //no nearby roads
+        if (nearbyRoadCount == 0)
+        {
+            mySpriteRenderer.sprite = road;
+        }
+
+        //Positions in the structureArr:
+        //right: structureArr[(int)mousePos.y, (int)mousePos.x + 1]
+        //left: structureArr[(int)mousePos.y, (int)mousePos.x - 1]
+        //top: structureArr[(int)mousePos.y + 1, (int)mousePos.x]
+        //bot: structureArr[(int)mousePos.y - 1, (int)mousePos.x]
+
+        //straight road
+        if (nearbyRoadCount == 1)
+        {
+            mySpriteRenderer.sprite = road;
+            if (top || bot)
+            {
+                //change the z rotation
+                var rotationVector = transform.rotation.eulerAngles;
+                rotationVector.z = 90;
+                gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+            }
+        }
+
+        //straight or corner; depends on if nearby roads are opposite or diagonal
+        if (nearbyRoadCount == 2)
+        {
+            if (right && left)
+            {
+                mySpriteRenderer.sprite = road;
+            }
+            else if (top && bot)
+            {
+                mySpriteRenderer.sprite = road;
+                var rotationVector = transform.rotation.eulerAngles;
+                rotationVector.z = 90;
+                gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+            }
+            else if (top)
+            {
+                mySpriteRenderer.sprite = cornerRoad;
+                //only needs to be rotated if the second connecting road is on the right
+                if (right)
+                {
+                    var rotationVector = transform.rotation.eulerAngles;
+                    rotationVector.z = 270;
+                    gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+                }
+            }
+            else if (bot)
+            {
+                mySpriteRenderer.sprite = cornerRoad;
+                if (right)
+                {
+                    var rotationVector = transform.rotation.eulerAngles;
+                    rotationVector.z = 180;
+                    gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+                }
+                else
+                {
+                    var rotationVector = transform.rotation.eulerAngles;
+                    rotationVector.z = 90;
+                    gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+                }
+            }
+        }
+
+        //T road
+        if (nearbyRoadCount == 3)
+        {
+            if (top && bot)
+            {
+                mySpriteRenderer.sprite = tRoad;
+                if (right)
+                {
+                    var rotationVector = transform.rotation.eulerAngles;
+                    rotationVector.z = 270;
+                    gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+                }
+                else
+                {
+                    var rotationVector = transform.rotation.eulerAngles;
+                    rotationVector.z = 90;
+                    gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+                }
+            }
+            else if (right && left)
+            {
+                mySpriteRenderer.sprite = tRoad;
+                //starting rotation is if the third connection is on top, therefore only need to rotation in this
+                // case if last connection is bot
+                if (bot)
+                {
+                    var rotationVector = transform.rotation.eulerAngles;
+                    rotationVector.z = 180;
+                    gameObject.transform.rotation = Quaternion.Euler(rotationVector);
+                }
+            }
+        }
+
+        //crossroad
+        if (nearbyRoadCount == 4)
+        {
+            mySpriteRenderer.sprite = crossRoad;
+        }
+    }
+
+    /**
+     * Updates the connecting neighbors of this aqueduct to also connect to this aqueduct
+     */
+    public void updateNeighbors()
+    {
+        GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+        if ((int)gameObject.transform.position.y + 1 < myWorld.mapSize
+            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y + 1] != null
+            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y + 1].tag == "Road")
+        {
+            structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y + 1].GetComponent<RoadInformation>().updateRoadConnection();
+        }
+        if ((int)gameObject.transform.position.y - 1 > 0
+            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y - 1] != null
+            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y - 1].tag == "Road")
+        {
+            structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y - 1].GetComponent<RoadInformation>().updateRoadConnection();
+        }
+        if ((int)gameObject.transform.position.x - 1 > 0
+            && structureArr[(int)gameObject.transform.position.x - 1, (int)gameObject.transform.position.y] != null
+            && structureArr[(int)gameObject.transform.position.x - 1, (int)gameObject.transform.position.y].tag == "Road")
+        {
+            structureArr[(int)gameObject.transform.position.x - 1, (int)gameObject.transform.position.y].GetComponent<RoadInformation>().updateRoadConnection();
+        }
+        if ((int)gameObject.transform.position.x + 1 < myWorld.mapSize
+            && structureArr[(int)gameObject.transform.position.x + 1, (int)gameObject.transform.position.y] != null
+            && structureArr[(int)gameObject.transform.position.x + 1, (int)gameObject.transform.position.y].tag == "Road")
+        {
+            structureArr[(int)gameObject.transform.position.x + 1, (int)gameObject.transform.position.y].GetComponent<RoadInformation>().updateRoadConnection();
+        }
+    }
 
     /**
      * Sets the aqueduct that is over this road object
@@ -45,7 +240,7 @@ public class RoadInformation : MonoBehaviour {
     {
         if (this.aqueduct != null)
         {
-            aqueduct.GetComponent<Employment>().destroyEmployment();
+            aqueduct.GetComponent<Aqueduct>().destroyAqueduct();
         }
         else
         {

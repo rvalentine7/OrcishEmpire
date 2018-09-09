@@ -31,10 +31,10 @@ public class Aqueduct : MonoBehaviour {
 
     private GameObject world;
     private World myWorld;
-    private GameObject topConnection;
-    private GameObject botConnection;
-    private GameObject leftConnection;
-    private GameObject rightConnection;
+    private GameObject topConnection = null;
+    private GameObject botConnection = null;
+    private GameObject leftConnection = null;
+    private GameObject rightConnection = null;
     private List<GameObject> waterSourcesFromTop;//TODO: change these to hold references to the reservoirs filled with water
     private List<GameObject> waterSourcesFromBot;
     private List<GameObject> waterSourcesFromLeft;
@@ -63,7 +63,14 @@ public class Aqueduct : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		//TODO: aqueducts should not connect to archs if they are not in line with each other (no corners over a road)
+        GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+        Vector2 aqueductPos = gameObject.transform.position;
+        if (structureArr[(int)aqueductPos.x, (int)aqueductPos.y] != null
+            && structureArr[(int)aqueductPos.x, (int)aqueductPos.y].tag == "Road"
+            && topConnection == null && botConnection == null && leftConnection == null && rightConnection == null)
+        {
+            Destroy(gameObject);
+        }
         //TODO: have methods for filling from directions
         //TODO: water originates from nearWater reservoirs.  If a reservoir is not near water, check if filled
 	}
@@ -83,35 +90,27 @@ public class Aqueduct : MonoBehaviour {
         bool east = false;
         //Checking the adjacent aqueducts to determine what connections are available
         int nearbyAqueductCount = 0;
-        bool topAq = false;
         if ((int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<Aqueduct>() != null)
         {
-            topAq = true;
             nearbyAqueductCount++;
             north = true;
         }
-        bool botAq = false;
         if ((int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<Aqueduct>() != null)
         {
-            botAq = true;
             nearbyAqueductCount++;
             south = true;
         }
-        bool leftAq = false;
         if ((int)aqueductPos.x - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<Aqueduct>() != null)
         {
-            leftAq = true;
             nearbyAqueductCount++;
             west = true;
         }
-        bool rightAq = false;
         if ((int)aqueductPos.x + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<Aqueduct>() != null)
         {
-            rightAq = true;
             nearbyAqueductCount++;
             east = true;
         }
@@ -159,35 +158,27 @@ public class Aqueduct : MonoBehaviour {
         }
 
         int nearbyReservoirCount = 0;
-        bool topRes = false;
         if ((int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<Reservoir>() != null)
         {
-            topRes = true;
             nearbyReservoirCount++;
             north = true;
         }
-        bool botRes = false;
         if ((int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<Reservoir>() != null)
         {
-            botRes = true;
             nearbyReservoirCount++;
             south = true;
         }
-        bool leftRes = false;
         if ((int)aqueductPos.x - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<Reservoir>() != null)
         {
-            leftRes = true;
             nearbyReservoirCount++;
             west = true;
         }
-        bool rightRes = false;
         if ((int)aqueductPos.x + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<Reservoir>() != null)
         {
-            rightRes = true;
             nearbyReservoirCount++;
             east = true;
         }
@@ -204,71 +195,44 @@ public class Aqueduct : MonoBehaviour {
         if (north && south && west && east)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
-            int numValidConnections = 4;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
+                    {
                         northArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (botArch)
                 {
-                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
+                    {
                         southArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (leftArch)
                 {
-                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
                         westArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (rightArch)
                 {
-                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
                         eastArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
@@ -408,56 +372,35 @@ public class Aqueduct : MonoBehaviour {
         else if (north && south && west)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
-            int numValidConnections = 3;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    //if ((int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2] == null
-                    //    || (int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2] != null
-                    //    && ((int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2].getcomponent<reservoir>() != null
-                    //    || (int)aqueductpos.y + 2 < myworld.mapsize && structurearr[(int)aqueductpos.x, (int)aqueductpos.y + 2].getcomponent<aqueduct>() != null))
-                    //{
+                    Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
+                    {
                         northArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (botArch)
                 {
-                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
+                    {
                         southArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (leftArch)
                 {
-                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
                         westArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                        numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
@@ -466,6 +409,7 @@ public class Aqueduct : MonoBehaviour {
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
+            rightConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && southConnectionValid && westConnectionValid)
             {
@@ -550,56 +494,35 @@ public class Aqueduct : MonoBehaviour {
         else if (north && south && east)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
-            int numValidConnections = 3;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
+                    {
                         northArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (botArch)
                 {
-                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
+                    {
                         southArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (rightArch)
                 {
-                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
                         eastArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
@@ -608,6 +531,7 @@ public class Aqueduct : MonoBehaviour {
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
+            leftConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && southConnectionValid && eastConnectionValid)
             {
@@ -692,56 +616,35 @@ public class Aqueduct : MonoBehaviour {
         else if (north && west && east)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-            int numValidConnections = 3;
             bool northArchConnectionValid = false;
             bool westArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
+                    {
                         northArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (leftArch)
                 {
-                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
                         westArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (rightArch)
                 {
-                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
                         eastArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
@@ -750,6 +653,7 @@ public class Aqueduct : MonoBehaviour {
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
+            botConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && westConnectionValid && eastConnectionValid)
             {
@@ -833,64 +737,44 @@ public class Aqueduct : MonoBehaviour {
         else if (south && west && east)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
-            int numValidConnections = 3;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (botArch)
                 {
-                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    //    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
+                    {
                         southArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (leftArch)
                 {
-                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
                         westArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (rightArch)
                 {
-                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
                         eastArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
-            bool westConnectionValid = (rightArch ? westArchConnectionValid : true);
-            bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
+            bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
+            bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
+            topConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (southConnectionValid && westConnectionValid && eastConnectionValid)
             {
@@ -977,47 +861,34 @@ public class Aqueduct : MonoBehaviour {
         else if (north && south)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
-            int numValidConnections = 2;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
+                    {
                         northArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (botArch)
                 {
-                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
+                    {
                         southArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
+            leftConnection = null;
+            rightConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (!overRoad || initialPlacement)
             {
@@ -1059,47 +930,34 @@ public class Aqueduct : MonoBehaviour {
         else if (north && west)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-            int numValidConnections = 2;
             bool northArchConnectionValid = false;
             bool westArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
+                    {
                         northArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (leftArch)
                 {
-                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
                         westArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
+            botConnection = null;
+            rightConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (!overRoad || initialPlacement)
             {
@@ -1143,47 +1001,34 @@ public class Aqueduct : MonoBehaviour {
         else if (north && east)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-            int numValidConnections = 2;
             bool northArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (topArch)
                 {
-                    //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] == null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                    //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
+                    {
                         northArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (rightArch)
                 {
-                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
                         eastArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             topConnection = northConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
+            botConnection = null;
+            leftConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (!overRoad || initialPlacement)
             {
@@ -1226,47 +1071,34 @@ public class Aqueduct : MonoBehaviour {
         else if (south && west)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
-            int numValidConnections = 2;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (botArch)
                 {
-                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    //    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
+                    {
                         southArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (leftArch)
                 {
-                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
                         westArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
             bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
+            topConnection = null;
+            rightConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (!overRoad || initialPlacement)
             {
@@ -1309,47 +1141,34 @@ public class Aqueduct : MonoBehaviour {
         else if (south && east)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
-            int numValidConnections = 2;
             bool southArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (botArch)
                 {
-                    //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] == null
-                    //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    //&& ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
+                    {
                         southArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (rightArch)
                 {
-                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
                         eastArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
             bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             botConnection = southConnectionValid ? structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
+            topConnection = null;
+            leftConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (!overRoad || initialPlacement)
             {
@@ -1392,47 +1211,34 @@ public class Aqueduct : MonoBehaviour {
         else if (west && east)
         {
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-            int numValidConnections = 2;
             bool westArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
             {
-                int numInvalidConnections = 0;
                 if (leftArch)
                 {
-                    //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
                         westArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
                 if (rightArch)
                 {
-                    //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] == null
-                    //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    //&& ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    //|| (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    //{
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
                         eastArchConnectionValid = true;
-                    //}
-                    //else
-                    //{
-                    //    numInvalidConnections++;
-                    //}
+                    }
                 }
-                numValidConnections -= numInvalidConnections;
             }
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
             bool eastConnectionValid = (rightArch ? eastArchConnectionValid : true);
             leftConnection = westConnectionValid ? structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] : null;
             rightConnection = eastConnectionValid ? structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] : null;
+            topConnection = null;
+            botConnection = null;
             //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (!overRoad || initialPlacement)
             {
@@ -1441,11 +1247,27 @@ public class Aqueduct : MonoBehaviour {
                     gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
                     if (waterSourcesCount > 0)
                     {
-                        gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
+                        if (overRoad)
+                        {
+                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
+                        }
+                        else
+                        {
+                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
+                        }
                     }
                     else
                     {
-                        gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
+                        if (overRoad)
+                        {
+                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2WEArch;
+                        }
+                        else
+                        {
+                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
+                        }
                     }
                 }
                 else if (westConnectionValid)
@@ -1473,14 +1295,30 @@ public class Aqueduct : MonoBehaviour {
                     }
                 }
             }
+            else if (overRoad && westConnectionValid && eastConnectionValid)
+            {
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                if (waterSourcesCount > 0)
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
+                }
+                else
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = empty2WEArch;
+                }
+            }
         }
         //One connection
         else if (north)
         {
-            topConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
+            topConnection = null;
+            botConnection = null;
+            leftConnection = null;
+            rightConnection = null;
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
             if (nearbyReservoirCount > 0)
             {
+                topConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
                 if (overRoad)
                 {
                     if (waterSourcesCount > 0)
@@ -1508,19 +1346,29 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1] == null
-                    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
-                {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1] == null
-                    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
+                //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
+                //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
+                //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1] == null
+                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1] == null
+                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<Aqueduct>();
+                //if (topAqueductScript != null && (topAqueductScript.getLeftConnection() != null || topAqueductScript.getRightConnection() != null))
+                //{
+                //    connectionPossible = false;
+                //}
+                Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
                 {
                     connectionPossible = true;
                 }
@@ -1529,6 +1377,7 @@ public class Aqueduct : MonoBehaviour {
 
                 if (connectionPossible)
                 {
+                    topConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
@@ -1541,6 +1390,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else
             {
+                topConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
                 if (overRoad)
                 {
                     if (waterSourcesCount > 0)
@@ -1567,10 +1417,14 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (south)
         {
-            botConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1];
+            topConnection = null;
+            botConnection = null;
+            leftConnection = null;
+            rightConnection = null;
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
             if (nearbyReservoirCount > 0)
             {
+                botConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1];
                 if (overRoad)
                 {
                     if (waterSourcesCount > 0)
@@ -1598,25 +1452,36 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1] == null
-                    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
-                {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1] == null
-                    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
+                //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
+                //    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
+                //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1] == null
+                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1] == null
+                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<Aqueduct>();
+                //if (botAqueductScript != null && (botAqueductScript.getLeftConnection() != null || botAqueductScript.getRightConnection() != null))
+                //{
+                //    connectionPossible = false;
+                //}
+                Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
                 {
                     connectionPossible = true;
                 }
 
                 if (connectionPossible)
                 {
+                    botConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1];
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
@@ -1629,6 +1494,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else
             {
+                botConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1];
                 if (overRoad)
                 {
                     if (waterSourcesCount > 0)
@@ -1655,10 +1521,14 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (west)
         {
-            leftConnection = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
+            topConnection = null;
+            botConnection = null;
+            leftConnection = null;
+            rightConnection = null;
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
             if (nearbyReservoirCount > 0)
             {
+                leftConnection = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
@@ -1687,25 +1557,39 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
+                //    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1] == null
+                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1] == null
+                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<Aqueduct>();
+                //if (leftAqueductScript != null && (leftAqueductScript.getTopConnection() != null || leftAqueductScript.getBotConnection() != null))
+                //{
+                //    connectionPossible = false;
+                //}
+                if (leftArch)
                 {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1] == null
-                    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
-                {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1] == null
-                    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
-                {
-                    connectionPossible = true;
+                    Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (leftAqueductScript.getTopConnection() == null && leftAqueductScript.getBotConnection() == null)
+                    {
+                        connectionPossible = true;
+                    }
                 }
 
                 if (connectionPossible)
                 {
+                    leftConnection = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -1718,6 +1602,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else
             {
+                leftConnection = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
@@ -1745,10 +1630,14 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (east)
         {
-            rightConnection = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
+            topConnection = null;
+            botConnection = null;
+            leftConnection = null;
+            rightConnection = null;
             gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
             if (nearbyReservoirCount > 0)
             {
+                rightConnection = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
@@ -1777,25 +1666,39 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
+                //    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
+                //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1] == null
+                //    || structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1] == null
+                //    || structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
+                //{
+                //    connectionPossible = true;
+                //}
+                //Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<Aqueduct>();
+                //if (rightAqueductScript != null && (rightAqueductScript.getTopConnection() != null || rightAqueductScript.getBotConnection() != null))
+                //{
+                //    connectionPossible = false;
+                //}
+                if (rightArch)
                 {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1] == null
-                    || structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
-                {
-                    connectionPossible = true;
-                }
-                else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1] == null
-                    || structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
-                {
-                    connectionPossible = true;
+                    Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                    if (rightAqueductScript.getTopConnection() == null && rightAqueductScript.getBotConnection() == null)
+                    {
+                        connectionPossible = true;
+                    }
                 }
 
                 if (connectionPossible)
                 {
+                    rightConnection = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -1808,6 +1711,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else
             {
+                rightConnection = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
@@ -1834,6 +1738,10 @@ public class Aqueduct : MonoBehaviour {
             }
         }
         initialPlacement = false;
+        if (overRoad && topConnection == null && botConnection == null && leftConnection == null && rightConnection == null)
+        {
+            Destroy(gameObject);
+        }
 
         //topAq, topArch, topRes.... only thing that really matters here is the direction for the sprite.  the connection itself will need to get the arch and not the road, though
         //nearbyAqueductCount, nearbyArchCount, nearbyReservoirCount
@@ -1863,6 +1771,38 @@ public class Aqueduct : MonoBehaviour {
     public void setRightConnection(GameObject aqueduct)
     {
         rightConnection = aqueduct;
+    }
+
+    /**
+     * Gets the connected aqueduct to the north/top of this one
+     */
+    public GameObject getTopConnection()
+    {
+        return topConnection;
+    }
+
+    /*
+     * Gets the connected aqueduct to the south/bot of this one
+     */
+    public GameObject getBotConnection()
+    {
+        return botConnection;
+    }
+
+    /**
+     * Gets the connected aqueduct to the west/left of this one
+     */
+    public GameObject getLeftConnection()
+    {
+        return leftConnection;
+    }
+
+    /**
+     * Gets the connected aqueduct to the east/right of this one
+     */
+    public GameObject getRightConnection()
+    {
+        return rightConnection;
     }
 
     /**
@@ -1942,1074 +1882,30 @@ public class Aqueduct : MonoBehaviour {
     public List<GameObject> getConnections()
     {
         List<GameObject> connections = new List<GameObject>();
-        connections.Add(topConnection);
-        connections.Add(botConnection);
-        connections.Add(leftConnection);
-        connections.Add(rightConnection);
+        if (topConnection != null)
+        {
+            connections.Add(topConnection);
+        }
+        if (botConnection != null)
+        {
+            connections.Add(botConnection);
+        }
+        if (leftConnection != null)
+        {
+            connections.Add(leftConnection);
+        }
+        if (rightConnection != null)
+        {
+            connections.Add(rightConnection);
+        }
         return connections;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /*this bit went inside the 4 aqueduct check
-     if (nearbyArchCount > 0)
-            {
-                bool northConnectionValid = false;
-                bool southConnectionValid = false;
-                bool westConnectionValid = false;
-                bool eastConnectionValid = false;
-                if (topArch)
-                {
-                    if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                        && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                        || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                    {
-                        northConnectionValid = true;
-                    }
-                }
-                if (botArch)
-                {
-                    if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                    {
-                        southConnectionValid = true;
-                    }
-                }
-                if (leftArch)
-                {
-                    if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
-                        westConnectionValid = true;
-                    }
-                }
-                if (rightArch)
-                {
-                    if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                    {
-                        eastConnectionValid = true;
-                    }
-                }
-                if (northConnectionValid && southConnectionValid && westConnectionValid && eastConnectionValid)//4 arches and all are valid to connect to
-                {
-                    if (waterSourcesCount > 0)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                    }
-                    else
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                    }
-                }
-                else if (northConnectionValid && southConnectionValid && westConnectionValid)//Have to check if there were 4 nearby arches, if so use the 3 sprite, otherwise use the 4
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (northConnectionValid && southConnectionValid && eastConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (northConnectionValid && westConnectionValid && eastConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (southConnectionValid && westConnectionValid && eastConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (northConnectionValid && southConnectionValid)//Have to check if there were more than 2 arches
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2NS;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is one valid aqueduct nearby that is not an arch
-                        if (leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                            }
-                        }
-                        else if (rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (northConnectionValid && westConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2NW;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2NW;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is one valid aqueduct nearby that is not an arch
-                        if (botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                            }
-                        }
-                        else if (rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (northConnectionValid && eastConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2NE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2NE;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is one valid aqueduct nearby that is not an arch
-                        if (leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                            }
-                        }
-                        else if (botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (southConnectionValid && westConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2SW;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2SW;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is one valid aqueduct nearby that is not an arch
-                        if (topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                            }
-                        }
-                        else if (rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (southConnectionValid && eastConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2NE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2NE;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is one valid aqueduct nearby that is not an arch
-                        if (leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                            }
-                        }
-                        else if (topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (westConnectionValid && eastConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is one valid aqueduct nearby that is not an arch
-                        if (topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                            }
-                        }
-                        else if (botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (northConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2NS;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is 1 valid aqueduct nearby that is not an arch
-                        if (leftArch && rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NS;
-                            }
-                        }
-                        else if (leftArch && botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NE;
-                            }
-                        }
-                        else if (rightArch && botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NW;
-                            }
-                        }
-                    }
-                    else if (nearbyArchCount == 2)
-                    {
-                        //There are 2 valid aqueducts nearby that are not arches
-                        if (leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                            }
-                        }
-                        else if (rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                            }
-                        }
-                        else if (botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (southConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2NS;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is 1 valid aqueduct nearby that is not an arch
-                        if (leftArch && rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NS;
-                            }
-                        }
-                        else if (leftArch && topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2SE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2SE;
-                            }
-                        }
-                        else if (rightArch && topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2SW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2SW;
-                            }
-                        }
-                    }
-                    else if (nearbyArchCount == 2)
-                    {
-                        //There are 2 valid aqueducts nearby that are not arches
-                        if (leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                            }
-                        }
-                        else if (rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                            }
-                        }
-                        else if (topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (westConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is 1 valid aqueduct nearby that is not an arch
-                        if (topArch && botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
-                            }
-                        }
-                        else if (rightArch && botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NW;
-                            }
-                        }
-                        else if (rightArch && topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2SW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2SW;
-                            }
-                        }
-                    }
-                    else if (nearbyArchCount == 2)
-                    {
-                        //There are 2 valid aqueducts nearby that are not arches
-                        if (botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                            }
-                        }
-                        else if (rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                            }
-                        }
-                        else if (topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else if (eastConnectionValid)
-                {
-                    if (nearbyArchCount == 4)
-                    {
-                        gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
-                        }
-                    }
-                    else if (nearbyArchCount == 3)
-                    {
-                        //There is 1 valid aqueduct nearby that is not an arch
-                        if (topArch && botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
-                            }
-                        }
-                        else if (leftArch && botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NE;
-                            }
-                        }
-                        else if (leftArch && topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2SE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2SE;
-                            }
-                        }
-                    }
-                    else if (nearbyArchCount == 2)
-                    {
-                        //There are 2 valid aqueducts nearby that are not arches
-                        if (botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                            }
-                        }
-                        else if (leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                            }
-                        }
-                        else if (topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (waterSourcesCount > 0)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                        }
-                        else
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                        }
-                    }
-                }
-                else
-                {
-                    //None of the arch connections are valid
-                    if (nearbyArchCount == 3)
-                    {
-                        if ((topArch && botArch && leftArch)
-                            || (topArch && botArch && rightArch))
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
-                            }
-                        }
-                        else if ((topArch && leftArch && rightArch)
-                            || (botArch && leftArch && rightArch))
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NS;
-                            }
-                        }
-                    }
-                    else if (nearbyArchCount == 2)
-                    {
-                        if (topArch && botArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
-                            }
-                        }
-                        else if (topArch && leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2SE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2SE;
-                            }
-                        }
-                        else if (topArch && rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2SW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2SW;
-                            }
-                        }
-                        else if (botArch && leftArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NE;
-                            }
-                        }
-                        else if (botArch && rightArch)
-                        {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NW;
-                            }
-                        }
-                        else if (leftArch && rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty2NS;
-                            }
-                        }
-                    }
-                    else if (nearbyArchCount == 1)
-                    {
-                        if (topArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3SWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3SWE;
-                            }
-                        }
-                        else if (botArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NWE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NWE;
-                            }
-                        }
-                        else if (leftArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSE;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSE;
-                            }
-                        }
-                        else if (rightArch)
-                        {
-                            if (waterSourcesCount > 0)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = filled3NSW;
-                            }
-                            else
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = empty3NSW;
-                            }
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (waterSourcesCount > 0)
-                {
-                    gameObject.GetComponent<SpriteRenderer>().sprite = filled4;
-                }
-                else
-                {
-                    gameObject.GetComponent<SpriteRenderer>().sprite = empty4;
-                }
-            }
+    /**
+     * Destroys the aqueduct
      */
+    public void destroyAqueduct()
+    {
+        Destroy(gameObject);
+    }
 }

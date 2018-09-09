@@ -64,7 +64,6 @@
     <Compile Include="Assets\Scripts\Building\AqueductPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\BuildingPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\Clear.cs" />
-    <Compile Include="Assets\Scripts\Building\ConstructNetwork.cs" />
     <Compile Include="Assets\Scripts\Building\CreateObject.cs" />
     <Compile Include="Assets\Scripts\Building\PreConstructedRoads.cs" />
     <Compile Include="Assets\Scripts\Building\RoadPlacement.cs" />
@@ -130,6 +129,7 @@
     <Compile Include="Assets\Scripts\UI\WarPaintWorkshopPopup.cs" />
     <Compile Include="Assets\Scripts\UI\WeaponsmithPopup.cs" />
     <Compile Include="Assets\Scripts\UI\WellPopup.cs" />
+    <Compile Include="Assets\Scripts\World\ConstructNetwork.cs" />
     <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />
     <Compile Include="Assets\Scripts\World\TerrainSegment.cs" />
     <Compile Include="Assets\Scripts\World\Tile.cs" />

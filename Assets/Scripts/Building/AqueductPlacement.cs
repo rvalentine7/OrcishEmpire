@@ -95,8 +95,6 @@ public class AqueductPlacement : MonoBehaviour {
             valid = specialRoadCaseValidity(gameObject, structureArr);
             if (valid)
             {
-                //TODO: probably want a bool value that gets set here for when the building is created to change sorting layer and to add it to the road
-                //  actually, just having a GameObject variable and checking later if it's null is probably preferable
                 roadAqueductIsOn = structureArr[(int)mousePos.x, (int)mousePos.y];
             }
         }
@@ -119,21 +117,16 @@ public class AqueductPlacement : MonoBehaviour {
             GetComponent<SpriteRenderer>().sprite = impossibleSprite;
         }
         
-        //TODO: create a method in Aqueduct.cs and have that update the aqueducts.  Aqueducts arches should not update their appearance, but if they properly connect to another
-        // aqueduct, it should recognize that
         //If the aqueduct is in a valid location and the left mouse is clicked, place it in the world
         if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0) && validPlacement)
         {
-            //TODO: once this is all working, need to go back into road placement and update it to work with aqueducts (check if object has the Aqueduct component,
-            //   make sure to swap the road into constructArr and have it keep track of the aqueduct if it's all valid, etc)
-
             //when mouse down, can place road in any viable location the mouse moves to
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
             {
                 //transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
                 if (roadAqueductIsOn == null || checkNearbyArchCount(mousePos) == 0)
                 {
-                    GameObject aqueductObj = Instantiate(building, mousePos, Quaternion.identity) as GameObject;//TODO: let it know what type of sprite to start with
+                    GameObject aqueductObj = Instantiate(building, mousePos, Quaternion.identity) as GameObject;
                     if (roadAqueductIsOn != null)
                     {
                         aqueductObj.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
@@ -143,7 +136,6 @@ public class AqueductPlacement : MonoBehaviour {
                     {
                         myWorld.constructNetwork.setConstructArr((int)mousePos.x, (int)mousePos.y, aqueductObj);
                     }
-                    //TODO: update nearby aqueducts... update both sprite and connection.  if it is an arch, it can only get a new connection if in line with it. cannot change sprite of arches
                     aqueductObj.GetComponent<Aqueduct>().updateConnections();
                     aqueductObj.GetComponent<Aqueduct>().updateNeighbors();
                     //TODO: update neighbors for reservoirs
@@ -631,7 +623,6 @@ public class AqueductPlacement : MonoBehaviour {
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
             bool westConnectionValid = (leftArch ? westArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && southConnectionValid && westConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite3NSW;
@@ -715,7 +706,6 @@ public class AqueductPlacement : MonoBehaviour {
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
             bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && southConnectionValid && eastConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite3NSE;
@@ -799,7 +789,6 @@ public class AqueductPlacement : MonoBehaviour {
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool westConnectionValid = (botArch ? westArchConnectionValid : true);
             bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && westConnectionValid && eastConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite3NWE;
@@ -883,7 +872,6 @@ public class AqueductPlacement : MonoBehaviour {
             bool southConnectionValid = (topArch ? southArchConnectionValid : true);
             bool westConnectionValid = (botArch ? westArchConnectionValid : true);
             bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (southConnectionValid && westConnectionValid && eastConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite3SWE;
@@ -953,7 +941,6 @@ public class AqueductPlacement : MonoBehaviour {
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && southConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2NS;
@@ -1006,7 +993,6 @@ public class AqueductPlacement : MonoBehaviour {
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool westConnectionValid = (botArch ? westArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && westConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2NW;
@@ -1060,7 +1046,6 @@ public class AqueductPlacement : MonoBehaviour {
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool northConnectionValid = (topArch ? northArchConnectionValid : true);
             bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (northConnectionValid && eastConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2NE;
@@ -1113,7 +1098,6 @@ public class AqueductPlacement : MonoBehaviour {
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool southConnectionValid = (topArch ? southArchConnectionValid : true);
             bool westConnectionValid = (botArch ? westArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (southConnectionValid && westConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2SW;
@@ -1166,7 +1150,6 @@ public class AqueductPlacement : MonoBehaviour {
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool southConnectionValid = (botArch ? southArchConnectionValid : true);
             bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (southConnectionValid && eastConnectionValid)
             {
                 gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2SE;
@@ -1219,10 +1202,16 @@ public class AqueductPlacement : MonoBehaviour {
             //have the new number of valid connections and have which aqueducts are invalid, if any
             bool westConnectionValid = (botArch ? westArchConnectionValid : true);
             bool eastConnectionValid = (leftArch ? eastArchConnectionValid : true);
-            //TODO: will need to check for if the connection is an arch/reservoir/aqueduct as they will have different components
             if (westConnectionValid && eastConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2WE;
+                if (overRoad)
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2WEArch;
+                }
+                else
+                {
+                    gameObject.GetComponent<SpriteRenderer>().sprite = possibleSprite2WE;
+                }
             }
             else if (westConnectionValid)
             {

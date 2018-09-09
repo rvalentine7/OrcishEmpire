@@ -18,10 +18,7 @@ public class RoadPlacement : MonoBehaviour {
     public Sprite possibleTRoadSprite;
     public Sprite possibleCornerRoadSprite;
     public Sprite impossibleSprite;
-    public GameObject straightRoad;
-    public GameObject cornerRoad;
-    public GameObject tRoad;
-    public GameObject crossRoad;
+    public GameObject straightRoad;//TODO: rename to just road and get rid of the other GameObjects
     
 
 	/**
@@ -88,7 +85,8 @@ public class RoadPlacement : MonoBehaviour {
         }
         //can't place a road on other constructs
         if (valid && structureArr[(int)mousePos.x, (int)mousePos.y] != null
-            && (!myWorld.buildableTerrain.Contains(structureArr[(int) mousePos.x, (int) mousePos.y].tag)))
+            && (!myWorld.buildableTerrain.Contains(structureArr[(int) mousePos.x, (int) mousePos.y].tag))
+            && structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Aqueduct>() == null)
         {
             valid = false;
         }
@@ -97,24 +95,106 @@ public class RoadPlacement : MonoBehaviour {
         {
             valid = false;
         }
-        //raycast to avoid building underneath the UI
-        //RaycastHit2D hit;
-        //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //if (Physics2D.Raycast(Input.mousePosition, -Vector2.up))
-        //{
-        //    Debug.Log("hit");
-        //}
 
+        //TODO: check also for aqueducts... this will be the exception for the "Building" tag
+        /*
+         If the location is an aqueduct, check if there are any connected aqueduct arches (roads holding an aqueduct object (getAqueduct() != null)
+         Checks to see if valid:
+         If there is a connected aqueduct arch, it is not valid
+         If the aqueduct has more than 2 connections, it is not valid
+         If the aqueduct has 2 connections and they are not North-South or East-West, it is not valid
+
+         When placing the road, it will need to add the aqueduct to the road and replace the aqueduct with a road in the construction network
+         */
         if (valid && (structureArr[(int) mousePos.x, (int) mousePos.y] == null))
         {
             validPlacement = true;
             //Border is green when it is possible to place a sprite in its current location
             updateRoadPreview(gameObject, structureArr);
-        } else
+        }
+        else
         {
-            validPlacement = false;
-            //Border turns red when it is impossible to place a sprite in its current location
-            GetComponent<SpriteRenderer>().sprite = impossibleSprite;
+            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null
+                && structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Aqueduct>() != null)
+            {
+                Aqueduct aqueductClass = structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Aqueduct>();
+                //If the aqueduct is connected to an aqueduct arch, it is not valid
+                //Checking to the left for an aqueduct arch
+                if ((int)mousePos.x + 1 < myWorld.mapSize
+                    && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
+                    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].GetComponent<RoadInformation>() != null
+                    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].GetComponent<RoadInformation>().getAqueduct() != null)
+                {
+                    valid = false;
+                }
+                //Checking to the right for an aqueduct arch
+                else if ((int)mousePos.x - 1 > 0
+                    && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
+                    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].GetComponent<RoadInformation>() != null
+                    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].GetComponent<RoadInformation>().getAqueduct() != null)
+                {
+                    valid = false;
+                }
+                //Checking to the top for an aqueduct arch
+                else if ((int)mousePos.y + 1 < myWorld.mapSize
+                    && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
+                    && structureArr[(int)mousePos.x, (int)mousePos.y + 1].GetComponent<RoadInformation>() != null
+                    && structureArr[(int)mousePos.x, (int)mousePos.y + 1].GetComponent<RoadInformation>().getAqueduct() != null)
+                {
+                    valid = false;
+                }
+                //Checking to the bot for an aqueduct arch
+                else if ((int)mousePos.y - 1 > 0
+                    && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
+                    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].GetComponent<RoadInformation>() != null
+                    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].GetComponent<RoadInformation>().getAqueduct() != null)
+                {
+                    valid = false;
+                }
+                //If the aqueduct has more than 2 connections, it is not valid
+                if (aqueductClass.getConnections().Count > 2)
+                {
+                    valid = false;
+                }
+                //If the aqueduct has 2 connections and they are not North-South or East-West, it is not valid
+                if (aqueductClass.getConnections().Count == 2)
+                {
+                    bool validArch = false;
+                    if (aqueductClass.getTopConnection() != null && aqueductClass.getBotConnection() != null)
+                    {
+                        validArch = true;
+                    }
+                    if (aqueductClass.getLeftConnection() != null && aqueductClass.getRightConnection() != null)
+                    {
+                        validArch = true;
+                    }
+                    if (!validArch)
+                    {
+                        valid = false;
+                    }
+                }
+
+                if (valid)
+                {
+                    validPlacement = true;
+                    //Border is green when it is possible to place a sprite in its current location
+                    updateRoadPreview(gameObject, structureArr);
+                }
+                else
+                {
+                    validPlacement = false;
+                }
+            }
+            else
+            {
+                valid = false;
+                validPlacement = false;
+            }
+            if (!valid)
+            {
+                //Border turns red when it is impossible to place a sprite in its current location
+                GetComponent<SpriteRenderer>().sprite = impossibleSprite;
+            }
         }
 
         //If the road is in a valid location and the left mouse is clicked, place it in the world
@@ -124,35 +204,23 @@ public class RoadPlacement : MonoBehaviour {
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
             {
                 transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
-
-                //update the new road
-                updateRoadConnection(gameObject, structureArr);
+                GameObject roadObj = Instantiate(straightRoad, mousePos, Quaternion.identity) as GameObject;
                 structureArr = myWorld.constructNetwork.getConstructArr();
-                //go through roads attached to the new road to update them visibly
-                //do not update the roads outside building limits
-                if ((int)mousePos.y + 1 < myWorld.mapSize && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
-                   && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
+                GameObject aqueductObj = null;
+                if (structureArr[(int)mousePos.x, (int)mousePos.y] != null
+                    && structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Aqueduct>() != null)
                 {
-                    //update road above the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y + 1], structureArr);
+                    roadObj.GetComponent<RoadInformation>().setAqueduct(structureArr[(int)mousePos.x, (int)mousePos.y]);
+                    aqueductObj = structureArr[(int)mousePos.x, (int)mousePos.y];
                 }
-                if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
-                    && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
+                structureArr[(int)mousePos.x, (int)mousePos.y] = roadObj;
+                RoadInformation roadInfo = roadObj.GetComponent<RoadInformation>();
+                roadInfo.updateRoadConnection();
+                roadInfo.updateNeighbors();
+                //Update the aqueduct so it becomes an arch if needed
+                if (aqueductObj != null)
                 {
-                    //update road below the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x, (int)mousePos.y - 1], structureArr);
-                }
-                if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
-                    && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
-                {
-                    //update road to the left of the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x - 1, (int)mousePos.y], structureArr);
-                }
-                if ((int)mousePos.x + 1 < myWorld.mapSize && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
-                    && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
-                {
-                    //update road to the right of the one you are trying to build
-                    updateRoadConnection(structureArr[(int)mousePos.x + 1, (int)mousePos.y], structureArr);
+                    aqueductObj.GetComponent<Aqueduct>().updateConnections();
                 }
 
                 if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
@@ -169,173 +237,6 @@ public class RoadPlacement : MonoBehaviour {
         if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
         {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
-        }
-    }
-    
-    /**
-     * Updates the appearance of the roads as they are added so that they line up with one another
-     * @param road is the road being updated
-     * @param structureArr is a multidimensional array containing all of the roads and buildings
-     */
-    void updateRoadConnection(GameObject road, GameObject[,] structureArr)
-    {
-        Vector2 roadPos = road.transform.position;
-
-        //check here for what gameobject I want and add it to the buildArr
-        int nearbyRoadCount = 0;
-        //booleans allow me to where the other roads are
-        bool top = false;
-        if (structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
-        {
-            top = true;
-            nearbyRoadCount++;
-        }
-        bool bot = false;
-        if (structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == "Road")
-        {
-            bot = true;
-            nearbyRoadCount++;
-        }
-        bool left = false;
-        if (structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == "Road")
-        {
-            left = true;
-            nearbyRoadCount++;
-        }
-        bool right = false;
-        if (structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
-        {
-            right = true;
-            nearbyRoadCount++;
-        }
-
-
-        //no nearby roads
-        GameObject roadObj;
-        if (nearbyRoadCount == 0)
-        {
-            roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
-            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-        }
-
-        //Positions in the structureArr:
-        //right: structureArr[(int)mousePos.y, (int)mousePos.x + 1]
-        //left: structureArr[(int)mousePos.y, (int)mousePos.x - 1]
-        //top: structureArr[(int)mousePos.y + 1, (int)mousePos.x]
-        //bot: structureArr[(int)mousePos.y - 1, (int)mousePos.x]
-
-        //straight road
-        if (nearbyRoadCount == 1)
-        {
-            roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
-            if (top || bot)
-            {
-                //change the z rotation
-                var rotationVector = transform.rotation.eulerAngles;
-                rotationVector.z = 90;
-                roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-            }
-            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-        }
-
-        //straight or corner; depends on if nearby roads are opposite or diagonal
-        if (nearbyRoadCount == 2)
-        {
-            if (right && left)
-            {
-                roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
-                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-            }
-            else if (top && bot)
-            {
-                roadObj = Instantiate(straightRoad, roadPos, Quaternion.identity) as GameObject;
-                var rotationVector = transform.rotation.eulerAngles;
-                rotationVector.z = 90;
-                roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-            }
-            else if (top)
-            {
-                roadObj = Instantiate(cornerRoad, roadPos, Quaternion.identity) as GameObject;
-                //only needs to be rotated if the second connecting road is on the right
-                if (right)
-                {
-                    var rotationVector = transform.rotation.eulerAngles;
-                    rotationVector.z = 270;
-                    roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                }
-                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-            }
-            else if (bot)
-            {
-                roadObj = Instantiate(cornerRoad, roadPos, Quaternion.identity) as GameObject;
-                if (right)
-                {
-                    var rotationVector = transform.rotation.eulerAngles;
-                    rotationVector.z = 180;
-                    roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                }
-                else
-                {
-                    var rotationVector = transform.rotation.eulerAngles;
-                    rotationVector.z = 90;
-                    roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                }
-                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-            }
-        }
-
-        //T road
-        if (nearbyRoadCount == 3)
-        {
-            if (top && bot)
-            {
-                roadObj = Instantiate(tRoad, roadPos, Quaternion.identity) as GameObject;
-                if (right)
-                {
-                    var rotationVector = transform.rotation.eulerAngles;
-                    rotationVector.z = 270;
-                    roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                }
-                else
-                {
-                    var rotationVector = transform.rotation.eulerAngles;
-                    rotationVector.z = 90;
-                    roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                }
-                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-            }
-            else if (right && left)
-            {
-                roadObj = Instantiate(tRoad, roadPos, Quaternion.identity) as GameObject;
-                //starting rotation is if the third connection is on top, therefore only need to rotation in this
-                // case if last connection is bot
-                if (bot)
-                {
-                    var rotationVector = transform.rotation.eulerAngles;
-                    rotationVector.z = 180;
-                    roadObj.transform.rotation = Quaternion.Euler(rotationVector);
-                }
-                myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-            }
-        }
-
-        //crossroad
-        if (nearbyRoadCount == 4)
-        {
-            roadObj = Instantiate(crossRoad, roadPos, Quaternion.identity) as GameObject;
-            myWorld.constructNetwork.setConstructArr((int)roadPos.x, (int)roadPos.y, roadObj);
-        }
-
-        //if the road is one of those surrounding the newly-placed road, delete it so
-        // that there are not two road objects at one location
-        if (road != gameObject)
-        {
-            Destroy(road);
         }
     }
 
@@ -489,15 +390,6 @@ public class RoadPlacement : MonoBehaviour {
     }
 
     /**
-     * Sets the aqueduct that is over this road object
-     * @param the aqueduct to go over this road
-     */
-    public void setAqueduct(GameObject aqueduct)
-    {
-        //this.aqueduct = aqueduct;
-    }
-
-    /**
      * Gets the aqueduct over this road object
      * @return the aqueduct over this road object if there is one, null otherwise
      */
@@ -505,20 +397,5 @@ public class RoadPlacement : MonoBehaviour {
     {
         //return this.aqueduct;
         return null;
-    }
-
-    /**
-     * Destroys the aqueduct if there is one on top of the road, otherwise destroy the road
-     */
-    public void destroyRoad()
-    {
-        //if (this.aqueduct != null)
-        //{
-            //aqueduct.GetComponent<Employment>().destroyEmployment();
-        //}
-        //else
-        //{
-            //Destroy(gameObject);
-        //}
     }
 }
