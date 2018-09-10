@@ -423,26 +423,42 @@ public class AqueductPlacement : MonoBehaviour {
         if ((int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            north = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
+            if (gameObject.transform.position.x == Mathf.RoundToInt(reservoirObj.transform.position.x))
+            {
+                nearbyReservoirCount++;
+                north = true;
+            }
         }
         if ((int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            south = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1];
+            if (gameObject.transform.position.x == Mathf.RoundToInt(reservoirObj.transform.position.x))
+            {
+                nearbyReservoirCount++;
+                south = true;
+            }
         }
         if ((int)aqueductPos.x - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            west = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
+            if (gameObject.transform.position.y == Mathf.RoundToInt(reservoirObj.transform.position.y))
+            {
+                nearbyReservoirCount++;
+                west = true;
+            }
         }
         if ((int)aqueductPos.x + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            east = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
+            if (gameObject.transform.position.y == Mathf.RoundToInt(reservoirObj.transform.position.y))
+            {
+                nearbyReservoirCount++;
+                east = true;
+            }
         }
 
         bool overRoad = false;

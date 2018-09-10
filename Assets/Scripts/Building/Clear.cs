@@ -77,14 +77,32 @@ public class Clear : MonoBehaviour {
             if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building")
             {
                 bool clearingAnAqueduct = false;
-                List<GameObject> aqueductConnections = new List<GameObject>();
+                bool clearingAReservoir = false;
+                List<GameObject> waterConnections = new List<GameObject>();
                 if (structureToClear.GetComponent<Aqueduct>() != null)
                 {
                     clearingAnAqueduct = true;
                     //get a list of the current connections
-                    aqueductConnections = structureToClear.GetComponent<Aqueduct>().getConnections();
+                    waterConnections = structureToClear.GetComponent<Aqueduct>().getConnections();
                 }
-                //TODO: will need to do do something similar with reservoirs
+                else if (structureToClear.GetComponent<Reservoir>() != null)
+                {
+                    clearingAReservoir = true;
+                    //get a list of the current connections
+                    waterConnections = structureToClear.GetComponent<Reservoir>().getConnections();
+                    //Need to set all of the reservoir's locations in the structureArr to null
+                    Vector2 reservoirPos = new Vector2(Mathf.RoundToInt(structureToClear.transform.position.x),
+                        Mathf.RoundToInt(structureToClear.transform.position.y));
+                    BoxCollider2D boxCollider2D = structureToClear.GetComponent<BoxCollider2D>();
+                    for (int i = 0; i < boxCollider2D.size.x; i++)
+                    {
+                        for (int j = 0; j < boxCollider2D.size.y; j++)
+                        {
+                            //The -1 is to get to the bottom left corner of the reservoir
+                            structureArr[(int)reservoirPos.x - 1 + i, (int)reservoirPos.y - 1 + j] = null;
+                        }
+                    }
+                }
 
                 Employment employment = structureToClear.GetComponent<Employment>();
                 employment.destroyEmployment();
@@ -98,40 +116,10 @@ public class Clear : MonoBehaviour {
                     }
                 }
 
-                if (clearingAnAqueduct)
+                //Need to update the connections of any aqueducts or reservoirs that were connected if this was a reservoir/aqueduct
+                if (clearingAnAqueduct || clearingAReservoir)
                 {
-                    //call update connections on each item in the list of the aqueduct's old connections
-                    foreach (GameObject connection in aqueductConnections) {
-                        if (connection != null)
-                        {
-                            if (connection.GetComponent<Aqueduct>() != null)
-                            {
-                                connection.GetComponent<Aqueduct>().updateConnections();
-                            }
-                            else if (connection.GetComponent<Reservoir>() != null)
-                            {
-                                connection.GetComponent<Reservoir>().updateConnections();
-                            }
-                            else if (connection.GetComponent<RoadInformation>() != null)
-                            {
-                                if (connection.GetComponent<RoadInformation>().getAqueduct() != null)
-                                {
-                                    //If an arch loses its connections, it should also be destroyed
-                                    Aqueduct connectingAqueductArch = connection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
-                                    if (connectingAqueductArch.getTopConnection() != null || connectingAqueductArch.getBotConnection() != null
-                                        || connectingAqueductArch.getLeftConnection() != null || connectingAqueductArch.getRightConnection() != null)
-                                    {
-                                        connectingAqueductArch.updateConnections();
-                                    }
-                                    else if (connectingAqueductArch.getTopConnection() == null && connectingAqueductArch.getBotConnection() == null
-                                        && connectingAqueductArch.getLeftConnection() == null && connectingAqueductArch.getRightConnection() == null)
-                                    {
-                                        connection.GetComponent<RoadInformation>().destroyRoad();
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    updateWaterConnections(waterConnections);
                 }
             }
             //If the deleted object is a road, the surrounding roads need to be updated to reflect
@@ -228,6 +216,47 @@ public class Clear : MonoBehaviour {
             GameObject terrainToClear = terrainArr[(int)mousePos.x, (int)mousePos.y];
             TreeRemoval treeToClear = terrainToClear.GetComponent<TreeRemoval>();
             treeToClear.removeTree();
+        }
+    }
+
+    /**
+     * Updates the connections of a reservoir or aqueduct that is being deleted
+     * @param waterConnections the connections to update
+     */
+    private void updateWaterConnections(List<GameObject> waterConnections)
+    {
+        //call update connections on each item in the list of the aqueduct's old connections
+        foreach (GameObject connection in waterConnections)
+        {
+            if (connection != null)
+            {
+                if (connection.GetComponent<Aqueduct>() != null)
+                {
+                    connection.GetComponent<Aqueduct>().updateConnections();
+                }
+                else if (connection.GetComponent<Reservoir>() != null)
+                {
+                    connection.GetComponent<Reservoir>().updateConnections();
+                }
+                else if (connection.GetComponent<RoadInformation>() != null)
+                {
+                    if (connection.GetComponent<RoadInformation>().getAqueduct() != null)
+                    {
+                        //If an arch loses its connections, it should also be destroyed
+                        Aqueduct connectingAqueductArch = connection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                        if (connectingAqueductArch.getTopConnection() != null || connectingAqueductArch.getBotConnection() != null
+                            || connectingAqueductArch.getLeftConnection() != null || connectingAqueductArch.getRightConnection() != null)
+                        {
+                            connectingAqueductArch.updateConnections();
+                        }
+                        else if (connectingAqueductArch.getTopConnection() == null && connectingAqueductArch.getBotConnection() == null
+                            && connectingAqueductArch.getLeftConnection() == null && connectingAqueductArch.getRightConnection() == null)
+                        {
+                            connection.GetComponent<RoadInformation>().destroyRoad();
+                        }
+                    }
+                }
+            }
         }
     }
 }

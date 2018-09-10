@@ -43,6 +43,7 @@ public class Reservoir : MonoBehaviour {
 
     private GameObject world;
     private World myWorld;
+    private SpriteRenderer spriteRenderer;
     //private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
     private int width;
@@ -59,10 +60,11 @@ public class Reservoir : MonoBehaviour {
     {
         world = GameObject.Find("WorldInformation");
         myWorld = world.GetComponent<World>();
+        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         //structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
-        width = (int) gameObject.GetComponent<BoxCollider2D>().size.x;
-        height = (int) gameObject.GetComponent<BoxCollider2D>().size.y;
+        width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
+        height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
         reservoirPosition = gameObject.transform.position;
         nextToWater = false;
         fillSources = new List<GameObject>();
@@ -75,7 +77,7 @@ public class Reservoir : MonoBehaviour {
     /**
      * Sets the initial sprite for the reservoir
      */
-    void Start () {
+    void Start() {
         for (int i = 0; i < width; i++)
         {
             //Mathf.CeilToInt(width / 2.0f - 1) finds the middle square and then that is subtracted from x to get to the edge to start checking the structure array
@@ -114,18 +116,21 @@ public class Reservoir : MonoBehaviour {
         }
         else
         {
+            fillSources.Add(gameObject);
             //Update all nearby tiles with water
             updatePipes(true);
         }
+        updateConnections();
+        updateNeighbors();
     }
-	
-	/**
+
+    /**
      * Updates the appearance of the reservoir and determines if it is filled
      */
-	void Update () {
+    void Update() {
         //TODO: have public methods for dealing with aqueducts.  use enums for determining which sprite should be displayed?
         //make sure to be calling add and remove fill sources to update water supply
-	}
+    }
 
     /**
      * Adds a reservoir to the list of reservoirs helping fill this reservoir with water
@@ -205,8 +210,328 @@ public class Reservoir : MonoBehaviour {
         }
     }
 
+    /**
+     * Updates the connections this reservoir has to nearby aqueducts/reservoirs
+     */
     public void updateConnections()
     {
+        //Check for other reservoirs, aqueducts, and arches (roads with aqueduct objects) around the reservoir
+        //Update art based on available connection sources and whether filled or empty
+        //Update north/south/west/eastConnection with what is valid
 
+        //anything that lines up with the center of the reservoir is a valid connection
+        GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+        Vector2 reservoirCenter = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x), Mathf.RoundToInt(gameObject.transform.position.y));
+        northConnection = null;
+        southConnection = null;
+        westConnection = null;
+        eastConnection = null;
+        if ((int)reservoirCenter.y + 2 < myWorld.mapSize && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2] != null
+            && ((structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].tag == "Road"
+                && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].GetComponent<RoadInformation>().getAqueduct() != null)
+            || structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].GetComponent<Aqueduct>() != null
+            || (structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].GetComponent<Reservoir>() != null
+                && Mathf.RoundToInt(structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].transform.position.x) == Mathf.RoundToInt(transform.position.x))))
+        {
+            northConnection = structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2];
+        }
+        if ((int)reservoirCenter.y - 2 > 0 && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2] != null
+            && ((structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].tag == "Road"
+                && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].GetComponent<RoadInformation>().getAqueduct() != null)
+            || structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].GetComponent<Aqueduct>() != null
+            || (structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].GetComponent<Reservoir>() != null
+                && Mathf.RoundToInt(structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].transform.position.x) == Mathf.RoundToInt(transform.position.x))))
+        {
+            southConnection = structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2];
+        }
+        if ((int)reservoirCenter.x - 2 > 0 && structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y] != null
+            && ((structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].tag == "Road"
+                && structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].GetComponent<RoadInformation>().getAqueduct() != null)
+            || structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].GetComponent<Aqueduct>() != null
+            || (structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].GetComponent<Reservoir>() != null
+                && Mathf.RoundToInt(structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].transform.position.y) == Mathf.RoundToInt(transform.position.y))))
+        {
+            westConnection = structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y];
+        }
+        if ((int)reservoirCenter.x + 2 < myWorld.mapSize && structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y] != null
+            && ((structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].tag == "Road"
+                && structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].GetComponent<RoadInformation>().getAqueduct() != null)
+            || structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].GetComponent<Aqueduct>() != null
+            || (structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].GetComponent<Reservoir>() != null
+                && Mathf.RoundToInt(structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].transform.position.y) == Mathf.RoundToInt(transform.position.y))))
+        {
+            eastConnection = structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y];
+        }
+        //Update sprite based on connections
+        if (northConnection != null && southConnection != null && westConnection != null && eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled4;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty4;
+            }
+        }
+        else if (northConnection != null && southConnection != null && westConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled3NSW;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty3NSW;
+            }
+        }
+        else if (northConnection != null && southConnection != null && eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled3NSE;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty3NSE;
+            }
+        }
+        else if (northConnection != null && westConnection != null && eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled3NWE;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty3NWE;
+            }
+        }
+        else if (southConnection != null && westConnection != null && eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled3SWE;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty3SWE;
+            }
+        }
+        else if (northConnection != null && southConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled2NS;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty2NS;
+            }
+        }
+        else if (northConnection != null && westConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled2NW;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty2NW;
+            }
+        }
+        else if (northConnection != null && eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled2NE;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty2NE;
+            }
+        }
+        else if (southConnection != null && westConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled2SW;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty2SW;
+            }
+        }
+        else if (southConnection != null && eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled2SE;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty2SE;
+            }
+        }
+        else if (westConnection != null && eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled2WE;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty2WE;
+            }
+        }
+        else if (northConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled1N;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty1N;
+            }
+        }
+        else if (southConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled1S;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty1S;
+            }
+        }
+        else if (westConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled1W;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty1W;
+            }
+        }
+        else if (eastConnection != null)
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filled1E;
+            }
+            else
+            {
+                spriteRenderer.sprite = empty1E;
+            }
+        }
+        else
+        {
+            if (fillSources.Count > 0)
+            {
+                spriteRenderer.sprite = filledSprite;
+            }
+            else
+            {
+                spriteRenderer.sprite = emptySprite;
+            }
+        }
+    }
+
+    /**
+     * Updates the connections of neighboring aqueducts/reservoirs to this reservoir
+     */
+    public void updateNeighbors()
+    {
+        //call this when created (in awake or start)
+        //TODO: go into clear and update it to update connections of neighbors when clearing a reservoir
+        if (northConnection != null)
+        {
+            if (northConnection.tag == "Road" && northConnection.GetComponent<RoadInformation>().getAqueduct() != null)
+            {
+                northConnection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (northConnection.GetComponent<Aqueduct>() != null)
+            {
+                northConnection.GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (northConnection.GetComponent<Reservoir>() != null)
+            {
+                northConnection.GetComponent<Reservoir>().updateConnections();
+            }
+        }
+        if (southConnection != null)
+        {
+            if (southConnection.tag == "Road" && southConnection.GetComponent<RoadInformation>().getAqueduct() != null)
+            {
+                southConnection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (southConnection.GetComponent<Aqueduct>() != null)
+            {
+                southConnection.GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (southConnection.GetComponent<Reservoir>() != null)
+            {
+                southConnection.GetComponent<Reservoir>().updateConnections();
+            }
+        }
+        if (westConnection != null)
+        {
+            if (westConnection.tag == "Road" && westConnection.GetComponent<RoadInformation>().getAqueduct() != null)
+            {
+                westConnection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (westConnection.GetComponent<Aqueduct>() != null)
+            {
+                westConnection.GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (westConnection.GetComponent<Reservoir>() != null)
+            {
+                westConnection.GetComponent<Reservoir>().updateConnections();
+            }
+        }
+        if (eastConnection != null)
+        {
+            if (eastConnection.tag == "Road" && eastConnection.GetComponent<RoadInformation>().getAqueduct() != null)
+            {
+                eastConnection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (eastConnection.GetComponent<Aqueduct>() != null)
+            {
+                eastConnection.GetComponent<Aqueduct>().updateConnections();
+            }
+            else if (eastConnection.GetComponent<Reservoir>() != null)
+            {
+                eastConnection.GetComponent<Reservoir>().updateConnections();
+            }
+        }
+    }
+
+    /**
+     * Gets the aqueducts/reservoirs connected to this reservoir
+     */
+    public List<GameObject> getConnections()
+    {
+        List<GameObject> connections = new List<GameObject>();
+        if (northConnection != null)
+        {
+            connections.Add(northConnection);
+        }
+        if (southConnection != null)
+        {
+            connections.Add(southConnection);
+        }
+        if (westConnection != null)
+        {
+            connections.Add(westConnection);
+        }
+        if (eastConnection != null)
+        {
+            connections.Add(eastConnection);
+        }
+        return connections;
     }
 }

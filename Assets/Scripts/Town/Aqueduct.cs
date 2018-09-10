@@ -161,26 +161,42 @@ public class Aqueduct : MonoBehaviour {
         if ((int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            north = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
+            if (gameObject.transform.position.x == Mathf.RoundToInt(reservoirObj.transform.position.x))
+            {
+                nearbyReservoirCount++;
+                north = true;
+            }
         }
         if ((int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            south = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1];
+            if (gameObject.transform.position.x == Mathf.RoundToInt(reservoirObj.transform.position.x))
+            {
+                nearbyReservoirCount++;
+                south = true;
+            }
         }
         if ((int)aqueductPos.x - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            west = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
+            if (gameObject.transform.position.y == Mathf.RoundToInt(reservoirObj.transform.position.y))
+            {
+                nearbyReservoirCount++;
+                west = true;
+            }
         }
         if ((int)aqueductPos.x + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] != null
             && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<Reservoir>() != null)
         {
-            nearbyReservoirCount++;
-            east = true;
+            GameObject reservoirObj = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
+            if (gameObject.transform.position.y == Mathf.RoundToInt(reservoirObj.transform.position.y))
+            {
+                nearbyReservoirCount++;
+                east = true;
+            }
         }
 
         bool overRoad = false;
@@ -1346,27 +1362,6 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                //if ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2] != null
-                //    && ((int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Reservoir>() != null
-                //    || (int)aqueductPos.y + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 2].GetComponent<Aqueduct>() != null))
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1] == null
-                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1] == null
-                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<Aqueduct>();
-                //if (topAqueductScript != null && (topAqueductScript.getLeftConnection() != null || topAqueductScript.getRightConnection() != null))
-                //{
-                //    connectionPossible = false;
-                //}
                 Aqueduct topAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
                 if (topAqueductScript.getLeftConnection() == null && topAqueductScript.getRightConnection() == null)
                 {
@@ -1452,27 +1447,6 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                //if ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2] != null
-                //    && ((int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Reservoir>() != null
-                //    || (int)aqueductPos.y - 2 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 2].GetComponent<Aqueduct>() != null))
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1] == null
-                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1] == null
-                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<Aqueduct>();
-                //if (botAqueductScript != null && (botAqueductScript.getLeftConnection() != null || botAqueductScript.getRightConnection() != null))
-                //{
-                //    connectionPossible = false;
-                //}
                 Aqueduct botAqueductScript = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
                 if (botAqueductScript.getLeftConnection() == null && botAqueductScript.getRightConnection() == null)
                 {
@@ -1557,27 +1531,6 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                //if ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y] != null
-                //    && ((int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                //    || (int)aqueductPos.x - 2 > 0 && structureArr[(int)aqueductPos.x - 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1] == null
-                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x - 1 > 0 && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1] == null
-                //    || structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<Aqueduct>();
-                //if (leftAqueductScript != null && (leftAqueductScript.getTopConnection() != null || leftAqueductScript.getBotConnection() != null))
-                //{
-                //    connectionPossible = false;
-                //}
                 if (leftArch)
                 {
                     Aqueduct leftAqueductScript = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
@@ -1666,27 +1619,6 @@ public class Aqueduct : MonoBehaviour {
             {
                 //Check if it can connect
                 bool connectionPossible = false;
-                //if ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y] != null
-                //    && ((int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Reservoir>() != null
-                //    || (int)aqueductPos.x + 2 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 2, (int)aqueductPos.y].GetComponent<Aqueduct>() != null))
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1] == null
-                //    || structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //else if ((int)aqueductPos.x + 1 < myWorld.mapSize && (int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1] == null
-                //    || structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null)
-                //{
-                //    connectionPossible = true;
-                //}
-                //Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<Aqueduct>();
-                //if (rightAqueductScript != null && (rightAqueductScript.getTopConnection() != null || rightAqueductScript.getBotConnection() != null))
-                //{
-                //    connectionPossible = false;
-                //}
                 if (rightArch)
                 {
                     Aqueduct rightAqueductScript = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
@@ -1742,9 +1674,6 @@ public class Aqueduct : MonoBehaviour {
         {
             Destroy(gameObject);
         }
-
-        //topAq, topArch, topRes.... only thing that really matters here is the direction for the sprite.  the connection itself will need to get the arch and not the road, though
-        //nearbyAqueductCount, nearbyArchCount, nearbyReservoirCount
 
         //TODO: at the end, I should call a fill method that checks connected aqueducts/reservoirs if they have access to nearWater reservoirs
 
