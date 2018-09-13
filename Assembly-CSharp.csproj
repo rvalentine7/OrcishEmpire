@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\Building\PreConstructedRoads.cs" />
     <Compile Include="Assets\Scripts\Building\RoadPlacement.cs" />
     <Compile Include="Assets\Scripts\Camera\Controls.cs" />
+    <Compile Include="Assets\Scripts\Characters\AStarForWaterBuildings.cs" />
     <Compile Include="Assets\Scripts\Characters\AstarResult.cs" />
     <Compile Include="Assets\Scripts\Characters\AstarSearch.cs" />
     <Compile Include="Assets\Scripts\Characters\Citizen.cs" />

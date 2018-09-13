@@ -136,9 +136,9 @@ public class AqueductPlacement : MonoBehaviour {
                     {
                         myWorld.constructNetwork.setConstructArr((int)mousePos.x, (int)mousePos.y, aqueductObj);
                     }
-                    aqueductObj.GetComponent<Aqueduct>().updateConnections();
-                    aqueductObj.GetComponent<Aqueduct>().updateNeighbors();
-                    //TODO: update neighbors for reservoirs
+                    //aqueductObj.GetComponent<Aqueduct>().updateConnections();
+                    //aqueductObj.GetComponent<Aqueduct>().updateNeighbors();
+                    //TODO?: update neighbors for reservoirs
                 }
             }
 
