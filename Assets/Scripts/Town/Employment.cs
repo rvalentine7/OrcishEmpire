@@ -260,8 +260,8 @@ public class Employment : MonoBehaviour {
      */
     public void addWaterSource()
     {
-        numWaterSources++;
-        if (gameObject.GetComponent<Fountain>() != null && numWaterSources == 1)
+        numWaterSources++;//TODO: remove and update to be like removeWaterSource()
+        if (gameObject.GetComponent<Fountain>() != null && numWaterSources >= 1)
         {
             gameObject.GetComponent<Fountain>().updateFilled(true);
         }
@@ -273,8 +273,24 @@ public class Employment : MonoBehaviour {
      */
     public void removeWaterSource()
     {
-        numWaterSources--;
-        if (gameObject.GetComponent<Fountain>() != null && numWaterSources == 0)
+        numWaterSources--;//TODO: remove
+        bool hasWaterAccess = false;
+        GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        BoxCollider2D boxCollider2D = gameObject.GetComponent<BoxCollider2D>();
+        int width = Mathf.RoundToInt(boxCollider2D.size.x);
+        int height = Mathf.RoundToInt(boxCollider2D.size.y);
+        for (int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                if (terrainArr[(int)gameObject.transform.position.x + i - Mathf.CeilToInt(width / 2.0f - 1),
+                    (int)gameObject.transform.position.y + j - Mathf.CeilToInt(height / 2.0f - 1)].GetComponent<Tile>().hasWater())
+                {
+                    hasWaterAccess = true;
+                }
+            }
+        }
+        if (gameObject.GetComponent<Fountain>() != null && hasWaterAccess/* && numWaterSources == 0*/)
         {
             gameObject.GetComponent<Fountain>().updateFilled(false);
         }

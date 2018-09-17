@@ -102,6 +102,11 @@ public class Clear : MonoBehaviour {
                             structureArr[(int)reservoirPos.x - 1 + i, (int)reservoirPos.y - 1 + j] = null;
                         }
                     }
+                    int waterSourcesCount = structureToClear.GetComponent<Reservoir>().getWaterSources().Count;
+                    if (waterSourcesCount > 0)
+                    {
+                        structureToClear.GetComponent<Reservoir>().updatePipes(false);
+                    }
                 }
 
                 Employment employment = structureToClear.GetComponent<Employment>();
@@ -225,11 +230,6 @@ public class Clear : MonoBehaviour {
      */
     private void updateWaterConnections(List<GameObject> waterConnections)
     {
-        /*TODO: when clearing, have the neighbors check if they still have access to the same water sources
-         * If they do not, have them remove the water source by calling their removeWaterSource(GameObject waterSource) method...
-         * What I would be calling from this method is the method that checks if they still have the water source... that method would call the removeWaterSource method
-         * The check should see if the waterSource still exists (reservoir near water destroyed) before running A* to check if it has a connection
-        */
         //call update connections on each item in the list of the aqueduct's old connections
         foreach (GameObject connection in waterConnections)
         {
@@ -239,13 +239,15 @@ public class Clear : MonoBehaviour {
                 {
                     Aqueduct aqueduct = connection.GetComponent<Aqueduct>();
                     aqueduct.updateConnections();
-                    aqueduct.setTimeToUpdateWaterSources();
+                    aqueduct.setTimeToUpdateWaterSources(false);
+                    aqueduct.setNextToClearedWaterStructure(true);
                 }
                 else if (connection.GetComponent<Reservoir>() != null)
                 {
                     Reservoir reservoir = connection.GetComponent<Reservoir>();
                     reservoir.updateConnections();
-                    reservoir.setTimeToUpdateWaterSources();
+                    reservoir.setTimeToUpdateWaterSources(false);
+                    reservoir.setNextToClearedWaterStructure(true);
                 }
                 else if (connection.GetComponent<RoadInformation>() != null)
                 {
@@ -257,7 +259,8 @@ public class Clear : MonoBehaviour {
                             || connectingAqueductArch.getLeftConnection() != null || connectingAqueductArch.getRightConnection() != null)
                         {
                             connectingAqueductArch.updateConnections();
-                            connectingAqueductArch.setTimeToUpdateWaterSources();
+                            connectingAqueductArch.setTimeToUpdateWaterSources(false);
+                            connectingAqueductArch.setNextToClearedWaterStructure(true);
                         }
                         else if (connectingAqueductArch.getTopConnection() == null && connectingAqueductArch.getBotConnection() == null
                             && connectingAqueductArch.getLeftConnection() == null && connectingAqueductArch.getRightConnection() == null)

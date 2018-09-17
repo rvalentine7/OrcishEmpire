@@ -87,7 +87,7 @@ public class Fountain : MonoBehaviour {
                     {
                         employment.addWaterSource();
                     }
-                    else
+                    else// if (filled)
                     {
                         employment.removeWaterSource();
                     }
@@ -103,7 +103,7 @@ public class Fountain : MonoBehaviour {
                     {
                         houseInformation.addWaterSource();
                     }
-                    else
+                    else// if (filled)
                     {
                         houseInformation.removeWaterSource();
                     }
@@ -117,7 +117,7 @@ public class Fountain : MonoBehaviour {
                     {
                         terrainArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].GetComponent<Tile>().addWaterSource();
                     }
-                    else
+                    else//  if (filled)
                     {
                         terrainArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].GetComponent<Tile>().removeWaterSource();
                     }

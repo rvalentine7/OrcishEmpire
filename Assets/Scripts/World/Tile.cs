@@ -54,6 +54,7 @@ public class Tile : MonoBehaviour {
      */
     public void removeWaterPipes(GameObject waterSource)
     {
+        //Debug.Log("removing pipes. num: " + numWaterPipes);
         if (numWaterPipes == 1)
         {
             //updates the building this tile is on to remove a water source
