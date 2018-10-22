@@ -123,6 +123,7 @@
     <Compile Include="Assets\Scripts\UI\LumberMillPopup.cs" />
     <Compile Include="Assets\Scripts\UI\MarketPopup.cs" />
     <Compile Include="Assets\Scripts\UI\OchrePitPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\PopulationAndCurrency.cs" />
     <Compile Include="Assets\Scripts\UI\PopupRemoval.cs" />
     <Compile Include="Assets\Scripts\UI\PubPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ReservoirPopup.cs" />

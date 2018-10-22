@@ -9,6 +9,7 @@ public class MarketPopup : MonoBehaviour {
     public Text employeeNum;
     public Text meatNum;
     public Text wheatNum;
+    public Text eggsNum;
     public Text fishNum;
     public Text furnitureNum;
     public Text weaponsNum;
@@ -43,6 +44,7 @@ public class MarketPopup : MonoBehaviour {
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         meatNum.text = "" + storage.getMeatCount();
         wheatNum.text = "" + storage.getWheatCount();
+        eggsNum.text = "" + storage.getEggCount();
     }
 
     /**

@@ -18,7 +18,8 @@ public class RoadPlacement : MonoBehaviour {
     public Sprite possibleTRoadSprite;
     public Sprite possibleCornerRoadSprite;
     public Sprite impossibleSprite;
-    public GameObject straightRoad;//TODO: rename to just road and get rid of the other GameObjects
+    public GameObject road;
+    public int buildingCost;
     
 
 	/**
@@ -50,6 +51,11 @@ public class RoadPlacement : MonoBehaviour {
         mousePos.z = 0;
 
         bool valid = true;
+        //Need enough currency to build the road
+        if (myWorld.getCurrency() < buildingCost)
+        {
+            valid = false;
+        }
         //Buildings cannot be placed outside of the map
         if (mousePos.x < 0)
         {
@@ -95,8 +101,7 @@ public class RoadPlacement : MonoBehaviour {
         {
             valid = false;
         }
-
-        //TODO: check also for aqueducts... this will be the exception for the "Building" tag
+        
         /*
          If the location is an aqueduct, check if there are any connected aqueduct arches (roads holding an aqueduct object (getAqueduct() != null)
          Checks to see if valid:
@@ -204,7 +209,8 @@ public class RoadPlacement : MonoBehaviour {
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
             {
                 transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
-                GameObject roadObj = Instantiate(straightRoad, mousePos, Quaternion.identity) as GameObject;
+                GameObject roadObj = Instantiate(road, mousePos, Quaternion.identity) as GameObject;
+                myWorld.updateCurrency(-buildingCost);
                 structureArr = myWorld.constructNetwork.getConstructArr();
                 GameObject aqueductObj = null;
                 if (structureArr[(int)mousePos.x, (int)mousePos.y] != null

@@ -392,6 +392,19 @@ public class Distribute : MonoBehaviour {
                     houseStorage.addResource("Wheat", employmentStorage.getWheatCount());
                     employmentStorage.removeResource("Wheat", employmentStorage.getWheatCount());
                 }
+                //
+                if (employmentStorage.getEggCount() >= foodNumToDistribute * houseSize
+                    && houseStorage.acceptsResource("Eggs", foodNumToDistribute * houseSize))
+                {
+                    houseStorage.addResource("Eggs", foodNumToDistribute * houseSize);
+                    employmentStorage.removeResource("Eggs", foodNumToDistribute * houseSize);
+                }
+                else if (employmentStorage.getEggCount() > 0
+                    && houseStorage.acceptsResource("Eggs", foodNumToDistribute * houseSize))
+                {
+                    houseStorage.addResource("Eggs", employmentStorage.getEggCount());
+                    employmentStorage.removeResource("Eggs", employmentStorage.getEggCount());
+                }
                 //TODO: add other types of food
             }
             //TODO: add other types of resources

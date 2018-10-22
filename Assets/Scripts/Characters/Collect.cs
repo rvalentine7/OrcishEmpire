@@ -200,6 +200,22 @@ public class Collect : MonoBehaviour {
                                     remainingCapacity -= wheatCount;
                                 }
                             }
+                            if (storage.getEggCount() > 0)
+                            {
+                                int eggCount = storage.getEggCount();
+                                if (eggCount > remainingCapacity)
+                                {
+                                    resources.Add("Eggs", remainingCapacity);
+                                    storage.removeResource("Eggs", remainingCapacity);
+                                    remainingCapacity = 0;
+                                }
+                                else
+                                {
+                                    resources.Add("Eggs", eggCount);
+                                    storage.removeResource("Eggs", eggCount);
+                                    remainingCapacity -= eggCount;
+                                }
+                            }
                             //TODO: when more types of food are added, account for those here
                         }
                         if (resourcesToCollect.Equals("Iron") && storage.getIronCount() > 0)

@@ -43,6 +43,7 @@ public class ReservoirPlacement : MonoBehaviour {
     public Sprite possibleFilledSprite4;
 
     public GameObject building;
+    public int buildingCost;
     private bool validPlacement;
     private GameObject world;
     private World myWorld;
@@ -75,7 +76,15 @@ public class ReservoirPlacement : MonoBehaviour {
         mousePos.y = Mathf.RoundToInt(mousePos.y);
         mousePos.z = 0;
 
-        validPlacement = true;
+        //Need enough currency to build the reservoir
+        if (myWorld.getCurrency() < buildingCost)
+        {
+            validPlacement = false;
+        }
+        else
+        {
+            validPlacement = true;
+        }
         //Buildings cannot be placed outside of the map
         if (mousePos.x < 0)
         {
@@ -163,6 +172,7 @@ public class ReservoirPlacement : MonoBehaviour {
                 Vector2 buildingVec = new Vector2(mousePos.x + adjustedX, mousePos.y + adjustedY);
                 //create the new building in the game world
                 GameObject buildingObj = Instantiate(building, buildingVec, Quaternion.identity) as GameObject;
+                myWorld.updateCurrency(-buildingCost);
                 for (r = 0; r < height; r++)
                 {
                     for (int c = 0; c < width; c++)

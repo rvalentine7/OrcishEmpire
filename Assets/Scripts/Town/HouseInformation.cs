@@ -115,7 +115,11 @@ public class HouseInformation : MonoBehaviour {
                 {
                     numFoodTypes++;
                 }
-                if (storage.getMeatCount() > 0)
+                if (storage.getWheatCount() > 0)
+                {
+                    numFoodTypes++;
+                }
+                if (storage.getEggCount() > 0)
                 {
                     numFoodTypes++;
                 }
@@ -132,11 +136,16 @@ public class HouseInformation : MonoBehaviour {
                 {
                     storage.removeResource("Wheat", numInhabitants * inhabitantFoodConsumption * (storage.getWheatCount() / storage.getFoodCount()));
                 }
+                if (storage.getFoodCount() > 0)
+                {
+                    storage.removeResource("Eggs", numInhabitants * inhabitantFoodConsumption * (storage.getEggCount() / storage.getFoodCount()));
+                }
             }
             else if (storage.getFoodCount() > 0)
             {
                 storage.removeResource("Meat", storage.getMeatCount());
                 storage.removeResource("Wheat", storage.getWheatCount());
+                storage.removeResource("Eggs", storage.getEggCount());
             }
 
             //TODO: Add text here for the house popup to pull on the describe why a house is upgrading/downgrading
@@ -332,6 +341,7 @@ public class HouseInformation : MonoBehaviour {
         }
         numInhabitants += num;
         //populationChange = true;
+        this.myWorld.updatePopulation(num);
     }
 
     /**
@@ -387,6 +397,7 @@ public class HouseInformation : MonoBehaviour {
             Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
                 gameObject.transform.position.y + 0.4f), Quaternion.identity);
         }
+        this.myWorld.updatePopulation(-num);
     }
 
     /**
@@ -405,6 +416,7 @@ public class HouseInformation : MonoBehaviour {
             Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
                 gameObject.transform.position.y + 0.4f), Quaternion.identity);
         }
+        this.myWorld.updatePopulation(-numInhabitants);
         Destroy(gameObject);
     }
 

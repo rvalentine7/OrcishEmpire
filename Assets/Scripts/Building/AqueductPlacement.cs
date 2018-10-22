@@ -19,6 +19,7 @@ public class AqueductPlacement : MonoBehaviour {
     public Sprite possibleSprite4;
     public Sprite impossibleSprite;
     public GameObject building;
+    public int buildingCost;
 
     private GameObject world;
     private World myWorld;
@@ -51,6 +52,11 @@ public class AqueductPlacement : MonoBehaviour {
         mousePos.z = 0;
 
         bool valid = true;
+        //Need enough currency to build the aqueduct
+        if (myWorld.getCurrency() < buildingCost)
+        {
+            valid = false;
+        }
         //Buildings cannot be placed outside of the map
         if (mousePos.x < 0)
         {
@@ -78,7 +84,7 @@ public class AqueductPlacement : MonoBehaviour {
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
 
         //bool valid = true;
-        if ((mousePos.x <= 0 && mousePos.x >= myWorld.mapSize && mousePos.y <= 0 && mousePos.y >= myWorld.mapSize))
+        if (valid && (mousePos.x <= 0 && mousePos.x >= myWorld.mapSize && mousePos.y <= 0 && mousePos.y >= myWorld.mapSize))
         {
             valid = false;
         }
@@ -127,6 +133,7 @@ public class AqueductPlacement : MonoBehaviour {
                 if (roadAqueductIsOn == null || checkNearbyArchCount(mousePos) == 0)
                 {
                     GameObject aqueductObj = Instantiate(building, mousePos, Quaternion.identity) as GameObject;
+                    myWorld.updateCurrency(-buildingCost);
                     if (roadAqueductIsOn != null)
                     {
                         aqueductObj.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";

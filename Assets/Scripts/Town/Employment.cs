@@ -7,8 +7,10 @@ using UnityEngine;
  * are also places of employment.
  */
 public class Employment : MonoBehaviour {
+    public int upkeep;//upkeep should be higher than worker pay
     public int workerCap;
     public int workerValue;
+    public int workerPay;//worker pay should be lower than upkeep
     private int numWorkers;
     private Dictionary<GameObject, int> workerHouses;
     private bool openForBusiness;

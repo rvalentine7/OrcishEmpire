@@ -12,7 +12,7 @@ public class Storage : MonoBehaviour {
     private int meatCount;
     private int wheatCount;
     private int fishCount;
-    //private int eggCount;
+    private int eggCount;
     //water
     private int waterCount;
     //crafting resources
@@ -39,7 +39,7 @@ public class Storage : MonoBehaviour {
         meatCount = 0;
         wheatCount = 0;
         fishCount = 0;
-        //eggCount = 0;
+        eggCount = 0;
 
         waterCount = 0;
 
@@ -74,7 +74,7 @@ public class Storage : MonoBehaviour {
     public int getCurrentAmountStored()
     {
         //TODO: add up other tangible resources as they are added to the game
-        return meatCount + wheatCount + hopsCount + fishCount
+        return meatCount + wheatCount + eggCount + hopsCount + fishCount
             + waterCount + lumberCount + ironCount + furnitureCount
             + weaponsCount + armorCount + beerCount + ochreCount
             + warPaintCount;
@@ -97,6 +97,10 @@ public class Storage : MonoBehaviour {
                 accepts = true;
             }
             if (name.Equals("Wheat") && num <= storageMax - getCurrentAmountStored())
+            {
+                accepts = true;
+            }
+            if (name.Equals("Eggs") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -214,6 +218,10 @@ public class Storage : MonoBehaviour {
         {
             wheatCount += num;
         }
+        else if (name.Equals("Eggs"))
+        {
+            eggCount += num;
+        }
         else if (name.Equals("Hops"))
         {
             hopsCount += num;
@@ -278,6 +286,10 @@ public class Storage : MonoBehaviour {
         {
             wheatCount -= num;
         }
+        else if (name.Equals("Eggs"))
+        {
+            eggCount -= num;
+        }
         else if (name.Equals("Hops"))
         {
             hopsCount -= num;
@@ -334,6 +346,10 @@ public class Storage : MonoBehaviour {
         else if (resourceName.Equals("Wheat"))
         {
             return getWheatCount();
+        }
+        else if (resourceName.Equals("Eggs"))
+        {
+            return getEggCount();
         }
         else if (resourceName.Equals("Hops"))
         {
@@ -397,6 +413,15 @@ public class Storage : MonoBehaviour {
     }
 
     /**
+     * Returns the total amount of eggs in storage
+     * @return eggCount the amount of eggs in storage
+     */
+    public int getEggCount()
+    {
+        return eggCount;
+    }
+
+    /**
      * Returns the total amount of hops in storage
      * @return hopsCount the amount of hops in storage
      */
@@ -421,7 +446,7 @@ public class Storage : MonoBehaviour {
     public int getFoodCount()
     {
         //TODO: add other food types to this count as they are added to the game
-        return meatCount + wheatCount + fishCount;
+        return meatCount + wheatCount + eggCount + fishCount;
     }
     
     /**
