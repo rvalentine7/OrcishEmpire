@@ -7,7 +7,9 @@ using UnityEngine;
  */
 public class World : MonoBehaviour {
     private int populationCount;
+    private float paymentTime;
 
+    public float paymentInterval;
     public int currencyCount;
     public ConstructionNetwork constructNetwork;
     public TerrainNetwork terrainNetwork;
@@ -29,6 +31,7 @@ public class World : MonoBehaviour {
     void Awake()
     {
         populationCount = 0;
+        paymentTime = paymentInterval;
         //eventually change these to be general and passed in by a level
         // manager
         constructNetwork = new ConstructionNetwork();
@@ -48,7 +51,10 @@ public class World : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (paymentInterval > 0.0f && Time.time > paymentTime)
+        {
+            paymentTime = Time.time + paymentInterval;
+        }
 	}
 
     /**
@@ -87,6 +93,15 @@ public class World : MonoBehaviour {
     {
         this.currencyCount += currencyChange;
         populationAndCurrency.updateCurrencyCount(this.currencyCount);
+    }
+
+    /**
+     * Get the time at which upkeep should occur and workers should be paid
+     * @return paymentTime the time for pay to go out
+     */
+    public float getPaymentTime()
+    {
+        return paymentTime;
     }
 
     //with a level manager, I will need getters and setters for information such as "spawnLocation" so that

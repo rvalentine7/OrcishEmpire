@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 public class HouseInformation : MonoBehaviour {
     public float timeInterval;
     public float timeBeforeEntertainmentDecay;
+    public int upkeep;
     public GameObject orcImmigrant;
     public GameObject orcEmigrant;
     public int inhabitantWaterConsumption;
@@ -20,7 +21,7 @@ public class HouseInformation : MonoBehaviour {
     public Sprite firstLevelHouse;
     public Sprite secondLevelHouse;
     public Sprite thirdLevelHouse;
-    //add future house sprites here (aiming for at least 5 house levels)
+    //add future house sprites here (aiming for at least 5 house levels... ideally more like 9)
 
     private int numInhabitants;
     private int numIncomingOrcs;
@@ -34,7 +35,9 @@ public class HouseInformation : MonoBehaviour {
     private int desirability;
     private bool multipleFoodTypes;
     private float checkTime;
-    //private int taxAmount;
+    private int householdCurrency;
+    private float nextPaymentTime;
+    private int taxAmount;
     private int food;//will need different types of food later on (meat, bread, etc)
     private int numWaterSources;
     private int entertainmentLevel;//this can be 0, 1, or 2.  If it just experiences a change,
@@ -65,12 +68,14 @@ public class HouseInformation : MonoBehaviour {
         desirability = 100;
         multipleFoodTypes = false;
         checkTime = 0.0f;
-        //taxAmount = 0;
+        householdCurrency = 0;
+        taxAmount = 0;
         entertainmentLevel = 0;
         timeOfLastEntertainment = 0.0f;
         world = GameObject.Find("WorldInformation");
         myWorld = world.GetComponent<World>();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        nextPaymentTime = myWorld.getPaymentTime();
         //Check if tile already has water, update numWaterSources if so
         if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasWater())
         {
@@ -293,6 +298,13 @@ public class HouseInformation : MonoBehaviour {
                 }
                 i++;
             }
+        }
+
+        //Upkeep
+        if (myWorld.getPaymentTime() > 0.0f && Mathf.Abs(myWorld.getPaymentTime() - nextPaymentTime) > 0.1f)
+        {
+            nextPaymentTime = myWorld.getPaymentTime();
+            myWorld.updateCurrency(-upkeep);
         }
 	}
 
@@ -544,5 +556,23 @@ public class HouseInformation : MonoBehaviour {
     public int getEntertainmentLevel()
     {
         return entertainmentLevel;
+    }
+
+    /**
+     * Gets the currency currently held by the household
+     * @return the currency the household currently has
+     */
+    public int getHouseholdCurrency()
+    {
+        return householdCurrency;
+    }
+
+    /**
+     * Updates the currency the houshold has
+     * @param currencyChange how much the household's currency should change by
+     */
+    public void updateHouseholdCurrency(int currencyChange)
+    {
+        householdCurrency += currencyChange;
     }
 }

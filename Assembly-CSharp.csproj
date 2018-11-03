@@ -95,6 +95,7 @@
     <Compile Include="Assets\Scripts\Town\Clicking Objects\OchrePitClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\PubClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ReservoirClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\TaxCollectorClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\WarPaintWorkshopClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\WeaponsmithClick.cs" />
     <Compile Include="Assets\Scripts\Town\Employment.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Assets\Scripts\Town\Reservoir.cs" />
     <Compile Include="Assets\Scripts\Town\RoadInformation.cs" />
     <Compile Include="Assets\Scripts\Town\Storage.cs" />
+    <Compile Include="Assets\Scripts\Town\TaxCollector.cs" />
     <Compile Include="Assets\Scripts\Town\Warehouse.cs" />
     <Compile Include="Assets\Scripts\Town\Well.cs" />
     <Compile Include="Assets\Scripts\UI\ArenaPopup.cs" />
@@ -127,6 +129,7 @@
     <Compile Include="Assets\Scripts\UI\PopupRemoval.cs" />
     <Compile Include="Assets\Scripts\UI\PubPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ReservoirPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\TaxCollectorPopup.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\WarehousePopup.cs" />
     <Compile Include="Assets\Scripts\UI\WarPaintWorkshopPopup.cs" />

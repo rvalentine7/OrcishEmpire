@@ -11,7 +11,9 @@ public class Employment : MonoBehaviour {
     public int workerCap;
     public int workerValue;
     public int workerPay;//worker pay should be lower than upkeep
+    private bool active;//TODO: have building-specific scripts get this active rather than have their own
     private int numWorkers;
+    private float nextPaymentTime;
     private Dictionary<GameObject, int> workerHouses;
     private bool openForBusiness;
     private bool workerDeliveringGoods;
@@ -44,6 +46,8 @@ public class Employment : MonoBehaviour {
                 }
             }
         }
+        nextPaymentTime = myWorld.getPaymentTime();
+        active = true;
     }
 
     /**
@@ -59,6 +63,7 @@ public class Employment : MonoBehaviour {
         //checking areas around the object to see if there is a road
         Vector2 employmentPos = gameObject.transform.position;
         openForBusiness = false;
+        //TODO: these while loops would probably be better on a timer to avoid slowdown
         int i = 0;
         while (openForBusiness == false && i < width)
         {
@@ -100,6 +105,17 @@ public class Employment : MonoBehaviour {
                 openForBusiness = true;
             }
             j++;
+        }
+        //Upkeep and pay workers
+        if (active && openForBusiness && myWorld.getPaymentTime() > 0.0f && Mathf.Abs(myWorld.getPaymentTime() - nextPaymentTime) > 0.1f)
+        {
+            nextPaymentTime = myWorld.getPaymentTime();
+            myWorld.updateCurrency(-upkeep);
+            foreach (KeyValuePair<GameObject, int> kvp in workerHouses)
+            {
+                HouseInformation houseInfo = kvp.Key.GetComponent<HouseInformation>();
+                houseInfo.updateHouseholdCurrency(workerPay * kvp.Value);
+            }
         }
         //if the employment loses access to roads while running, its employees become unemployed
         if (!openForBusiness)
@@ -296,5 +312,14 @@ public class Employment : MonoBehaviour {
         {
             gameObject.GetComponent<Fountain>().updateFilled(false);
         }
+    }
+
+    /**
+     * Getter for seeing if the building should be operating
+     * @return active whether the building is activated
+     */
+    public bool getActivated()
+    {
+        return active;
     }
 }
