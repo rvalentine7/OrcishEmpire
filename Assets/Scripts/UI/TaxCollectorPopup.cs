@@ -7,6 +7,7 @@ public class TaxCollectorPopup : MonoBehaviour {
     public GameObject taxCollector;
     public Text status;
     public Text employeeNum;
+    public Text taxesCollectedNum;
 
     // Use this for initialization
     void Start()
@@ -21,6 +22,23 @@ public class TaxCollectorPopup : MonoBehaviour {
         {
             Destroy(gameObject);
         }
+
+        Employment employment = taxCollector.GetComponent<Employment>();
+        employeeNum.text = "" + employment.getNumWorkers();
+        TaxCollector taxCollectorScript = taxCollector.GetComponent<TaxCollector>();
+        if (employment.getNumWorkers() == 0)
+        {
+            status.text = "This building is unable to collect taxes with no workers";
+        }
+        else if (taxCollectorScript.getCollectorStatus() == true)
+        {
+            status.text = "An orc is currently collecting taxes from nearby houses";
+        }
+        else
+        {
+            status.text = "An orc is getting ready to collect taxes from nearby houses";
+        }
+        taxesCollectedNum.text = "" + taxCollectorScript.getTaxesCollected();
     }
 
     /**

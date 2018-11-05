@@ -10,6 +10,7 @@ public class World : MonoBehaviour {
     private float paymentTime;
 
     public float paymentInterval;
+    public float taxPercentage;
     public int currencyCount;
     public ConstructionNetwork constructNetwork;
     public TerrainNetwork terrainNetwork;
@@ -22,6 +23,10 @@ public class World : MonoBehaviour {
     public List<string> aqueductTerrain;
     public List<string> mountainousTerrain;
     public List<string> wateryTerrain;
+
+    //Strings that are used in multiple places
+    public const string JOB_PAYMENT = "Job Payment";
+    public const string TAX = "Tax";
 
     private PopulationAndCurrency populationAndCurrency;
 
@@ -102,6 +107,11 @@ public class World : MonoBehaviour {
     public float getPaymentTime()
     {
         return paymentTime;
+    }
+
+    public float getTaxPercentage()
+    {
+        return taxPercentage;
     }
 
     //with a level manager, I will need getters and setters for information such as "spawnLocation" so that

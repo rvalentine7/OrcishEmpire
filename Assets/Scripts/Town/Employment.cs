@@ -114,7 +114,7 @@ public class Employment : MonoBehaviour {
             foreach (KeyValuePair<GameObject, int> kvp in workerHouses)
             {
                 HouseInformation houseInfo = kvp.Key.GetComponent<HouseInformation>();
-                houseInfo.updateHouseholdCurrency(workerPay * kvp.Value);
+                houseInfo.updateHouseholdCurrency(World.JOB_PAYMENT, workerPay * kvp.Value);
             }
         }
         //if the employment loses access to roads while running, its employees become unemployed

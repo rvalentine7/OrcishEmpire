@@ -36,8 +36,8 @@ public class HouseInformation : MonoBehaviour {
     private bool multipleFoodTypes;
     private float checkTime;
     private int householdCurrency;
+    private int goldSinceLastTax;
     private float nextPaymentTime;
-    private int taxAmount;
     private int food;//will need different types of food later on (meat, bread, etc)
     private int numWaterSources;
     private int entertainmentLevel;//this can be 0, 1, or 2.  If it just experiences a change,
@@ -69,7 +69,7 @@ public class HouseInformation : MonoBehaviour {
         multipleFoodTypes = false;
         checkTime = 0.0f;
         householdCurrency = 0;
-        taxAmount = 0;
+        goldSinceLastTax = 0;
         entertainmentLevel = 0;
         timeOfLastEntertainment = 0.0f;
         world = GameObject.Find("WorldInformation");
@@ -571,8 +571,24 @@ public class HouseInformation : MonoBehaviour {
      * Updates the currency the houshold has
      * @param currencyChange how much the household's currency should change by
      */
-    public void updateHouseholdCurrency(int currencyChange)
+    public void updateHouseholdCurrency(string reason, int currencyChange)
     {
+        if (reason.Equals(World.TAX))
+        {
+            goldSinceLastTax = 0;
+        }
+        else if (reason.Equals(World.JOB_PAYMENT))
+        {
+            goldSinceLastTax += currencyChange;
+        }
         householdCurrency += currencyChange;
+    }
+
+    /**
+     * Returns the amount of gold gained from jobs since the last time the house was taxed
+     */
+    public int getGoldSinceLastTax()
+    {
+        return goldSinceLastTax;
     }
 }
