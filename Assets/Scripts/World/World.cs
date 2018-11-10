@@ -27,6 +27,8 @@ public class World : MonoBehaviour {
     //Strings that are used in multiple places
     public const string JOB_PAYMENT = "Job Payment";
     public const string TAX = "Tax";
+    public const string ROAD = "Road";
+    public const string STAIRS = "Stairs";
 
     private PopulationAndCurrency populationAndCurrency;
 

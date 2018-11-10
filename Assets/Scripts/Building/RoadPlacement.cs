@@ -12,6 +12,7 @@ public class RoadPlacement : MonoBehaviour {
     private bool validPlacement;
     private GameObject world;
     private World myWorld;
+    GameObject[,] terrainArr;
     //private GameObject aqueduct;
     public Sprite possibleSprite;
     public Sprite possibleXRoadSprite;
@@ -20,23 +21,24 @@ public class RoadPlacement : MonoBehaviour {
     public Sprite impossibleSprite;
     public GameObject road;
     public int buildingCost;
-    
 
-	/**
+
+    /**
      * Initializes the RoadPlacement class.
      */
-	void Start () {
+    void Start() {
         validPlacement = true;
         world = GameObject.Find("WorldInformation");
         myWorld = world.GetComponent<World>();
+        terrainArr = myWorld.terrainNetwork.getTerrainArr();
         //aqueduct = null;
     }
-	
-	/**
+
+    /**
      * Moves the visual road icon around to tell whether a location is viable to build on.
      * The player can build a road game object at the mouse location if it is in a viable build location.
      */
-	void Update () {
+    void Update() {
         if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Escape))
         {
             //exits out of construction mode if the right mouse button or escape is clicked
@@ -91,7 +93,7 @@ public class RoadPlacement : MonoBehaviour {
         }
         //can't place a road on other constructs
         if (valid && structureArr[(int)mousePos.x, (int)mousePos.y] != null
-            && (!myWorld.buildableTerrain.Contains(structureArr[(int) mousePos.x, (int) mousePos.y].tag))
+            && (!myWorld.buildableTerrain.Contains(structureArr[(int)mousePos.x, (int)mousePos.y].tag))
             && structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Aqueduct>() == null)
         {
             valid = false;
@@ -101,7 +103,7 @@ public class RoadPlacement : MonoBehaviour {
         {
             valid = false;
         }
-        
+
         /*
          If the location is an aqueduct, check if there are any connected aqueduct arches (roads holding an aqueduct object (getAqueduct() != null)
          Checks to see if valid:
@@ -111,7 +113,7 @@ public class RoadPlacement : MonoBehaviour {
 
          When placing the road, it will need to add the aqueduct to the road and replace the aqueduct with a road in the construction network
          */
-        if (valid && (structureArr[(int) mousePos.x, (int) mousePos.y] == null))
+        if (valid && (structureArr[(int)mousePos.x, (int)mousePos.y] == null))
         {
             validPlacement = true;
             //Border is green when it is possible to place a sprite in its current location
@@ -265,36 +267,61 @@ public class RoadPlacement : MonoBehaviour {
         // a data structure with a length of 5 or a data structure that resizes itself. the first
         // location in the structure would be how many nearby roads followed by all of the sides
         // my current road object is surrounded on
+        //Checking for roads
         int nearbyRoadCount = 0;
         bool top = false;
         if ((int)roadPos.y + 1 < myWorld.mapSize && structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
+            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.ROAD)
         {
             top = true;
             nearbyRoadCount++;
         }
         bool bot = false;
         if ((int)roadPos.y - 1 > 0 && structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == "Road")
+            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.ROAD)
         {
             bot = true;
             nearbyRoadCount++;
         }
         bool left = false;
         if ((int)roadPos.x - 1 > 0 && structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == "Road")
+            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.ROAD)
         {
             left = true;
             nearbyRoadCount++;
         }
         bool right = false;
         if ((int)roadPos.x + 1 < myWorld.mapSize && structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
+            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.ROAD)
         {
             right = true;
             nearbyRoadCount++;
         }
-
+        //Checking for stairs
+        if (top == false && (int)roadPos.y + 1 < myWorld.mapSize && terrainArr[(int)roadPos.x, (int)roadPos.y + 1] != null
+            && terrainArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.STAIRS)
+        {
+            top = true;
+            nearbyRoadCount++;
+        }
+        if (bot == false && (int)roadPos.y - 1 > 0 && terrainArr[(int)roadPos.x, (int)roadPos.y - 1] != null
+            && terrainArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.STAIRS)
+        {
+            bot = true;
+            nearbyRoadCount++;
+        }
+        if (left == false && (int)roadPos.x - 1 > 0 && terrainArr[(int)roadPos.x - 1, (int)roadPos.y] != null
+            && terrainArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.STAIRS)
+        {
+            left = true;
+            nearbyRoadCount++;
+        }
+        if (right == false && (int)roadPos.x + 1 < myWorld.mapSize && terrainArr[(int)roadPos.x + 1, (int)roadPos.y] != null
+            && terrainArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.STAIRS)
+        {
+            right = true;
+            nearbyRoadCount++;
+        }
 
         //no nearby roads
         if (nearbyRoadCount == 0)

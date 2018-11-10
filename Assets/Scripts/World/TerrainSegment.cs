@@ -6,7 +6,7 @@ using UnityEngine;
  * Adds this terrain GameObject to the terrain network.
  */
 public class TerrainSegment : MonoBehaviour {
-    public List<Sprite> ground;
+    public List<Sprite> spriteChoices;
 
 	/**
      * Adds the terrain segment to the terrain array.
@@ -17,12 +17,12 @@ public class TerrainSegment : MonoBehaviour {
         World myWorld = world.GetComponent<World>();
         myWorld.terrainNetwork.setTerrainArr((int)terrainPos.x, (int)terrainPos.y, gameObject);
 
-        if (ground.Count > 0)
+        if (spriteChoices.Count > 0)
         {
             SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
             System.Random random = new System.Random();
-            int groundSpriteNum = random.Next(ground.Count);
-            spriteRenderer.sprite = ground[groundSpriteNum];
+            int groundSpriteNum = random.Next(spriteChoices.Count);
+            spriteRenderer.sprite = spriteChoices[groundSpriteNum];
         }
     }
 }

@@ -41,34 +41,60 @@ public class RoadInformation : MonoBehaviour {
         roadRotation.z = 0;
         gameObject.transform.rotation = Quaternion.Euler(roadRotation);
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
+        GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
 
         //check here for what gameobject I want and add it to the buildArr
         int nearbyRoadCount = 0;
         //booleans allow me to where the other roads are
         bool top = false;
         if (structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == "Road")
+            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.ROAD)
         {
             top = true;
             nearbyRoadCount++;
         }
         bool bot = false;
         if (structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == "Road")
+            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.ROAD)
         {
             bot = true;
             nearbyRoadCount++;
         }
         bool left = false;
         if (structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == "Road")
+            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.ROAD)
         {
             left = true;
             nearbyRoadCount++;
         }
         bool right = false;
         if (structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == "Road")
+            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.ROAD)
+        {
+            right = true;
+            nearbyRoadCount++;
+        }
+        //checking for stairs
+        if (top == false && terrainArr[(int)roadPos.x, (int)roadPos.y + 1] != null
+            && terrainArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.STAIRS)
+        {
+            top = true;
+            nearbyRoadCount++;
+        }
+        if (bot == false && terrainArr[(int)roadPos.x, (int)roadPos.y - 1] != null
+            && terrainArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.STAIRS)
+        {
+            bot = true;
+            nearbyRoadCount++;
+        }
+        if (left == false && terrainArr[(int)roadPos.x - 1, (int)roadPos.y] != null
+            && terrainArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.STAIRS)
+        {
+            left = true;
+            nearbyRoadCount++;
+        }
+        if (right == false && terrainArr[(int)roadPos.x + 1, (int)roadPos.y] != null
+            && terrainArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.STAIRS)
         {
             right = true;
             nearbyRoadCount++;
@@ -191,25 +217,25 @@ public class RoadInformation : MonoBehaviour {
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         if ((int)gameObject.transform.position.y + 1 < myWorld.mapSize
             && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y + 1] != null
-            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y + 1].tag == "Road")
+            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y + 1].tag == World.ROAD)
         {
             structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y + 1].GetComponent<RoadInformation>().updateRoadConnection();
         }
         if ((int)gameObject.transform.position.y - 1 > 0
             && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y - 1] != null
-            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y - 1].tag == "Road")
+            && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y - 1].tag == World.ROAD)
         {
             structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y - 1].GetComponent<RoadInformation>().updateRoadConnection();
         }
         if ((int)gameObject.transform.position.x - 1 > 0
             && structureArr[(int)gameObject.transform.position.x - 1, (int)gameObject.transform.position.y] != null
-            && structureArr[(int)gameObject.transform.position.x - 1, (int)gameObject.transform.position.y].tag == "Road")
+            && structureArr[(int)gameObject.transform.position.x - 1, (int)gameObject.transform.position.y].tag == World.ROAD)
         {
             structureArr[(int)gameObject.transform.position.x - 1, (int)gameObject.transform.position.y].GetComponent<RoadInformation>().updateRoadConnection();
         }
         if ((int)gameObject.transform.position.x + 1 < myWorld.mapSize
             && structureArr[(int)gameObject.transform.position.x + 1, (int)gameObject.transform.position.y] != null
-            && structureArr[(int)gameObject.transform.position.x + 1, (int)gameObject.transform.position.y].tag == "Road")
+            && structureArr[(int)gameObject.transform.position.x + 1, (int)gameObject.transform.position.y].tag == World.ROAD)
         {
             structureArr[(int)gameObject.transform.position.x + 1, (int)gameObject.transform.position.y].GetComponent<RoadInformation>().updateRoadConnection();
         }
