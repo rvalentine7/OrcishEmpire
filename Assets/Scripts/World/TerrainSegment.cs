@@ -20,8 +20,7 @@ public class TerrainSegment : MonoBehaviour {
         if (spriteChoices.Count > 0)
         {
             SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-            System.Random random = new System.Random();
-            int groundSpriteNum = random.Next(spriteChoices.Count);
+            int groundSpriteNum = Mathf.FloorToInt(Random.value * spriteChoices.Count);
             spriteRenderer.sprite = spriteChoices[groundSpriteNum];
         }
     }
