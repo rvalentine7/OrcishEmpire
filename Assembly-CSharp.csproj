@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\Building\AqueductPlacement.cs" />
+    <Compile Include="Assets\Scripts\Building\BridgePlacement.cs" />
     <Compile Include="Assets\Scripts\Building\BuildingPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\Clear.cs" />
     <Compile Include="Assets\Scripts\Building\CreateObject.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Assets\Scripts\Town\Arena.cs" />
     <Compile Include="Assets\Scripts\Town\AStarForWaterBuildings.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
+    <Compile Include="Assets\Scripts\Town\Bridge.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BreweryClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FarmClick.cs" />

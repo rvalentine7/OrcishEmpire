@@ -29,6 +29,8 @@ public class World : MonoBehaviour {
     public const string TAX = "Tax";
     public const string ROAD = "Road";
     public const string STAIRS = "Stairs";
+    public const string LOW_BRIDGE = "LowBridge";
+    public const string HIGH_BRIDGE = "HighBridge";
 
     private PopulationAndCurrency populationAndCurrency;
 
