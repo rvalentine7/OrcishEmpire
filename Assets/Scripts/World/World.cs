@@ -27,10 +27,13 @@ public class World : MonoBehaviour {
     //Strings that are used in multiple places
     public const string JOB_PAYMENT = "Job Payment";
     public const string TAX = "Tax";
+    public const string HOUSE = "House";
+    public const string BUILDING = "Building";
     public const string ROAD = "Road";
     public const string STAIRS = "Stairs";
     public const string LOW_BRIDGE = "LowBridge";
     public const string HIGH_BRIDGE = "HighBridge";
+    public const string WATER = "Water";
 
     private PopulationAndCurrency populationAndCurrency;
 

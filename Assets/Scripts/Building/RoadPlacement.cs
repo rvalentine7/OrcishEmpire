@@ -271,28 +271,36 @@ public class RoadPlacement : MonoBehaviour {
         int nearbyRoadCount = 0;
         bool top = false;
         if ((int)roadPos.y + 1 < myWorld.mapSize && structureArr[(int)roadPos.x, (int)roadPos.y + 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.ROAD)
+            && (structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.ROAD
+            || structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.HIGH_BRIDGE
+            || structureArr[(int)roadPos.x, (int)roadPos.y + 1].tag == World.LOW_BRIDGE))
         {
             top = true;
             nearbyRoadCount++;
         }
         bool bot = false;
         if ((int)roadPos.y - 1 > 0 && structureArr[(int)roadPos.x, (int)roadPos.y - 1] != null
-            && structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.ROAD)
+            && (structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.ROAD
+            || structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.HIGH_BRIDGE
+            || structureArr[(int)roadPos.x, (int)roadPos.y - 1].tag == World.LOW_BRIDGE))
         {
             bot = true;
             nearbyRoadCount++;
         }
         bool left = false;
         if ((int)roadPos.x - 1 > 0 && structureArr[(int)roadPos.x - 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.ROAD)
+            && (structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.ROAD
+            || structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.HIGH_BRIDGE
+            || structureArr[(int)roadPos.x - 1, (int)roadPos.y].tag == World.LOW_BRIDGE))
         {
             left = true;
             nearbyRoadCount++;
         }
         bool right = false;
         if ((int)roadPos.x + 1 < myWorld.mapSize && structureArr[(int)roadPos.x + 1, (int)roadPos.y] != null
-            && structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.ROAD)
+            && (structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.ROAD
+            || structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.HIGH_BRIDGE
+            || structureArr[(int)roadPos.x + 1, (int)roadPos.y].tag == World.LOW_BRIDGE))
         {
             right = true;
             nearbyRoadCount++;

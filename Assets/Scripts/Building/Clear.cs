@@ -64,17 +64,19 @@ public class Clear : MonoBehaviour {
         if (Input.GetMouseButton(0)
             && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1
             && structureArr[(int)mousePos.x, (int)mousePos.y] != null
-            && (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road"
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building"
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House"))
+            && (structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.ROAD
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.BUILDING
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HOUSE
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HIGH_BRIDGE
+            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.LOW_BRIDGE))
         {
             GameObject structureToClear = structureArr[(int)mousePos.x, (int)mousePos.y];
-            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "House")
+            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HOUSE)
             {
                 HouseInformation houseInfo = structureToClear.GetComponent<HouseInformation>();
                 houseInfo.destroyHouse();
             }
-            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Building")
+            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.BUILDING)
             {
                 bool clearingAnAqueduct = false;
                 bool clearingAReservoir = false;
@@ -126,6 +128,12 @@ public class Clear : MonoBehaviour {
                 {
                     updateWaterConnections(waterConnections);
                 }
+            }
+            //Deleting bridges
+            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HIGH_BRIDGE
+                || structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.LOW_BRIDGE)
+            {
+                structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Bridge>().destroyBridge();
             }
             //If the deleted object is a road, the surrounding roads need to be updated to reflect
             // the fact there is no longer a road where the deleted one was

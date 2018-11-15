@@ -24,10 +24,10 @@ public class BridgePlacement : MonoBehaviour {
     private bool validPlacement;
     private GameObject world;
     private World myWorld;
-    private GameObject[,] terrainArr;
     private bool placedStartingLocation;
     private Dictionary<Vector2, GameObject> tempBridgeSegments;//The key is the position
     private Vector2 startingPosition;
+    private Vector2 endingPosition;
 
     // Use this for initialization
     void Start () {
@@ -35,10 +35,10 @@ public class BridgePlacement : MonoBehaviour {
         validPlacement = true;
         world = GameObject.Find("WorldInformation");
         myWorld = world.GetComponent<World>();
-        terrainArr = myWorld.terrainNetwork.getTerrainArr();
         placedStartingLocation = false;
         tempBridgeSegments = new Dictionary<Vector2, GameObject>();
         startingPosition = new Vector2(0, 0);
+        endingPosition = new Vector2(-1, -1);
     }
 	
 	// Update is called once per frame
@@ -48,27 +48,21 @@ public class BridgePlacement : MonoBehaviour {
          2 Mouse click: place the last piece
             Fill everything inbetween
             At the time of the 2nd mouseclick, create the actual objects and make sure they have references to all the other pieces in the bridge
-            Each piece of the bridge will cost gold (5g for each piece?)
-
-        Will need to make roads connect to bridges.  When bridges are destroyed, the end points will need to update any connected roads
-
-        If a bridge piece is destroyed, destroy the entire bridge (each piece has references to the other pieces)
-
-        Right clicks/esc -> If no mouse clicks, cancel building.  If 1 mouse click, undo the starting place
-        If clicking a UI element, should cancel this entirely
+            Each piece of the bridge will cost gold
          */
 
-        if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Escape))
+        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
         {
             if (placedStartingLocation)
             {
                 placedStartingLocation = false;
-                //TODO: delete any temp segments that currently exist
+                //Delete any temp segments that currently exist
                 foreach (Vector2 tempSegmentKey in tempBridgeSegments.Keys)
                 {
                     Destroy(tempBridgeSegments[tempSegmentKey]);
                 }
                 tempBridgeSegments = new Dictionary<Vector2, GameObject>();
+                spriteRenderer.enabled = true;
             }
             else
             {
@@ -121,14 +115,14 @@ public class BridgePlacement : MonoBehaviour {
         {
             valid = false;
         }
-        //can't place a bridge on other constructs
-        if (valid && structureArr[(int)mousePos.x, (int)mousePos.y] != null
+        //can't place a bridge on other constructs.  if the starting location has been placed, don't worry about validity at mouse position
+        if (valid && !placedStartingLocation && structureArr[(int)mousePos.x, (int)mousePos.y] != null
             && (!myWorld.buildableTerrain.Contains(structureArr[(int)mousePos.x, (int)mousePos.y].tag))
             && structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Aqueduct>() == null)
         {
             valid = false;
         }
-        if (valid && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
+        if (valid && !placedStartingLocation && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
             && !myWorld.buildableTerrain.Contains(terrainArr[(int)mousePos.x, (int)mousePos.y].tag))
         {
             valid = false;
@@ -155,14 +149,93 @@ public class BridgePlacement : MonoBehaviour {
         {
             nextToWater = true;
         }
-        //TODO: need a check for the final segment's validity and everything inbetween (everything inbetween must be over water)
+        if (!placedStartingLocation && !nextToWater)
+        {
+            valid = false;
+        }
+        //If the first location has been placed, we now care more about if a valid bridge is being formed (must have a middle segment)
+        if (valid && placedStartingLocation && tempBridgeSegments.Count <= 2)
+        {
+            valid = false;
+        }
+        //If endingPosition is not (-1, -1), there are multiple segments and they potentially create a bridge.  Need to see if the segments are in valid locations
+        bool segmentsInValidPositions = true;
+        if (valid && endingPosition != new Vector2(-1, -1))
+        {
+            //Check for the final segment's validity and everything inbetween (everything inbetween must be over water)
+            foreach (Vector2 segmentPosition in tempBridgeSegments.Keys)
+            {
+                //Starting position was already determined to be valid
+                //Checking if ending position is next to water
+                if (segmentPosition == endingPosition)
+                {
+                    //Checking if the end segment is in a buildable location
+                    if (terrainArr[(int)endingPosition.x, (int)endingPosition.y] == null
+                        || !myWorld.buildableTerrain.Contains(terrainArr[(int)endingPosition.x, (int)endingPosition.y].tag)
+                        || structureArr[(int)endingPosition.x, (int)endingPosition.y] != null)
+                    {
+                        valid = false;
+                    }
 
-        validPlacement = valid && nextToWater && (structureArr[(int)mousePos.x, (int)mousePos.y] == null);
+                    bool endNextToWater = false;
+                    if (valid && endingPosition.x + 1 < myWorld.mapSize && terrainArr[(int)endingPosition.x + 1, (int)endingPosition.y] != null
+                        && myWorld.wateryTerrain.Contains(terrainArr[(int)endingPosition.x + 1, (int)endingPosition.y].tag))
+                    {
+                        endNextToWater = true;
+                    }
+                    if (valid && !endNextToWater && endingPosition.x - 1 > 0 && terrainArr[(int)endingPosition.x - 1, (int)endingPosition.y] != null
+                        && myWorld.wateryTerrain.Contains(terrainArr[(int)endingPosition.x - 1, (int)endingPosition.y].tag))
+                    {
+                        endNextToWater = true;
+                    }
+                    if (valid && !endNextToWater && endingPosition.y + 1 < myWorld.mapSize && terrainArr[(int)endingPosition.x, (int)endingPosition.y + 1] != null
+                        && myWorld.wateryTerrain.Contains(terrainArr[(int)endingPosition.x, (int)endingPosition.y + 1].tag))
+                    {
+                        endNextToWater = true;
+                    }
+                    if (valid && !endNextToWater && endingPosition.y - 1 > 0 && terrainArr[(int)endingPosition.x, (int)endingPosition.y - 1] != null
+                        && myWorld.wateryTerrain.Contains(terrainArr[(int)endingPosition.x, (int)endingPosition.y - 1].tag))
+                    {
+                        endNextToWater = true;
+                    }
+                    if (!endNextToWater)
+                    {
+                        segmentsInValidPositions = false;
+                    }
+                }
+                //Checking if middle segments are over water or over another structure (a bridge over the water) or next to another bridge
+                else if (segmentPosition != startingPosition && (terrainArr[(int)segmentPosition.x, (int)segmentPosition.y] == null
+                    || terrainArr[(int)segmentPosition.x, (int)segmentPosition.y].tag != World.WATER
+                    || structureArr[(int)segmentPosition.x, (int)segmentPosition.y] != null
+                    || (structureArr[(int)segmentPosition.x + 1, (int)segmentPosition.y] != null
+                        && (structureArr[(int)segmentPosition.x + 1, (int)segmentPosition.y].tag == World.HIGH_BRIDGE
+                        || structureArr[(int)segmentPosition.x + 1, (int)segmentPosition.y].tag == World.LOW_BRIDGE))
+                    || (structureArr[(int)segmentPosition.x - 1, (int)segmentPosition.y] != null
+                        && (structureArr[(int)segmentPosition.x - 1, (int)segmentPosition.y].tag == World.HIGH_BRIDGE
+                        || structureArr[(int)segmentPosition.x - 1, (int)segmentPosition.y].tag == World.LOW_BRIDGE))
+                    || (structureArr[(int)segmentPosition.x, (int)segmentPosition.y + 1] != null
+                        && (structureArr[(int)segmentPosition.x, (int)segmentPosition.y + 1].tag == World.HIGH_BRIDGE
+                        || structureArr[(int)segmentPosition.x, (int)segmentPosition.y + 1].tag == World.LOW_BRIDGE))
+                    || (structureArr[(int)segmentPosition.x, (int)segmentPosition.y - 1] != null
+                        && (structureArr[(int)segmentPosition.x, (int)segmentPosition.y - 1].tag == World.HIGH_BRIDGE
+                        || structureArr[(int)segmentPosition.x, (int)segmentPosition.y - 1].tag == World.LOW_BRIDGE))))
+                {
+                    segmentsInValidPositions = false;
+                }
+            }
+        }
+        //If there is no ending segment and the segment that does exist is not next to water
+        else if (valid && !nextToWater)
+        {
+            valid = false;
+        }
+
+        validPlacement = valid && segmentsInValidPositions && (structureArr[(int)mousePos.x, (int)mousePos.y] == null);
         //Update the preview (this will show segments inbetween the two endpoints and show possible/impossible sprites)
         updateBridgePreview(mousePos);
 
         //If the bridge is in a valid location and the left mouse is clicked, place an object
-        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0) && validPlacement)
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonUp(0) && validPlacement)
         {
             //when mouse down, can place a bridge object
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
@@ -175,23 +248,94 @@ public class BridgePlacement : MonoBehaviour {
 
                     GameObject startingBridgeSegment = Instantiate(tempBridgeObject, mousePos, Quaternion.identity) as GameObject;
                     startingPosition = mousePos;
+                    //The end segment will be shown connected to the other segments (hiding the object attached to the mouse... re-enabled if the starting point is cancelled)
+                    spriteRenderer.enabled = false;
                     tempBridgeSegments.Add(mousePos, startingBridgeSegment);
                 }
                 //Second click.  Place the end point
-                else
+                else if (new Vector2(mousePos.x, mousePos.y) != startingPosition)
                 {
-                    //TODO: go through all of the segments and have them build an actual bridge segment and the location and destroy themselves
+                    //Update the city's currency for building the bridge
+                    myWorld.updateCurrency(-(bridgeSegmentCost * tempBridgeSegments.Count));
+
+                    //Go through all of the segments and have them build an actual bridge segment and the location and destroy themselves
+                    float xDifference = startingPosition.x - endingPosition.x;
+                    float yDifference = startingPosition.y - endingPosition.y;
                     List<GameObject> confirmedBridgeSegments = new List<GameObject>();
                     foreach (GameObject segment in tempBridgeSegments.Values)
                     {
                         Vector2 segmentPosition = segment.transform.position;
-                        GameObject confirmedBridgeSegment = Instantiate(bridgeObject, mousePos, Quaternion.identity) as GameObject;
+                        GameObject confirmedBridgeSegment = Instantiate(bridgeObject, segmentPosition, Quaternion.identity) as GameObject;
                         confirmedBridgeSegments.Add(confirmedBridgeSegment);
-                    }
-                    //TODO: delete the temp segments
+                        structureArr[(int)segmentPosition.x, (int)segmentPosition.y] = confirmedBridgeSegment;
 
-                    GameObject endingBridgeSegment = Instantiate(bridgeObject, mousePos, Quaternion.identity) as GameObject;
-                    confirmedBridgeSegments.Add(endingBridgeSegment);
+                        //Set the sprite of the finalized bridge segment
+                        string confirmedSegmentSprite = Bridge.HORIZONTAL;
+                        if (xDifference < 0)
+                        {
+                            if (segmentPosition == startingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.WEST_END;
+                            }
+                            else if (segmentPosition == endingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.EAST_END;
+                            }
+                            else
+                            {
+                                confirmedSegmentSprite = Bridge.HORIZONTAL;
+                            }
+                        }
+                        else if (xDifference > 0)
+                        {
+                            if (segmentPosition == startingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.EAST_END;
+                            }
+                            else if (segmentPosition == endingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.WEST_END;
+                            }
+                            else
+                            {
+                                confirmedSegmentSprite = Bridge.HORIZONTAL;
+                            }
+                        }
+                        else if (yDifference < 0)
+                        {
+                            if (segmentPosition == startingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.SOUTH_END;
+                            }
+                            else if (segmentPosition == endingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.NORTH_END;
+                            }
+                            else
+                            {
+                                confirmedSegmentSprite = Bridge.VERTICAL;
+                            }
+                        }
+                        else if (yDifference > 0)
+                        {
+                            if (segmentPosition == startingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.NORTH_END;
+                            }
+                            else if (segmentPosition == endingPosition)
+                            {
+                                confirmedSegmentSprite = Bridge.SOUTH_END;
+                            }
+                            else
+                            {
+                                confirmedSegmentSprite = Bridge.VERTICAL;
+                            }
+                        }
+                        confirmedBridgeSegment.GetComponent<Bridge>().setSpriteAppearance(confirmedSegmentSprite);
+
+                        Destroy(segment);
+                    }
+
                     foreach (GameObject confirmedSegment in confirmedBridgeSegments)
                     {
                         //Giving each segment access to all of the other segments (for deleting purposes... if a segment is deleted, the others should be as well)
@@ -199,18 +343,24 @@ public class BridgePlacement : MonoBehaviour {
                         otherSegments.Remove(confirmedSegment);
                         confirmedSegment.GetComponent<Bridge>().setConnectedBridgeObjects(otherSegments);
                     }
-                    //TODO: delete this gameObject
+
+                    //Start over from square one now that a bridge has been created
+                    placedStartingLocation = false;
+                    tempBridgeSegments = new Dictionary<Vector2, GameObject>();
+                    spriteRenderer.enabled = true;
                 }
             }
         }
-        if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
+        if (!placedStartingLocation && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
         {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
         }
     }
 
     /**
-     * 
+     * Displays all of the segments of a bridge and shows whether it is possible
+     * to create the bridge.
+     * @param mousePos the position of the mouse
      */
     private void updateBridgePreview(Vector3 mousePos)
     {
@@ -237,6 +387,7 @@ public class BridgePlacement : MonoBehaviour {
                     Destroy(tempBridgeSegments[tempSegmentKey]);
                 }
             }
+            endingPosition = new Vector2(-1, -1);
             GameObject firstSegment = tempBridgeSegments[startingPosition];
             tempBridgeSegments = new Dictionary<Vector2, GameObject>();
             tempBridgeSegments.Add(startingPosition, firstSegment);
@@ -246,73 +397,106 @@ public class BridgePlacement : MonoBehaviour {
             float xDifference = mousePos.x - firstTempBridgeLocation.x;
             float yDifference = mousePos.y - firstTempBridgeLocation.y;
             bool buildVertical = Mathf.Abs(yDifference) > Mathf.Abs(xDifference);
-            //TODO: update the preview of all of the gameobjects from the starting point to where the mouse is now (sprite at mouse icon is always a start/end point... everything inbetween is a middle segment)
-            if (validPlacement)//TODO: these should be the exact same... change it so I just check at the end if it's possible or impossible
+            //Updating the preview of all of the gameobjects from the starting point to the x/y location of the mouse
+            if (buildVertical)
             {
-                if (buildVertical)
+                //Starting from south going up
+                if (yDifference > 0)
                 {
-                    //Starting from south going up
-                    if (yDifference > 0)
+                    tempBridgeSegments[startingPosition].GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleSouthConnection : impossibleSouthConnection;
+                    spriteRenderer.sprite = possibleNorthConnection;
+                    for (int i = 1; i < Mathf.RoundToInt(yDifference); i++)
                     {
-                        tempBridgeSegments[startingPosition].GetComponent<SpriteRenderer>().sprite = possibleSouthConnection;
-                        spriteRenderer.sprite = possibleNorthConnection;
-                        for (int i = 1; i < Mathf.RoundToInt(yDifference); i++)
+                        Vector2 segmentPosition = new Vector2(firstTempBridgeLocation.x, firstTempBridgeLocation.y + i);
+                        if (!tempBridgeSegments.ContainsKey(segmentPosition))
                         {
-                            Vector2 segmentPosition = new Vector2(firstTempBridgeLocation.x, firstTempBridgeLocation.y + i);
-                            if (!tempBridgeSegments.ContainsKey(segmentPosition))
-                            {
-                                GameObject middleBridgeSegment = Instantiate(tempBridgeObject, segmentPosition, Quaternion.identity) as GameObject;
-                                middleBridgeSegment.GetComponent<SpriteRenderer>().sprite = possibleVerticalMiddle;
-                                tempBridgeSegments.Add(segmentPosition, middleBridgeSegment);
-                            }
+                            GameObject middleBridgeSegment = Instantiate(tempBridgeObject, segmentPosition, Quaternion.identity) as GameObject;
+                            middleBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleVerticalMiddle : impossibleVerticalMiddle;
+                            tempBridgeSegments.Add(segmentPosition, middleBridgeSegment);
                         }
                     }
-                    //Starting from north going down
-                    else
+                    Vector2 endPosition = new Vector2(firstTempBridgeLocation.x, firstTempBridgeLocation.y + Mathf.RoundToInt(yDifference));
+                    if (!tempBridgeSegments.ContainsKey(endPosition))
                     {
-
+                        GameObject endBridgeSegment = Instantiate(tempBridgeObject, endPosition, Quaternion.identity) as GameObject;
+                        endBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleNorthConnection : impossibleNorthConnection;
+                        tempBridgeSegments.Add(endPosition, endBridgeSegment);
+                        endingPosition = endPosition;
                     }
                 }
+                //Starting from north going down
                 else
                 {
-                    //Starting from left going right
-                    if (xDifference > 0)
+                    tempBridgeSegments[startingPosition].GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleNorthConnection : impossibleNorthConnection;
+                    spriteRenderer.sprite = possibleNorthConnection;
+                    for (int i = 1; i < Mathf.Abs(Mathf.RoundToInt(yDifference)); i++)
                     {
-
+                        Vector2 segmentPosition = new Vector2(firstTempBridgeLocation.x, firstTempBridgeLocation.y - i);
+                        if (!tempBridgeSegments.ContainsKey(segmentPosition))
+                        {
+                            GameObject middleBridgeSegment = Instantiate(tempBridgeObject, segmentPosition, Quaternion.identity) as GameObject;
+                            middleBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleVerticalMiddle : impossibleVerticalMiddle;
+                            tempBridgeSegments.Add(segmentPosition, middleBridgeSegment);
+                        }
                     }
-                    //Starting from right going left
-                    else
+                    Vector2 endPosition = new Vector2(firstTempBridgeLocation.x, firstTempBridgeLocation.y + Mathf.RoundToInt(yDifference));
+                    if (!tempBridgeSegments.ContainsKey(endPosition))
                     {
-
+                        GameObject endBridgeSegment = Instantiate(tempBridgeObject, endPosition, Quaternion.identity) as GameObject;
+                        endBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleSouthConnection : impossibleSouthConnection;
+                        tempBridgeSegments.Add(endPosition, endBridgeSegment);
+                        endingPosition = endPosition;
                     }
                 }
             }
             else
             {
-                if (buildVertical)
+                //Starting from left going right
+                if (xDifference > 0)
                 {
-                    //Starting from south going up
-                    if (yDifference > 0)
+                    tempBridgeSegments[startingPosition].GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleWestConnection : impossibleWestConnection;
+                    spriteRenderer.sprite = possibleNorthConnection;
+                    for (int i = 1; i < Mathf.RoundToInt(xDifference); i++)
                     {
-
+                        Vector2 segmentPosition = new Vector2(firstTempBridgeLocation.x + i, firstTempBridgeLocation.y);
+                        if (!tempBridgeSegments.ContainsKey(segmentPosition))
+                        {
+                            GameObject middleBridgeSegment = Instantiate(tempBridgeObject, segmentPosition, Quaternion.identity) as GameObject;
+                            middleBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleHorizontalMiddle : impossibleHorizontalMiddle;
+                            tempBridgeSegments.Add(segmentPosition, middleBridgeSegment);
+                        }
                     }
-                    //Starting from north going down
-                    else
+                    Vector2 endPosition = new Vector2(firstTempBridgeLocation.x + Mathf.RoundToInt(xDifference), firstTempBridgeLocation.y);
+                    if (!tempBridgeSegments.ContainsKey(endPosition))
                     {
-
+                        GameObject endBridgeSegment = Instantiate(tempBridgeObject, endPosition, Quaternion.identity) as GameObject;
+                        endBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleEastConnection : impossibleEastConnection;
+                        tempBridgeSegments.Add(endPosition, endBridgeSegment);
+                        endingPosition = endPosition;
                     }
                 }
+                //Starting from right going left
                 else
                 {
-                    //Starting from left going right
-                    if (xDifference > 0)
+                    tempBridgeSegments[startingPosition].GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleEastConnection : impossibleEastConnection;
+                    spriteRenderer.sprite = possibleNorthConnection;
+                    for (int i = 1; i < Mathf.Abs(Mathf.RoundToInt(xDifference)); i++)
                     {
-
+                        Vector2 segmentPosition = new Vector2(firstTempBridgeLocation.x - i, firstTempBridgeLocation.y);
+                        if (!tempBridgeSegments.ContainsKey(segmentPosition))
+                        {
+                            GameObject middleBridgeSegment = Instantiate(tempBridgeObject, segmentPosition, Quaternion.identity) as GameObject;
+                            middleBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleHorizontalMiddle : impossibleHorizontalMiddle;
+                            tempBridgeSegments.Add(segmentPosition, middleBridgeSegment);
+                        }
                     }
-                    //Starting from right going left
-                    else
+                    Vector2 endPosition = new Vector2(firstTempBridgeLocation.x + Mathf.RoundToInt(xDifference), firstTempBridgeLocation.y);
+                    if (!tempBridgeSegments.ContainsKey(endPosition))
                     {
-
+                        GameObject endBridgeSegment = Instantiate(tempBridgeObject, endPosition, Quaternion.identity) as GameObject;
+                        endBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleWestConnection : impossibleWestConnection;
+                        tempBridgeSegments.Add(endPosition, endBridgeSegment);
+                        endingPosition = endPosition;
                     }
                 }
             }
