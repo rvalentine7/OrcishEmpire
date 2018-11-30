@@ -8,14 +8,16 @@ using UnityEngine;
 public class TogglePanel : MonoBehaviour {
     public GameObject panelToSetActive;
     //The other panels for making sure they are turned off when the new panel becomes active
-    public GameObject offPanelA;
-    public GameObject offPanelB;
-    public GameObject offPanelC;
-    public GameObject offPanelD;
-    public GameObject offPanelE;
-    public GameObject offPanelF;
-    public GameObject offPanelG;
-    public GameObject offPanelH;
+    public GameObject offPanelA;//1
+    public GameObject offPanelB;//2
+    public GameObject offPanelC;//3
+    public GameObject offPanelD;//4
+    public GameObject offPanelE;//5
+    public GameObject offPanelF;//6
+    public GameObject offPanelG;//7
+    public GameObject offPanelH;//8
+    public GameObject offPanelI;//9
+    public GameObject offPanelJ;//10
 
     /**
      * Toggle the passed-in game object on or off
@@ -63,6 +65,14 @@ public class TogglePanel : MonoBehaviour {
         if (offPanelH != null)
         {
             offPanelH.SetActive(false);
+        }
+        if (offPanelI != null)
+        {
+            offPanelI.SetActive(false);
+        }
+        if (offPanelJ != null)
+        {
+            offPanelJ.SetActive(false);
         }
     }
 }

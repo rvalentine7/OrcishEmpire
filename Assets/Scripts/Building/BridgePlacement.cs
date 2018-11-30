@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+/**
+ * Used to place bridges in the world
+ */
 public class BridgePlacement : MonoBehaviour {
     public GameObject bridgeObject;
     public int bridgeSegmentCost;

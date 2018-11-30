@@ -25,6 +25,7 @@ public class World : MonoBehaviour {
     public List<string> wateryTerrain;
 
     //Strings that are used in multiple places
+    public const string WORLD_INFORMATION = "WorldInformation";
     public const string JOB_PAYMENT = "Job Payment";
     public const string TAX = "Tax";
     public const string HOUSE = "House";
@@ -52,7 +53,7 @@ public class World : MonoBehaviour {
         spawnLocation = new Vector2(0f, 5.41f);
         exitLocation = new Vector2(39f, 5.41f);
 
-        GameObject populationAndCurrencyUI = GameObject.Find("PopulationAndCurrency");
+        GameObject populationAndCurrencyUI = GameObject.Find("ResourcesPanel");
         populationAndCurrency = populationAndCurrencyUI.GetComponent<PopulationAndCurrency>();
     }
 
