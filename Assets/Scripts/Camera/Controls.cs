@@ -31,56 +31,22 @@ public class Controls : MonoBehaviour {
         float cameraSize = myCamera.orthographicSize / 5;
         float cameraAdjustment = 0.1f * (cameraSize / 1.3f);
         //Scrolling up
-        if (Input.mousePosition.y >= Screen.height * 0.98 && currentPos.y < mapSize - myCamera.orthographicSize - 1 + cameraAdjustment)
+        if (Input.mousePosition.y >= Screen.height * 0.999 && currentPos.y < mapSize - myCamera.orthographicSize - 1 + cameraAdjustment)
         {
             transform.position = new Vector3(currentPos.x, currentPos.y + scrollSpeed * Time.deltaTime * cameraSize, currentPos.z);
         }
-        //Specific camera adjustments for the UI at the bottom of the screen
-        float uiAdjustment = 0.1f;
-        if (myCamera.orthographicSize == 1)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 7);
-        }
-        else if (myCamera.orthographicSize == 2)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 19);
-        }
-        else if (myCamera.orthographicSize == 3)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 36);
-        }
-        else if (myCamera.orthographicSize == 4)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 55);
-        }
-        else if (myCamera.orthographicSize == 5)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 92);
-        }
-        else if (myCamera.orthographicSize == 6)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 113);
-        }
-        else if (myCamera.orthographicSize == 7)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 158);
-        }
-        else if (myCamera.orthographicSize == 8)
-        {
-            uiAdjustment /= (myCamera.orthographicSize / 195);
-        }
         //Scrolling down
-        if (Input.mousePosition.y <= Screen.height * 0.02 && currentPos.y > myCamera.orthographicSize - uiAdjustment - cameraAdjustment)
+        if (Input.mousePosition.y <= Screen.height * 0.001 && currentPos.y > myCamera.orthographicSize - cameraAdjustment)
         {
             transform.position = new Vector3(currentPos.x, currentPos.y - scrollSpeed * Time.deltaTime * cameraSize, currentPos.z);
         }
         //Scrolling right
-        if (Input.mousePosition.x >= Screen.width * 0.98 && currentPos.x < mapSize - myCamera.aspect * myCamera.orthographicSize - 1 + cameraAdjustment)
+        if (Input.mousePosition.x >= Screen.width * 0.999 && currentPos.x < mapSize - myCamera.aspect * myCamera.orthographicSize - 1 + cameraAdjustment)
         {
             transform.position = new Vector3(currentPos.x + scrollSpeed * Time.deltaTime * cameraSize, currentPos.y, currentPos.z);
         }
         //Scrolling left
-        if (Input.mousePosition.x <= Screen.width * 0.02 && currentPos.x > myCamera.aspect * myCamera.orthographicSize - cameraAdjustment)
+        if (Input.mousePosition.x <= Screen.width * 0.001 && currentPos.x > myCamera.aspect * myCamera.orthographicSize - cameraAdjustment)
         {
             transform.position = new Vector3(currentPos.x - scrollSpeed * Time.deltaTime * cameraSize, currentPos.y, currentPos.z);
         }
@@ -103,9 +69,9 @@ public class Controls : MonoBehaviour {
             transform.position = new Vector3(currentPos.x, mapSize - myCamera.orthographicSize - 1 + cameraAdjustment - 1.8f, currentPos.z);
         }
         //Bottom
-        if (currentPos.y < myCamera.orthographicSize - uiAdjustment - cameraAdjustment - 1)
+        if (currentPos.y < myCamera.orthographicSize - cameraAdjustment - 1)
         {
-            transform.position = new Vector3(currentPos.x, myCamera.orthographicSize - uiAdjustment - cameraAdjustment, currentPos.z);
+            transform.position = new Vector3(currentPos.x, myCamera.orthographicSize - cameraAdjustment, currentPos.z);
         }
         //Right
         if (currentPos.x > mapSize - myCamera.aspect * myCamera.orthographicSize - 1 + cameraAdjustment + 1)

@@ -6,8 +6,9 @@ using UnityEngine.UI;
 
 public class HousePopup : MonoBehaviour {
     public GameObject house;
+    public GameObject houseImage;
+    public Text statusText;
     public Text inhabitantCount;
-    public Text houseSize;
     public Text employedInhabCount;
     public Text foodCount;
     public Text waterCount;
@@ -29,14 +30,30 @@ public class HousePopup : MonoBehaviour {
         }
         HouseInformation houseInfo = house.GetComponent<HouseInformation>();
         Storage storage = house.GetComponent<Storage>();
-        inhabitantCount.text = "" + houseInfo.getNumInhabitants();
-        houseSize.text = "" + houseInfo.getHouseSize();
+        houseImage.GetComponent<Image>().sprite = houseInfo.getHouseSprite();
+        int houseLevel = houseInfo.getHouseLevel();
+        if (houseInfo.getNumInhabitants() == 0)//sign
+        {
+            statusText.text = "This location is currently waiting on orcs to move in.";
+        }
+        else if (houseLevel == 1)//tent
+        {
+            statusText.text = "With a stable supply of food and water, this house will upgrade.";
+        }
+        else if (houseLevel == 2)//wood with tent roof
+        {
+            statusText.text = "With regular access to entertainment, this house will upgrade.";
+        }
+        else if (houseLevel == 3)//wood
+        {
+            statusText.text = "This house cannot upgrade further.";
+        }
+        inhabitantCount.text = "" + houseInfo.getNumInhabitants() + "/" + houseInfo.getHouseSize();
         employedInhabCount.text = "" + houseInfo.getNumEmployedInhabs();
         foodCount.text = "" + storage.getFoodCount();
         waterCount.text = "" + houseInfo.getWaterCount();
         entertainmentLevel.text = "" + houseInfo.getEntertainmentLevel();
         goldCount.text = "" + houseInfo.getHouseholdCurrency();
-        //use houseinformation to get the gold the house has
 	}
 
     /**

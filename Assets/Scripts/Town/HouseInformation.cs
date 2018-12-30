@@ -591,4 +591,20 @@ public class HouseInformation : MonoBehaviour {
     {
         return goldSinceLastTax;
     }
+
+    /**
+     * Returns the sprite currently being used by the house
+     */
+    public Sprite getHouseSprite()
+    {
+        return gameObject.GetComponent<SpriteRenderer>().sprite;
+    }
+
+    /**
+     * Gets the current level of the house
+     */
+    public int getHouseLevel()
+    {
+        return houseLevel;
+    }
 }
