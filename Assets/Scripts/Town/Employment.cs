@@ -24,7 +24,7 @@ public class Employment : MonoBehaviour {
     /**
      * Initializes necessary variables
      */
-    void Start () {
+    void Start() {
         workerHouses = new Dictionary<GameObject, int>();
         openForBusiness = false;
         workerDeliveringGoods = false;
@@ -35,9 +35,9 @@ public class Employment : MonoBehaviour {
         //Check if tiles already have water, update numWaterSources if so
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
-        for (int r = 0;  r < height; r++)
+        for (int r = 0; r < height; r++)
         {
-            for (int c = 0;  c < width; c++)
+            for (int c = 0; c < width; c++)
             {
                 if (terrainArr[Mathf.RoundToInt(gameObject.transform.position.x) - Mathf.CeilToInt(width / 2.0f - 1) + c,
                     Mathf.RoundToInt(gameObject.transform.position.y) - Mathf.CeilToInt(height / 2.0f - 1) + r].GetComponent<Tile>().hasWater())
@@ -53,19 +53,19 @@ public class Employment : MonoBehaviour {
     /**
      * A place of employment can only take in workers if it is connected to a road.
      */
-    void Update ()
+    void Update()
     {
         GameObject world = GameObject.Find("WorldInformation");
         World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
-        int width = (int) gameObject.GetComponent<BoxCollider2D>().size.x;
-        int height = (int) gameObject.GetComponent<BoxCollider2D>().size.y;
+        int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
+        int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
         //checking areas around the object to see if there is a road
         Vector2 employmentPos = gameObject.transform.position;
         openForBusiness = false;
         //TODO: these while loops would probably be better on a timer to avoid slowdown
         int i = 0;
-        while (openForBusiness == false && i < width)
+        while (active && openForBusiness == false && i < width)
         {
             //checking the row below the gameObject
             if (structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
@@ -86,7 +86,7 @@ public class Employment : MonoBehaviour {
             i++;
         }
         int j = 0;
-        while (openForBusiness == false && j < height)
+        while (active && openForBusiness == false && j < height)
         {
             //checking the column to the left of the gameObject
             if (structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
@@ -205,7 +205,7 @@ public class Employment : MonoBehaviour {
         //lets the houses of the workers know the inhabitants are now unemployed
         if (numWorkers > 0)
         {
-            foreach(KeyValuePair<GameObject, int> kvp in workerHouses)
+            foreach (KeyValuePair<GameObject, int> kvp in workerHouses)
             {
                 HouseInformation houseInfo = kvp.Key.GetComponent<HouseInformation>();
                 houseInfo.removeWorkLocation(gameObject);
@@ -320,6 +320,15 @@ public class Employment : MonoBehaviour {
      */
     public bool getActivated()
     {
+        return active;
+    }
+
+    /**
+     * Activates/deactivates the employment
+     */
+    public bool toggleActivated()
+    {
+        active = !active;
         return active;
     }
 }

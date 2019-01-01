@@ -10,6 +10,9 @@ public class ArenaPopup : MonoBehaviour {
     public Text gladiatorsNum;
     public Text progressNum;
     public Text fightDurationNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -25,6 +28,15 @@ public class ArenaPopup : MonoBehaviour {
             Destroy(gameObject);
         }
         Employment employment = arena.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         if (employment.getNumWorkers() == 0)
         {
@@ -58,6 +70,22 @@ public class ArenaPopup : MonoBehaviour {
             fightDurationTime = "" + Mathf.RoundToInt(arenaScript.getRemainingFightTime()) + "s";
         }
         fightDurationNum.text = fightDurationTime;
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = arena.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
     }
 
     /**

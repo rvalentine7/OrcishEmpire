@@ -8,6 +8,9 @@ public class OchrePitPopup : MonoBehaviour {
     public Text status;
     public Text employeeNum;
     public Text progressNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -25,6 +28,15 @@ public class OchrePitPopup : MonoBehaviour {
         Production ochrePitProduction = ochrePit.GetComponent<Production>();
         progressNum.text = "" + ochrePitProduction.getProgressNum() + "/100";
         Employment employment = ochrePit.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         if (employment.getNumWorkers() == 0)
         {
@@ -37,6 +49,22 @@ public class OchrePitPopup : MonoBehaviour {
         else
         {
             status.text = "This pit is mining ochre at peak efficiency.";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = ochrePit.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 

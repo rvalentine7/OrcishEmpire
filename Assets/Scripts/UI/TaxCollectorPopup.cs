@@ -8,6 +8,9 @@ public class TaxCollectorPopup : MonoBehaviour {
     public Text status;
     public Text employeeNum;
     public Text taxesCollectedNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -24,6 +27,15 @@ public class TaxCollectorPopup : MonoBehaviour {
         }
 
         Employment employment = taxCollector.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers();
         TaxCollector taxCollectorScript = taxCollector.GetComponent<TaxCollector>();
         if (employment.getNumWorkers() == 0)
@@ -39,6 +51,22 @@ public class TaxCollectorPopup : MonoBehaviour {
             status.text = "An orc is getting ready to collect taxes from nearby houses";
         }
         taxesCollectedNum.text = "" + taxCollectorScript.getTaxesCollected();
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = taxCollector.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
     }
 
     /**

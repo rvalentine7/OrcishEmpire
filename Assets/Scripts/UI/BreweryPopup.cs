@@ -7,8 +7,12 @@ public class BreweryPopup : MonoBehaviour {
     public GameObject brewery;
     public Text status;
     public Text employeeNum;
+    public Text storageCapacity;
     public Text hopsNum;
     public Text progressNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start () {
@@ -24,8 +28,18 @@ public class BreweryPopup : MonoBehaviour {
         ItemProduction thisBrewery = brewery.GetComponent<ItemProduction>();
         progressNum.text = "" + thisBrewery.getProgressNum() + "/100";
         Employment employment = brewery.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         Storage storage = brewery.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         hopsNum.text = "" + storage.getHopsCount();
         if (employment.getNumWorkers() == 0)
         {
@@ -38,6 +52,22 @@ public class BreweryPopup : MonoBehaviour {
         else
         {
             status.text = "This brewery is producing beer at peak efficiency.";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = brewery.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 

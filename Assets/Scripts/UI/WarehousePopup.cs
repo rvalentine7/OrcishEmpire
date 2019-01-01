@@ -7,6 +7,7 @@ public class WarehousePopup : MonoBehaviour {
     public GameObject warehouse;
     public Text status;
     public Text employeeNum;
+    public Text storageCapacity;
     public Text meatNum;
     public Text wheatNum;
     public Text eggsNum;
@@ -20,6 +21,9 @@ public class WarehousePopup : MonoBehaviour {
     public Text ochreNum;
     public Text warPaintNum;
     public Text treasureNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start () {
@@ -35,7 +39,17 @@ public class WarehousePopup : MonoBehaviour {
             Destroy(gameObject);
         }
         Storage storage = warehouse.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         Employment employment = warehouse.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         if (employment.getNumWorkers() == 0)
         {
             status.text = "Without any employees, this warehouse cannot distribute goods.";
@@ -61,6 +75,22 @@ public class WarehousePopup : MonoBehaviour {
         ochreNum.text = "" + storage.getOchreCount();
         warPaintNum.text = "" + storage.getWarPaintCount();
         treasureNum.text = "0";
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = warehouse.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
     }
 
     /**

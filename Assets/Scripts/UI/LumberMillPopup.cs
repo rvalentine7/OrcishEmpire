@@ -8,6 +8,9 @@ public class LumberMillPopup : MonoBehaviour {
     public Text status;
     public Text employeeNum;
     public Text progressNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -25,6 +28,15 @@ public class LumberMillPopup : MonoBehaviour {
         Production lumberMillProduction = lumberMill.GetComponent<Production>();
         progressNum.text = "" + lumberMillProduction.getProgressNum() + "/100";
         Employment employment = lumberMill.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         if (employment.getNumWorkers() == 0)
         {
@@ -37,6 +49,22 @@ public class LumberMillPopup : MonoBehaviour {
         else
         {
             status.text = "This mill is harvesting lumber at peak efficiency.";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = lumberMill.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 

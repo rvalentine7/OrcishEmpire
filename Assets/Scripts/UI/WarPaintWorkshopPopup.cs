@@ -7,8 +7,12 @@ public class WarPaintWorkshopPopup : MonoBehaviour {
     public GameObject warPaintWorkshop;
     public Text status;
     public Text employeeNum;
+    public Text storageCapacity;
     public Text ochreNum;
     public Text progressNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -26,8 +30,18 @@ public class WarPaintWorkshopPopup : MonoBehaviour {
         ItemProduction warPaintProduction = warPaintWorkshop.GetComponent<ItemProduction>();
         progressNum.text = "" + warPaintProduction.getProgressNum() + "/100";
         Employment employment = warPaintWorkshop.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         Storage storage = warPaintWorkshop.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         ochreNum.text = "" + storage.getOchreCount();
         if (employment.getNumWorkers() == 0)
         {
@@ -40,6 +54,22 @@ public class WarPaintWorkshopPopup : MonoBehaviour {
         else
         {
             status.text = "This workshop is producing war paint at peak efficiency.";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = warPaintWorkshop.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 

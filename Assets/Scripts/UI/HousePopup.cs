@@ -10,6 +10,7 @@ public class HousePopup : MonoBehaviour {
     public Text statusText;
     public Text inhabitantCount;
     public Text employedInhabCount;
+    public Text storageCapacity;
     public Text foodCount;
     public Text waterCount;
     public Text entertainmentLevel;
@@ -30,6 +31,7 @@ public class HousePopup : MonoBehaviour {
         }
         HouseInformation houseInfo = house.GetComponent<HouseInformation>();
         Storage storage = house.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         houseImage.GetComponent<Image>().sprite = houseInfo.getHouseSprite();
         int houseLevel = houseInfo.getHouseLevel();
         if (houseInfo.getNumInhabitants() == 0)//sign

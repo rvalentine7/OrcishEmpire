@@ -9,6 +9,9 @@ public class PigFarmPopup : MonoBehaviour
     public Text status;
     public Text employeeNum;
     public Text progressNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -26,6 +29,15 @@ public class PigFarmPopup : MonoBehaviour
         Production thisFarm = farm.GetComponent<Production>();
         progressNum.text = "" + thisFarm.getProgressNum() + "/100";
         Employment employment = farm.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         if (employment.getNumWorkers() == 0)
         {
@@ -38,6 +50,22 @@ public class PigFarmPopup : MonoBehaviour
         else
         {
             status.text = "This pig farm is producing meat at peak efficiency.";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = farm.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 

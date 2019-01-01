@@ -7,8 +7,12 @@ public class PubPopup : MonoBehaviour {
     private GameObject pub;
     public Text status;
     public Text employeeNum;
+    public Text storageCapacity;
     public Text beerNum;
     public Text timeLeftNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start () {
@@ -22,8 +26,18 @@ public class PubPopup : MonoBehaviour {
             Destroy(gameObject);
         }
         Employment employment = pub.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         Storage storage = pub.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         if (employment.getNumWorkers() == 0)
         {
             status.text = "There is no drinking going on at the pub right now.";
@@ -50,6 +64,22 @@ public class PubPopup : MonoBehaviour {
         else
         {
             timeLeftNum.text = "" + timeLeft + "s";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = pub.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 

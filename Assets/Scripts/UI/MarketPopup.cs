@@ -7,12 +7,16 @@ public class MarketPopup : MonoBehaviour {
     public GameObject marketplace;
     public Text status;
     public Text employeeNum;
+    public Text storageCapacity;
     public Text meatNum;
     public Text wheatNum;
     public Text eggsNum;
     public Text fishNum;
     public Text furnitureNum;
     public Text weaponsNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start () {
@@ -28,7 +32,17 @@ public class MarketPopup : MonoBehaviour {
             Destroy(gameObject);
         }
         Storage storage = marketplace.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         Employment employment = marketplace.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         if (employment.getNumWorkers() == 0)
         {
             status.text = "Without any employees, this marketplace cannot distribute goods.";
@@ -45,6 +59,22 @@ public class MarketPopup : MonoBehaviour {
         meatNum.text = "" + storage.getMeatCount();
         wheatNum.text = "" + storage.getWheatCount();
         eggsNum.text = "" + storage.getEggCount();
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = marketplace.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
     }
 
     /**

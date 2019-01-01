@@ -9,6 +9,9 @@ public class GladiatorPitPopup : MonoBehaviour {
     public Text employeeNum;
     public Text gladiatorsNumText;
     public Text trainingProgressNumText;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -24,6 +27,15 @@ public class GladiatorPitPopup : MonoBehaviour {
             Destroy(gameObject);
         }
         Employment employment = gladiatorPit.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         if (employment.getNumWorkers() == 0)
         {
@@ -40,6 +52,22 @@ public class GladiatorPitPopup : MonoBehaviour {
         GladiatorPit gladiatorPitScript = gladiatorPit.GetComponent<GladiatorPit>();
         gladiatorsNumText.text = "" + gladiatorPitScript.getNumReadyGladiators();
         trainingProgressNumText.text = "" + gladiatorPitScript.getTrainingProgress() + "/100";
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = gladiatorPit.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
     }
 
     /**

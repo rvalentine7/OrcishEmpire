@@ -7,8 +7,12 @@ public class WeaponsmithPopup : MonoBehaviour {
     public GameObject weaponsmith;
     public Text status;
     public Text employeeNum;
+    public Text storageCapacity;
     public Text ironNum;
     public Text progressNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -26,8 +30,18 @@ public class WeaponsmithPopup : MonoBehaviour {
         ItemProduction thisWeaponsmith = weaponsmith.GetComponent<ItemProduction>();
         progressNum.text = "" + thisWeaponsmith.getProgressNum() + "/100";
         Employment employment = weaponsmith.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         Storage storage = weaponsmith.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         ironNum.text = "" + storage.getIronCount();
         if (employment.getNumWorkers() == 0)
         {
@@ -40,6 +54,22 @@ public class WeaponsmithPopup : MonoBehaviour {
         else
         {
             status.text = "This smithy is producing weapons at peak efficiency.";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = weaponsmith.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 

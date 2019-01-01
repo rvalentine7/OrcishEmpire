@@ -7,8 +7,12 @@ public class FurnitureWorkshopPopup : MonoBehaviour {
     public GameObject furnitureWorkshop;
     public Text status;
     public Text employeeNum;
+    public Text storageCapacity;
     public Text lumberNum;
     public Text progressNum;
+    public Button activateButton;
+    public Sprite activateSprite;
+    public Sprite deactivateSprite;
 
     // Use this for initialization
     void Start()
@@ -26,8 +30,18 @@ public class FurnitureWorkshopPopup : MonoBehaviour {
         ItemProduction thisFurnitureWorkshop = furnitureWorkshop.GetComponent<ItemProduction>();
         progressNum.text = "" + thisFurnitureWorkshop.getProgressNum() + "/100";
         Employment employment = furnitureWorkshop.GetComponent<Employment>();
+        bool activated = employment.getActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
+        }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         Storage storage = furnitureWorkshop.GetComponent<Storage>();
+        storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         lumberNum.text = "" + storage.getLumberCount();
         if (employment.getNumWorkers() == 0)
         {
@@ -40,6 +54,22 @@ public class FurnitureWorkshopPopup : MonoBehaviour {
         else
         {
             status.text = "This workshop is producing furniture at peak efficiency.";
+        }
+    }
+
+    /**
+     * Toggles the building on/off
+     */
+    public void toggleActivate()
+    {
+        bool activated = furnitureWorkshop.GetComponent<Employment>().toggleActivated();
+        if (!activated)
+        {
+            activateButton.image.sprite = activateSprite;
+        }
+        else
+        {
+            activateButton.image.sprite = deactivateSprite;
         }
     }
 
