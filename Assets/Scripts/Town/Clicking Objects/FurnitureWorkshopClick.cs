@@ -11,8 +11,13 @@ public class FurnitureWorkshopClick : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
+        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag(World.BUILD_OBJECT) == null)
         {
+            GameObject popupObject = GameObject.FindWithTag(World.POPUP);
+            if (popupObject != null)
+            {
+                Destroy(popupObject);
+            }
             GameObject popup = Instantiate(productionPopupObject) as GameObject;
             FurnitureWorkshopPopup furnitureWorkshopPopup = popup.GetComponent<FurnitureWorkshopPopup>();
             furnitureWorkshopPopup.setFurnitureWorkshop(gameObject);

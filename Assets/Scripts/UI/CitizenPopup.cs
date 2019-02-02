@@ -2,18 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class CitizenPopup : MonoBehaviour {
     public Text statusText;
+    private bool initialClick;
 
 	// Use this for initialization
 	void Start () {
-		
+        GameObject panel = GameObject.FindWithTag(World.BUILD_PANEL);
+        if (panel != null)
+        {
+            panel.SetActive(false);
+        }
+        initialClick = true;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (Input.GetKey(KeyCode.Escape))
+        if (initialClick && (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)))
+        {
+            initialClick = false;
+        }
+        if (Input.GetKey(KeyCode.Escape) || (!initialClick
+            && !EventSystem.current.IsPointerOverGameObject()
+            && (Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(0))))
         {
             Destroy(gameObject);
         }

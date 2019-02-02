@@ -24,6 +24,11 @@ public class TogglePanel : MonoBehaviour {
      */
     public void togglePanel()
     {
+        GameObject popupObject = GameObject.FindWithTag(World.POPUP);
+        if (popupObject != null)
+        {
+            Destroy(popupObject);
+        }
         //Panel to toggle
         if (panelToSetActive != null && panelToSetActive.activeSelf == false)
         {

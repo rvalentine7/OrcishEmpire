@@ -313,7 +313,7 @@ public class HouseInformation : MonoBehaviour {
      */
     void OnMouseDown()
     {
-        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag("Popup") == null)
+        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag(World.BUILD_OBJECT) == null)
         {
             GameObject popup = Instantiate(housePopupObject) as GameObject;
             HousePopup housePopup = popup.GetComponent<HousePopup>();

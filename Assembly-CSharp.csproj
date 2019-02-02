@@ -123,6 +123,7 @@
     <Compile Include="Assets\Scripts\UI\ArenaPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BreweryPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\ClosePanel.cs" />
     <Compile Include="Assets\Scripts\UI\EggFarmPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FarmPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FountainPopup.cs" />

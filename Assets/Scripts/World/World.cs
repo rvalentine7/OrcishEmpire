@@ -35,6 +35,9 @@ public class World : MonoBehaviour {
     public const string LOW_BRIDGE = "LowBridge";
     public const string HIGH_BRIDGE = "HighBridge";
     public const string WATER = "Water";
+    public const string BUILD_OBJECT = "BuildObject";
+    public const string POPUP = "Popup";
+    public const string BUILD_PANEL = "BuildPanel";
 
     private PopulationAndCurrency populationAndCurrency;
 
