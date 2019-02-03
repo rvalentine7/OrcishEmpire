@@ -22,8 +22,11 @@ public class Deliver : MonoBehaviour {
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
+    private bool hasGoods;
     public float stepSize;
     public int searchRadius;
+    public Sprite deliveryWithGoods;
+    public Sprite deliveryWithoutGoods;
 
     /**
      * Initializes the deliver class
@@ -40,6 +43,8 @@ public class Deliver : MonoBehaviour {
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        hasGoods = true;
+        gameObject.GetComponent<SpriteRenderer>().sprite = deliveryWithGoods;
     }
 
     /**
@@ -61,7 +66,7 @@ public class Deliver : MonoBehaviour {
         {
             StartCoroutine(runDeliver());
         }
-	}
+    }
 
     /**
      * Plans out the movement and deliver of resources for the delivery orc
@@ -152,7 +157,8 @@ public class Deliver : MonoBehaviour {
                     * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
                     * (nextLocation.y - gameObject.transform.position.y));
                 bool nextIsGoal = false;
-                if (nextLocation == goal)
+                if (nextLocation == goal || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                 {
                     nextIsGoal = true;
                 }
@@ -160,7 +166,8 @@ public class Deliver : MonoBehaviour {
                 {
                     path.RemoveAt(0);
                 }
-                if (path.Count == 0)
+                if (path.Count == 0 || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                 {
                     //if the orc is at the storage goal, deliver resources
                     if (nextIsGoal)
@@ -190,6 +197,11 @@ public class Deliver : MonoBehaviour {
                         else
                         {
                             reachedGoal = true;
+                            if (resources.Count == 0 && hasGoods)
+                            {
+                                gameObject.GetComponent<SpriteRenderer>().sprite = deliveryWithoutGoods;
+                                hasGoods = false;
+                            }
                         }
                         //path = findPathHome();
                         yield return StartCoroutine(findPathHome(returnPath =>

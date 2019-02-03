@@ -169,7 +169,9 @@ public class Gladiator : MonoBehaviour {
                     * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
                     * (nextLocation.y - gameObject.transform.position.y));
                 bool nextIsGoal = false;
-                if (nextLocation == goalLocation)
+                //path[1] is valid as next being the goal because arenas are 3x3.  If I add a larger entertainment building that uses gladiators, this will need an update
+                if (nextLocation == goalLocation || (network[(int) nextLocation.x, (int) nextLocation.y] != null
+                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                 {
                     nextIsGoal = true;
                 }
@@ -177,7 +179,8 @@ public class Gladiator : MonoBehaviour {
                 {
                     path.RemoveAt(0);
                 }
-                if (path.Count == 0)
+                if (path.Count == 0 || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                 {
                     //if the orc is at the arena, update the arena and gladiator pit and destroy this object
                     if (nextIsGoal)

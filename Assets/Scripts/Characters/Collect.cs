@@ -25,8 +25,11 @@ public class Collect : MonoBehaviour {
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
+    private bool hasGoods;
     public float stepSize;
     public int searchRadius;
+    public Sprite collectorWithGoods;
+    public Sprite collectorWithoutGoods;
 
     /**
      * Initializes the collector class
@@ -46,6 +49,8 @@ public class Collect : MonoBehaviour {
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        hasGoods = false;
+        gameObject.GetComponent<SpriteRenderer>().sprite = collectorWithoutGoods;
     }
 
     /**
@@ -151,7 +156,8 @@ public class Collect : MonoBehaviour {
                     * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
                     * (nextLocation.y - gameObject.transform.position.y));
                 bool nextIsGoal = false;
-                if (nextLocation == goal)
+                if (nextLocation == goal || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                 {
                     nextIsGoal = true;
                 }
@@ -159,7 +165,8 @@ public class Collect : MonoBehaviour {
                 {
                     path.RemoveAt(0);
                 }
-                if (path.Count == 0)
+                if (path.Count == 0 || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                 {
                     //if the orc is at the storage goal, deliver resources
                     if (nextIsGoal)
@@ -350,6 +357,10 @@ public class Collect : MonoBehaviour {
                         if (resources.Count > 0)
                         {
                             reachedGoal = true;
+                            if (!hasGoods)
+                            {
+                                gameObject.GetComponent<SpriteRenderer>().sprite = collectorWithGoods;
+                            }
                         }
                         yield return StartCoroutine(findPathHome(returnPath =>
                         {
