@@ -13,6 +13,7 @@ public class Employment : MonoBehaviour {
     public int workerPay;//worker pay should be lower than upkeep
     private bool active;//TODO: have building-specific scripts get this active rather than have their own
     private int numWorkers;
+    private int numSickWorkers;
     private float nextPaymentTime;
     private Dictionary<GameObject, int> workerHouses;
     private bool openForBusiness;
@@ -26,10 +27,11 @@ public class Employment : MonoBehaviour {
      */
     void Start() {
         workerHouses = new Dictionary<GameObject, int>();
+        numSickWorkers = 0;
         openForBusiness = false;
         workerDeliveringGoods = false;
         numWaterSources = 0;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         //Check if tiles already have water, update numWaterSources if so
@@ -55,7 +57,7 @@ public class Employment : MonoBehaviour {
      */
     void Update()
     {
-        GameObject world = GameObject.Find("WorldInformation");
+        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
         World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
@@ -111,6 +113,7 @@ public class Employment : MonoBehaviour {
         {
             nextPaymentTime = myWorld.getPaymentTime();
             myWorld.updateCurrency(-upkeep);
+            //workerHouses contains a key of a house and a value of the num workers from that house
             foreach (KeyValuePair<GameObject, int> kvp in workerHouses)
             {
                 HouseInformation houseInfo = kvp.Key.GetComponent<HouseInformation>();
@@ -198,6 +201,15 @@ public class Employment : MonoBehaviour {
     }
 
     /**
+     * Updates the number of sick workers at the place of employment
+     * @param numSickWorkers the number of sick workers this employment was just notified about
+     */
+    public void updateSickWorkers(int numSickWorkers)
+    {
+        this.numSickWorkers += numSickWorkers;
+    }
+
+    /**
      * Destroy this employment and unemploy the workers.
      */
     public void destroyEmployment()
@@ -224,6 +236,10 @@ public class Employment : MonoBehaviour {
         {
             gameObject.GetComponent<Well>().updateWaterSupplying(false);
         }
+        else if (gameObject.GetComponent<MudBath>() != null)
+        {
+            gameObject.GetComponent<MudBath>().handleServices(false);
+        }
         Destroy(gameObject);
     }
 
@@ -234,6 +250,15 @@ public class Employment : MonoBehaviour {
     public int getNumWorkers()
     {
         return numWorkers;
+    }
+
+    /**
+     * Gets the number of workers currently able to work
+     * @return the number of work-ready workers
+     */
+    public int getNumHealthyWorkers()
+    {
+        return numWorkers - numSickWorkers;
     }
 
     /**
@@ -283,6 +308,10 @@ public class Employment : MonoBehaviour {
         {
             gameObject.GetComponent<Fountain>().updateFilled(true);
         }
+        else if (gameObject.GetComponent<MudBath>() != null && numWaterSources >= 1)
+        {
+            gameObject.GetComponent<MudBath>().updateFilled(true);
+        }
     }
 
     /**
@@ -311,6 +340,10 @@ public class Employment : MonoBehaviour {
         if (gameObject.GetComponent<Fountain>() != null && hasWaterAccess/* && numWaterSources == 0*/)
         {
             gameObject.GetComponent<Fountain>().updateFilled(false);
+        }
+        else if (gameObject.GetComponent<MudBath>() != null && hasWaterAccess)
+        {
+            gameObject.GetComponent<MudBath>().updateFilled(false);
         }
     }
 

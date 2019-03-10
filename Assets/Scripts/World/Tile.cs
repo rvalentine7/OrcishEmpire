@@ -37,8 +37,9 @@ public class Tile : MonoBehaviour {
             structureArr = myWorld.constructNetwork.getConstructArr();
             if (structureArr[(int) gameObject.transform.position.x, (int) gameObject.transform.position.y] != null)
             {
-                if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].tag == "Building"
-                    && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Fountain>() != null)
+                if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].tag == World.BUILDING
+                    && (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Fountain>() != null
+                    || structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<MudBath>() != null))
                 {
                     structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Employment>().addWaterSource();
                 }
@@ -61,8 +62,9 @@ public class Tile : MonoBehaviour {
             structureArr = myWorld.constructNetwork.getConstructArr();
             if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y] != null)
             {
-                if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].tag == "Building"
-                    && structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Fountain>() != null)
+                if (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].tag == World.BUILDING
+                    && (structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Fountain>() != null
+                    || structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<MudBath>() != null))
                 {
                     structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Employment>().removeWaterSource();
                 }

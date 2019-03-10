@@ -16,7 +16,7 @@ public class Fountain : MonoBehaviour {
 
     private void Awake()
     {
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
     }
 
@@ -77,7 +77,7 @@ public class Fountain : MonoBehaviour {
                             && gameObject.transform.position.x != (int)fountainPosition.x - waterRadius + i//avoid adding/removing water to/from itself
                             && gameObject.transform.position.y != (int)fountainPosition.y - waterRadius + j
                             && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j] != null
-                            && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].tag == "Building"
+                            && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].tag == World.BUILDING
                             && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].GetComponent<Fountain>() == null
                             && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].GetComponent<Reservoir>() == null)
                 {
@@ -95,7 +95,7 @@ public class Fountain : MonoBehaviour {
                 if (fountainPosition.x - waterRadius + i >= 0 && fountainPosition.y - waterRadius + j >= 0
                         && fountainPosition.x - waterRadius + i <= 40 && fountainPosition.y - waterRadius + j <= 40
                         && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j] != null
-                        && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].tag == "House")
+                        && constructArr[(int)fountainPosition.x - waterRadius + i, (int)fountainPosition.y - waterRadius + j].tag == World.HOUSE)
                 {
                     HouseInformation houseInformation = constructArr[(int)fountainPosition.x - waterRadius + i,
                         (int)fountainPosition.y - waterRadius + j].GetComponent<HouseInformation>();

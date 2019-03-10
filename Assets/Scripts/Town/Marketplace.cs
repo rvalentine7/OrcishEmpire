@@ -52,7 +52,7 @@ public class Marketplace : MonoBehaviour {
         //repeat the 2 steps above this until out of food to deliver
         //return to the market
         if (storage.getCurrentAmountStored() > 0 && orcOutForDelivery == false
-            && (employment.getNumWorkers() > 1 || (employment.getNumWorkers() == 1
+            && (employment.getNumHealthyWorkers() > 1 || (employment.getNumHealthyWorkers() == 1
             && orcOutForCollection == false)))
         {
             orcOutForDelivery = true;
@@ -65,8 +65,8 @@ public class Marketplace : MonoBehaviour {
         //  This might be changed to have a variable amount based on however much room is available in the market. (Ex. Instead of
         //  needing 200 at all times, it might be sent out when there is only 100 space available)
         if (storage.getStorageMax() - storage.getCurrentAmountStored() >= collectorCarryCapacity
-            && orcOutForCollection == false && (employment.getNumWorkers() > 1
-            || (employment.getNumWorkers() == 1 && orcOutForDelivery == false)))
+            && orcOutForCollection == false && (employment.getNumHealthyWorkers() > 1
+            || (employment.getNumHealthyWorkers() == 1 && orcOutForDelivery == false)))
         {
             orcOutForCollection = true;
             employment.setWorkerDeliveringGoods(true);

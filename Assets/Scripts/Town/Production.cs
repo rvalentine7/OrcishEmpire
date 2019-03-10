@@ -41,7 +41,7 @@ public class Production : MonoBehaviour {
      */
 	void Update () {
         orcOutForDelivery = employment.getWorkerDeliveringGoods();
-        numWorkers = employment.getNumWorkers();
+        numWorkers = employment.getNumHealthyWorkers();
         if (active)
         {
             //Lumber mills need to be near trees in order to function
@@ -49,7 +49,7 @@ public class Production : MonoBehaviour {
             {
                 //nearTrees = true;
 
-                GameObject world = GameObject.Find("WorldInformation");
+                GameObject world = GameObject.Find(World.WORLD_INFORMATION);
                 World myWorld = world.GetComponent<World>();
                 GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
                 Vector2 millPos = gameObject.transform.position;
@@ -106,7 +106,7 @@ public class Production : MonoBehaviour {
      */
     private void createDeliveryOrc()
     {
-        GameObject world = GameObject.Find("WorldInformation");
+        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
         World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;

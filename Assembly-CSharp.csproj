@@ -86,6 +86,7 @@
     <Compile Include="Assets\Scripts\Town\Arena.cs" />
     <Compile Include="Assets\Scripts\Town\AStarForWaterBuildings.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
+    <Compile Include="Assets\Scripts\Town\Barber.cs" />
     <Compile Include="Assets\Scripts\Town\Bridge.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BreweryClick.cs" />
@@ -109,9 +110,11 @@
     <Compile Include="Assets\Scripts\Town\Farm.cs" />
     <Compile Include="Assets\Scripts\Town\Fountain.cs" />
     <Compile Include="Assets\Scripts\Town\GladiatorPit.cs" />
+    <Compile Include="Assets\Scripts\Town\Hospital.cs" />
     <Compile Include="Assets\Scripts\Town\HouseInformation.cs" />
     <Compile Include="Assets\Scripts\Town\ItemProduction.cs" />
     <Compile Include="Assets\Scripts\Town\Marketplace.cs" />
+    <Compile Include="Assets\Scripts\Town\MudBath.cs" />
     <Compile Include="Assets\Scripts\Town\Production.cs" />
     <Compile Include="Assets\Scripts\Town\Pub.cs" />
     <Compile Include="Assets\Scripts\Town\Reservoir.cs" />

@@ -26,6 +26,7 @@ public class HouseInformation : MonoBehaviour {
     private int numInhabitants;
     private int numIncomingOrcs;
     private Dictionary<GameObject, int> inhabWorkLocations;
+    private Dictionary<GameObject, int> sickInhabWorkLocations;
     private int numEmployedInhabitants;
     private int houseSize;
     private int houseLevel;
@@ -43,6 +44,20 @@ public class HouseInformation : MonoBehaviour {
     private int entertainmentLevel;//this can be 0, 1, or 2.  If it just experiences a change,
                                    // there will need to be some sort of delay before the house reacts
     private float timeOfLastEntertainment;
+
+    private List<GameObject> nearbyBarbers;//Reduces likelihood of getting sick
+    private int numCoveredByBarbers;
+    private List<GameObject> nearbyBaths;//Reduces likelihood of getting sick
+    private List<GameObject> nearbyHospitals;//Hospitals treat orcs who are sick
+    private int baseHealthPercentage;
+    private int bathHealthPercentage;
+    private int barberHealthPercentage;
+    private int numSickInhabitantsAtHospital;
+    private int minSickRecoveryWait;
+    private int maxSickRecoveryWait;
+    private int sickRecoveryChance;
+    private List<SickInhabitant> sickInhabitants;
+
     //add future resources here (weapons/furniture/currency)
     private GameObject world;
     private World myWorld;
@@ -50,10 +65,11 @@ public class HouseInformation : MonoBehaviour {
     /**
      * Initializes the variables involving the house.
      */
-    void Start () {
+    void Start() {
         numInhabitants = 0;
         numIncomingOrcs = 0;
         inhabWorkLocations = new Dictionary<GameObject, int>();//keeps a list of the gameObjects where inhabitants
+        sickInhabWorkLocations = new Dictionary<GameObject, int>();//keeps a list of where sick inhabitants work
         // are working
         numEmployedInhabitants = 0;
         food = 0;
@@ -72,14 +88,59 @@ public class HouseInformation : MonoBehaviour {
         goldSinceLastTax = 0;
         entertainmentLevel = 0;
         timeOfLastEntertainment = 0.0f;
-        world = GameObject.Find("WorldInformation");
+
+        //TODO: should look for nearby health buildings.  should also have public methods for adding health buildings (when a health building is added after the house is built)
+        /*Health buildings can only service so many people... need to account for this... number of employees at health locations determines how many people can be serviced
+         Structure it like employing inhabitants?  Baths already have a restriction so maybe just hospital beds and how many people can be taken care of at barbers?*/
+        nearbyBarbers = new List<GameObject>();
+        numCoveredByBarbers = 0;
+        nearbyBaths = new List<GameObject>();
+        nearbyHospitals = new List<GameObject>();
+        baseHealthPercentage = 39;
+        bathHealthPercentage = 30;
+        barberHealthPercentage = 30;
+        numSickInhabitantsAtHospital = 0;
+        minSickRecoveryWait = 15;
+        maxSickRecoveryWait = 30;
+        sickRecoveryChance = 25;
+        sickInhabitants = new List<SickInhabitant>();
+
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        GameObject[,] constructArr = myWorld.constructNetwork.getConstructArr();
         nextPaymentTime = myWorld.getPaymentTime();
         //Check if tile already has water, update numWaterSources if so
         if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasWater())
         {
             addWaterSource();
+        }
+
+        //Seeing if any barbers/baths/hospitals are already around
+        Vector2 housePosition = gameObject.transform.position;
+        for (int i = -jobSearchRadius; i < jobSearchRadius; i++)
+        {
+            for (int j = -jobSearchRadius; j < jobSearchRadius; j++)
+            {
+                if (housePosition.x - jobSearchRadius + i >= 0 && housePosition.y - jobSearchRadius + j >= 0
+                        && housePosition.x - jobSearchRadius + i <= myWorld.mapSize && housePosition.y - jobSearchRadius + j <= myWorld.mapSize
+                        && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j] != null
+                        && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].tag == World.BUILDING)
+                {
+                    if (constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].GetComponent<Barber>() != null)
+                    {
+                        //TODO: this should only actually happen when adding inhabitants because a barber can only take so many clients
+                    }
+                    else if (constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].GetComponent<MudBath>() != null)
+                    {
+                        //TODO: this should only be added if the mudbath is wet
+                    }
+                    else if (constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].GetComponent<Hospital>() != null)
+                    {
+                        nearbyHospitals.Add(constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j]);
+                    }
+                }
+            }
         }
     }
 
@@ -108,7 +169,7 @@ public class HouseInformation : MonoBehaviour {
 
         //updates the resources of the household
         Storage storage = gameObject.GetComponent<Storage>();
-        if (Time.time > checkTime)
+        if (Time.time > checkTime)//TODO: break these up into separate methods for better clarity (like updateHealth() and updateStorage())
         {
             checkTime = Time.time + timeInterval;
 
@@ -228,7 +289,7 @@ public class HouseInformation : MonoBehaviour {
                 }
             }
 
-            //TODO: should not be able to downgrade twice in one time tick
+            //TODO: should not be able to downgrade twice in one time tick... is this still needed? don't recall houses downgrading twice in one tick
             if (multipleFoodTypes && houseLevel == 2)
             {
                 //will be used for upgrading to tier 3
@@ -237,13 +298,72 @@ public class HouseInformation : MonoBehaviour {
             {
 
             }
+
+            //Health (TODO: might need to slow this down later on by setting it to a different timer)
+            if (numInhabitants > 0)
+            {
+                //If an orc is sick, it has a chance to improve on its own
+                List<int> recoveredOrcIndices = new List<int>();
+                for (int i = 0; i < sickInhabitants.Count; i++)
+                {
+                    sickInhabitants[i].increaseWaitTime();
+                    //Check if the sick inhabitant has recovered
+                    if (sickInhabitants[i].getWaitTime() > minSickRecoveryWait && (Random.value * 100 < sickRecoveryChance || sickInhabitants[i].getWaitTime() > maxSickRecoveryWait))
+                    {
+                        recoveredOrcIndices.Add(i);
+                    }
+                    //If the sick inhabitant is not at a hospital, check if it can go to one
+                    else if (!sickInhabitants[i].getAtHospital())
+                    {
+                        //TODO: look for hospitals the orc can recover at
+                    }
+                }
+                recoveredOrcIndices.Sort();//TODO: Will this sort them by number? Ex. 1, 2, 3
+                for (int i = 0; i < recoveredOrcIndices.Count; i++)
+                {
+                    //Get the recovered orc index, but as it removes from sickInhabitants, the index will also lower
+                    sickInhabitants.RemoveAt(recoveredOrcIndices[i] - i);
+                    //TODO: make sure the hospital knows the orc has recovered
+                }
+
+                //Orcs getting sick - 100 represents 100%. Health percentages add up to 99% because there is always a chance of sickness
+                //TODO: orcs that are already sick have make it more likely other orcs get sick... unless they are in a hospital
+                int chanceOfSickness = 100 - (baseHealthPercentage + bathHealthPercentage + barberHealthPercentage * (numCoveredByBarbers / numInhabitants));//TODO: these percentages only get used if the buildings are usable
+                if (Random.value * 100 <= chanceOfSickness)
+                {
+                    sickInhabitants.Add(new SickInhabitant(0, false));
+                    //Inform work location the inhabitant can't work right now
+                    List<GameObject> workLocations = new List<GameObject>(inhabWorkLocations.Keys);
+                    bool foundWorkLocationOfSickWorker = false;
+                    int i = 0;
+                    while (!foundWorkLocationOfSickWorker && i < workLocations.Count)
+                    {
+                        //If there are still healthy workers from this household at the work location
+                        if (!sickInhabWorkLocations.ContainsKey(workLocations[i]) || sickInhabWorkLocations[workLocations[i]] <= inhabWorkLocations[workLocations[i]])
+                        {
+                            Employment workLocationEmployment = workLocations[i].GetComponent<Employment>();
+                            workLocationEmployment.updateSickWorkers(1);
+                            if (sickInhabWorkLocations.ContainsKey(workLocations[i]))
+                            {
+                                sickInhabWorkLocations[workLocations[i]] += 1;
+                            }
+                            else
+                            {
+                                sickInhabWorkLocations.Add(workLocations[i], 1);
+                            }
+                            foundWorkLocationOfSickWorker = true;
+                        }
+                        i++;
+                    }
+                }
+            }
         }
 
-        //find places for unemployed inhabitants to work
-        if (numEmployedInhabitants < numInhabitants)
+        //find places for unemployed inhabitants to work. if an orc is sick, it cannot find a job
+        if (numEmployedInhabitants < numInhabitants - sickInhabitants.Count)
         {
             Vector2 housePosition = gameObject.transform.position;
-            GameObject world = GameObject.Find("WorldInformation");
+            GameObject world = GameObject.Find(World.WORLD_INFORMATION);
             World myWorld = world.GetComponent<World>();
             GameObject[,] constructArr = myWorld.constructNetwork.getConstructArr();
             int i = 0;
@@ -253,9 +373,9 @@ public class HouseInformation : MonoBehaviour {
                 while (j <= jobSearchRadius * 2 && numEmployedInhabitants < numInhabitants)
                 {
                     if (housePosition.x - jobSearchRadius + i >= 0 && housePosition.y - jobSearchRadius + j >= 0
-                        && housePosition.x - jobSearchRadius + i <= 39 && housePosition.y - jobSearchRadius + j <= 39
+                        && housePosition.x - jobSearchRadius + i <= myWorld.mapSize && housePosition.y - jobSearchRadius + j <= myWorld.mapSize
                         && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j] != null
-                        && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].tag == "Building")
+                        && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].tag == World.BUILDING)
                     {
                         GameObject possibleEmployment = constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j];
                         Employment employment = possibleEmployment.GetComponent<Employment>();
@@ -306,7 +426,7 @@ public class HouseInformation : MonoBehaviour {
             nextPaymentTime = myWorld.getPaymentTime();
             myWorld.updateCurrency(-upkeep);
         }
-	}
+    }
 
     /**
      * Click the object to see information about it
@@ -568,6 +688,78 @@ public class HouseInformation : MonoBehaviour {
     }
 
     /**
+     * Adds a Mud Bath to the possible Mud Baths this household can visit
+     * @param mudBath a nearby mud bath this household can visit
+     */
+    public void addMudBath(GameObject mudBath)
+    {
+        if (!nearbyBaths.Contains(mudBath))
+        {
+            nearbyBaths.Add(mudBath);
+        }
+    }
+
+    /**
+     * Removes a Mud Bath from the possible Mud Baths this household can visit
+     * @param mudBath a mud bath this household can no longer visit
+     */
+    public void removeMudBath(GameObject mudBath)
+    {
+        if (nearbyBaths.Contains(mudBath))
+        {
+            nearbyBaths.Remove(mudBath);
+        }
+    }
+
+    /**
+     * Adds a Barber to the possible Barbers this household can visit
+     * @param barber a nearby barber this household can visit
+     */
+    public void addBarber(GameObject barber)
+    {
+        if (!nearbyBarbers.Contains(barber))
+        {
+            nearbyBarbers.Add(barber);
+        }
+    }
+
+    /**
+     * Removes a Barber from the possible Barbers this household can visit
+     * @param barber a barber this household can no longer visit
+     */
+    public void removeBarber(GameObject barber)
+    {
+        if (nearbyBarbers.Contains(barber))
+        {
+            nearbyBarbers.Remove(barber);
+        }
+    }
+
+    /**
+     * Adds a Hospital to the possible Hospitals this household can visit
+     * @param hospital a nearby hospital this household can visit
+     */
+    public void addHospital(GameObject hospital)
+    {
+        if (!nearbyHospitals.Contains(hospital))
+        {
+            nearbyHospitals.Add(hospital);
+        }
+    }
+
+    /**
+     * Removes a Hospital from the possible Hospitals this household can visit
+     * @param hospital a hospital this household can no longer visit
+     */
+    public void removeHospital(GameObject hospital)
+    {
+        if (nearbyHospitals.Contains(hospital))
+        {
+            nearbyHospitals.Remove(hospital);
+        }
+    }
+
+    /**
      * Updates the currency the houshold has
      * @param currencyChange how much the household's currency should change by
      */
@@ -606,5 +798,61 @@ public class HouseInformation : MonoBehaviour {
     public int getHouseLevel()
     {
         return houseLevel;
+    }
+
+    /**
+     * A sick inhabitant
+     */
+    public class SickInhabitant
+    {
+        private int wait;
+        private bool atHospital;
+
+        /**
+         * Constructor
+         * 
+         * @param wait how long this inhabitant has been sick
+         * @param atHospital whether the inhabitant is at a hospital
+         */
+        public SickInhabitant(int wait, bool atHospital)
+        {
+            this.wait = wait;
+            this.atHospital = atHospital;
+        }
+
+        /**
+         * Increase how long this inhabitant has spent recovering by 1
+         */
+        public void increaseWaitTime()
+        {
+            wait += (atHospital ? 2 : 1);
+        }
+
+        /**
+         * Gets how long the inhabitant has spent recovering
+         * @return wait how long the inhabitant has spent recovering
+         */
+        public int getWaitTime()
+        {
+            return wait;
+        }
+
+        /**
+         * Gets whether the inhabitant is at a hospital
+         */
+        public bool getAtHospital()
+        {
+            return atHospital;
+        }
+
+        public void setHospital(GameObject hospital)
+        {
+
+        }
+
+        public void removeHospital()
+        {
+
+        }
     }
 }

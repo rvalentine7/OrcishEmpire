@@ -29,7 +29,7 @@ public class Arena : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         active = true;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         ongoingFight = false;
@@ -46,7 +46,7 @@ public class Arena : MonoBehaviour {
         if (active)
         {
             Employment employment = gameObject.GetComponent<Employment>();
-            if (employment.getNumWorkers() == 0)
+            if (employment.getNumHealthyWorkers() == 0)
             {
                 if (ongoingFight)
                 {
@@ -60,7 +60,7 @@ public class Arena : MonoBehaviour {
                 //Make progress towards setting up a fight
                 if (setupProgress < 100 && !ongoingFight && Time.time > checkTime)
                 {
-                    setupProgress += employment.getNumWorkers() * employment.getWorkerValue();
+                    setupProgress += employment.getNumHealthyWorkers() * employment.getWorkerValue();
                     if (setupProgress > 100)
                     {
                         setupProgress = 100;
@@ -100,7 +100,7 @@ public class Arena : MonoBehaviour {
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
                                 Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j] != null
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
-                                Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j].tag == "Building"
+                                Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j].tag == World.BUILDING
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
                                 Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j].GetComponent<GladiatorPit>() != null)
                             {
@@ -137,7 +137,7 @@ public class Arena : MonoBehaviour {
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
                                 Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j] != null
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
-                                Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j].tag == "House")
+                                Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j].tag == World.HOUSE)
                             {
                                 GameObject house = structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
                                     Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j];
