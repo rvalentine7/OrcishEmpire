@@ -38,6 +38,9 @@ public class World : MonoBehaviour {
     public const string BUILD_OBJECT = "BuildObject";
     public const string POPUP = "Popup";
     public const string BUILD_PANEL = "BuildPanel";
+    public const string MEAT = "Meat";
+    public const string WHEAT = "Wheat";
+    public const string EGGS = "Eggs";
 
     private PopulationAndCurrency populationAndCurrency;
 

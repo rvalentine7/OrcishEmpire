@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\Characters\ImmigrantPrefab.cs" />
     <Compile Include="Assets\Scripts\Characters\Immigrate.cs" />
     <Compile Include="Assets\Scripts\Characters\OrcInformation.cs" />
+    <Compile Include="Assets\Scripts\Characters\SickOrc.cs" />
     <Compile Include="Assets\Scripts\Town\Aqueduct.cs" />
     <Compile Include="Assets\Scripts\Town\Arena.cs" />
     <Compile Include="Assets\Scripts\Town\AStarForWaterBuildings.cs" />
