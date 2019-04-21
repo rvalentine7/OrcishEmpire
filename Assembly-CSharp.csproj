@@ -126,6 +126,7 @@
     <Compile Include="Assets\Scripts\Town\Well.cs" />
     <Compile Include="Assets\Scripts\UI\ArenaPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BreweryPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\ChangeTabs.cs" />
     <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ClosePanel.cs" />
     <Compile Include="Assets\Scripts\UI\EggFarmPopup.cs" />
