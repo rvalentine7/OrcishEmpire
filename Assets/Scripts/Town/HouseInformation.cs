@@ -64,6 +64,11 @@ public class HouseInformation : MonoBehaviour {
     private GameObject world;
     private World myWorld;
 
+    private void Awake()
+    {
+        sickInhabitants = new List<SickOrc>();
+    }
+
     /**
      * Initializes the variables involving the house.
      */
@@ -102,10 +107,9 @@ public class HouseInformation : MonoBehaviour {
         bathHealthPercentage = 30;
         barberHealthPercentage = 30;
         numSickInhabitantsAtHospital = 0;
-        minSickRecoveryWait = 15;
-        maxSickRecoveryWait = 30;
+        minSickRecoveryWait = 2;
+        maxSickRecoveryWait = 5;
         sickRecoveryChance = 25;
-        sickInhabitants = new List<SickOrc>();
 
         world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
@@ -309,6 +313,7 @@ public class HouseInformation : MonoBehaviour {
                 List<SickOrc> sickOrcsNeedingHospitals = new List<SickOrc>();
                 for (int i = 0; i < sickInhabitants.Count; i++)
                 {
+                    //Debug.Log("increasing wait time");
                     sickInhabitants[i].increaseWaitTime();
                     //Check if the sick inhabitant has recovered
                     if (sickInhabitants[i].getWaitTime() > minSickRecoveryWait && (Random.value * 100 < sickRecoveryChance || sickInhabitants[i].getWaitTime() > maxSickRecoveryWait))
@@ -329,7 +334,7 @@ public class HouseInformation : MonoBehaviour {
                     while (sickOrcsNeedingHospitals.Count > 0 && yIndex < jobSearchRadius * 2)
                     {
                         if (housePosition.x - jobSearchRadius + xIndex >= 0 && housePosition.y - jobSearchRadius + yIndex >= 0
-                        && housePosition.x - jobSearchRadius + xIndex <= myWorld.mapSize && housePosition.y - jobSearchRadius + yIndex <= myWorld.mapSize
+                        && housePosition.x - jobSearchRadius + xIndex <= myWorld.mapSize - 1 && housePosition.y - jobSearchRadius + yIndex <= myWorld.mapSize - 1
                         && constructArr[(int)housePosition.x - jobSearchRadius + xIndex, (int)housePosition.y - jobSearchRadius + yIndex] != null
                         && constructArr[(int)housePosition.x - jobSearchRadius + xIndex, (int)housePosition.y - jobSearchRadius + yIndex].tag == World.BUILDING
                         && constructArr[(int)housePosition.x - jobSearchRadius + xIndex, (int)housePosition.y - jobSearchRadius + yIndex].GetComponent<Hospital>() != null)
@@ -356,15 +361,29 @@ public class HouseInformation : MonoBehaviour {
                         Hospital hospital = recoveredOrcHospital.GetComponent<Hospital>();
                         hospital.removeSickOrc(recoveredOrc);
                     }
+                    //Debug.Log("recovered");
+                    recoveredOrc.informWorkLocationHealthy();
+                    //Updating sickInhabWorkLocations to remove this orc so that the house does not believe the location is unavailable
+                    //TODO: does this cause issues between houses?
+                    if (recoveredOrc.getWorkLocation() != null && sickInhabWorkLocations[recoveredOrc.getWorkLocation()] > 1)
+                    {
+                        sickInhabWorkLocations[recoveredOrc.getWorkLocation()]--;
+                    }
+                    else if (recoveredOrc.getWorkLocation() != null)
+                    {
+                        sickInhabWorkLocations.Remove(recoveredOrc.getWorkLocation());
+                    }
                     sickInhabitants.Remove(recoveredOrc);
                 }
 
                 //Orcs getting sick - 100 represents 100%. Health percentages add up to 99% because there is always a chance of sickness
                 //TODO: orcs that are already sick have make it more likely other orcs get sick... unless they are in a hospital
+                //TODO: the chance of sickness should be lower... way too many orcs getting sick... there should also probably be some sort of buffer at the beginning of a game
                 int chanceOfSickness = 100 - (baseHealthPercentage + bathHealthPercentage + barberHealthPercentage * (numCoveredByBarbers / numInhabitants));//TODO: these percentages only get used if the buildings are usable
-                if (Random.value * 100 <= chanceOfSickness)
+                if (sickInhabitants.Count < numInhabitants && Random.value * 100 <= chanceOfSickness)
                 {
-                    sickInhabitants.Add(new SickOrc());
+                    SickOrc sickOrc = new SickOrc();
+                    sickInhabitants.Add(sickOrc);
                     //Inform work location the inhabitant can't work right now
                     List<GameObject> workLocations = new List<GameObject>(inhabWorkLocations.Keys);
                     bool foundWorkLocationOfSickWorker = false;
@@ -372,8 +391,9 @@ public class HouseInformation : MonoBehaviour {
                     while (!foundWorkLocationOfSickWorker && i < workLocations.Count)
                     {
                         //If there are still healthy workers from this household at the work location
-                        if (!sickInhabWorkLocations.ContainsKey(workLocations[i]) || sickInhabWorkLocations[workLocations[i]] <= inhabWorkLocations[workLocations[i]])
+                        if (!sickInhabWorkLocations.ContainsKey(workLocations[i]) || sickInhabWorkLocations[workLocations[i]] < inhabWorkLocations[workLocations[i]])//<=?
                         {
+                            //sickOrc works at this work location
                             Employment workLocationEmployment = workLocations[i].GetComponent<Employment>();
                             workLocationEmployment.updateSickWorkers(1);
                             if (sickInhabWorkLocations.ContainsKey(workLocations[i]))
@@ -384,6 +404,7 @@ public class HouseInformation : MonoBehaviour {
                             {
                                 sickInhabWorkLocations.Add(workLocations[i], 1);
                             }
+                            sickOrc.setWorkLocation(workLocations[i]);
                             foundWorkLocationOfSickWorker = true;
                         }
                         i++;
@@ -406,7 +427,7 @@ public class HouseInformation : MonoBehaviour {
                 while (j <= jobSearchRadius * 2 && numEmployedInhabitants < numInhabitants)
                 {
                     if (housePosition.x - jobSearchRadius + i >= 0 && housePosition.y - jobSearchRadius + j >= 0
-                        && housePosition.x - jobSearchRadius + i <= myWorld.mapSize && housePosition.y - jobSearchRadius + j <= myWorld.mapSize
+                        && housePosition.x - jobSearchRadius + i <= myWorld.mapSize - 1 && housePosition.y - jobSearchRadius + j <= myWorld.mapSize - 1
                         && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j] != null
                         && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].tag == World.BUILDING)
                     {
@@ -831,5 +852,13 @@ public class HouseInformation : MonoBehaviour {
     public int getHouseLevel()
     {
         return houseLevel;
+    }
+
+    /**
+     * Gets the number of sick inhabitants dwelling in this house
+     */
+    public int getNumSickInhabitants()
+    {
+        return sickInhabitants.Count;
     }
 }

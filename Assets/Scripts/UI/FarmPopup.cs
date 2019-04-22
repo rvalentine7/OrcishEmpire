@@ -8,6 +8,7 @@ public class FarmPopup : MonoBehaviour {
     public GameObject farm;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text progressNum;
     private bool initialClick;
 

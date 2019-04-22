@@ -9,6 +9,7 @@ public class HousePopup : MonoBehaviour {
     public GameObject houseImage;
     public Text statusText;
     public Text inhabitantCount;
+    public Text sickInhabitantCount;
     public Text employedInhabCount;
     public Text storageCapacity;
     public Text foodCount;
@@ -63,6 +64,7 @@ public class HousePopup : MonoBehaviour {
             statusText.text = "This house cannot upgrade further.";
         }
         inhabitantCount.text = "" + houseInfo.getNumInhabitants() + "/" + houseInfo.getHouseSize();
+        sickInhabitantCount.text = "" + houseInfo.getNumSickInhabitants() + "/" + houseInfo.getNumInhabitants();
         employedInhabCount.text = "" + houseInfo.getNumEmployedInhabs();
         foodCount.text = "" + storage.getFoodCount();
         waterCount.text = "" + houseInfo.getWaterCount();

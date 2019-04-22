@@ -8,6 +8,7 @@ public class WeaponsmithPopup : MonoBehaviour {
     public GameObject weaponsmith;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text storageCapacity;
     public Text ironNum;
     public Text progressNum;
@@ -53,6 +54,7 @@ public class WeaponsmithPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         Storage storage = weaponsmith.GetComponent<Storage>();
         storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         ironNum.text = "" + storage.getIronCount();

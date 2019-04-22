@@ -8,6 +8,7 @@ public class FurnitureWorkshopPopup : MonoBehaviour {
     public GameObject furnitureWorkshop;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text storageCapacity;
     public Text lumberNum;
     public Text progressNum;
@@ -53,6 +54,7 @@ public class FurnitureWorkshopPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         Storage storage = furnitureWorkshop.GetComponent<Storage>();
         storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         lumberNum.text = "" + storage.getLumberCount();

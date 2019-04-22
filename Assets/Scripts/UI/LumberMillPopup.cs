@@ -8,6 +8,7 @@ public class LumberMillPopup : MonoBehaviour {
     public GameObject lumberMill;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text progressNum;
     public Button activateButton;
     public Sprite activateSprite;
@@ -51,6 +52,7 @@ public class LumberMillPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         if (employment.getNumWorkers() == 0)
         {
             status.text = "Without any employees, this mill cannot produce any lumber.";

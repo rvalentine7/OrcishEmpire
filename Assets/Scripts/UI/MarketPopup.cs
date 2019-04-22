@@ -8,6 +8,7 @@ public class MarketPopup : MonoBehaviour {
     public GameObject marketplace;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text storageCapacity;
     public Text meatNum;
     public Text wheatNum;
@@ -69,6 +70,7 @@ public class MarketPopup : MonoBehaviour {
             status.text = "This marketplace is efficiently distributing goods.";
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         meatNum.text = "" + storage.getMeatCount();
         wheatNum.text = "" + storage.getWheatCount();
         eggsNum.text = "" + storage.getEggCount();

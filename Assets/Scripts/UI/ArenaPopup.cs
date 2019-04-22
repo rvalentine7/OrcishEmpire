@@ -8,6 +8,7 @@ public class ArenaPopup : MonoBehaviour {
     public GameObject arena;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text gladiatorsNum;
     public Text progressNum;
     public Text fightDurationNum;
@@ -51,6 +52,7 @@ public class ArenaPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         if (employment.getNumWorkers() == 0)
         {
             status.text = "There are no fights going on at the arena right now.";

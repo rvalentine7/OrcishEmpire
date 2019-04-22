@@ -15,10 +15,14 @@ public class Hospital : MonoBehaviour
     Employment employment;
     private int maxEmployeeNum;
 
+    private void Awake()
+    {
+        sickOrcs = new List<SickOrc>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        sickOrcs = new List<SickOrc>();
         numAvailableBeds = 0;
         employment = gameObject.GetComponent<Employment>();
         maxEmployeeNum = employment.getWorkerCap();
@@ -61,5 +65,21 @@ public class Hospital : MonoBehaviour
     {
         sickOrcs.Remove(sickOrc);
         sickOrc.removeHospital();
+    }
+
+    /**
+     * Gets the number of sick orcs recovering at this hospital
+     */
+    public int getNumPatients()
+    {
+        return sickOrcs.Count;
+    }
+
+    /**
+     * Gets the number of beds this hospital currently has for patients
+     */
+    public int getNumAvailableBeds()
+    {
+        return numAvailableBeds;
     }
 }

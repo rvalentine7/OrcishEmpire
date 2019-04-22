@@ -8,6 +8,7 @@ public class PubPopup : MonoBehaviour {
     private GameObject pub;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text storageCapacity;
     public Text beerNum;
     public Text timeLeftNum;
@@ -49,6 +50,7 @@ public class PubPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         Storage storage = pub.GetComponent<Storage>();
         storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         if (employment.getNumWorkers() == 0)

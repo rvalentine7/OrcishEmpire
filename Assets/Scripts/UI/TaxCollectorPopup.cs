@@ -8,6 +8,7 @@ public class TaxCollectorPopup : MonoBehaviour {
     public GameObject taxCollector;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text taxesCollectedNum;
     public Button activateButton;
     public Sprite activateSprite;
@@ -50,6 +51,7 @@ public class TaxCollectorPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         TaxCollector taxCollectorScript = taxCollector.GetComponent<TaxCollector>();
         if (employment.getNumWorkers() == 0)
         {

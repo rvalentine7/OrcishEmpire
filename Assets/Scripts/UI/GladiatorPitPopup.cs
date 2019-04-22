@@ -8,6 +8,7 @@ public class GladiatorPitPopup : MonoBehaviour {
     public GameObject gladiatorPit;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text gladiatorsNumText;
     public Text trainingProgressNumText;
     public Button activateButton;
@@ -50,6 +51,7 @@ public class GladiatorPitPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         if (employment.getNumWorkers() == 0)
         {
             status.text = "Without any employees, this pit cannot train any gladiators.";

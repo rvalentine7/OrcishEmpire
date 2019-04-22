@@ -8,6 +8,7 @@ public class WarPaintWorkshopPopup : MonoBehaviour {
     public GameObject warPaintWorkshop;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text storageCapacity;
     public Text ochreNum;
     public Text progressNum;
@@ -53,6 +54,7 @@ public class WarPaintWorkshopPopup : MonoBehaviour {
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         Storage storage = warPaintWorkshop.GetComponent<Storage>();
         storageCapacity.text = "" + storage.getCurrentAmountStored() + "/" + storage.getStorageMax();
         ochreNum.text = "" + storage.getOchreCount();

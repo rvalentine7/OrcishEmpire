@@ -9,6 +9,7 @@ public class EggFarmPopup : MonoBehaviour
     public GameObject farm;
     public Text status;
     public Text employeeNum;
+    public Text sickEmployeeNum;
     public Text progressNum;
     public Button activateButton;
     public Sprite activateSprite;
@@ -52,6 +53,7 @@ public class EggFarmPopup : MonoBehaviour
             activateButton.image.sprite = deactivateSprite;
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
+        sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         if (employment.getNumWorkers() == 0)
         {
             status.text = "Without any employees, this egg farm cannot produce any eggs.";
