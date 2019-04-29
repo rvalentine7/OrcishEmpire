@@ -6,6 +6,8 @@ using UnityEngine.EventSystems;
 /**
  * Contains information about the house this is attached to such as
  *  which orcs live in it and what kind of supplies the house has.
+ *  
+ *  TODO: OrcInhabitants should be handling more of the starting/quitting jobs instead of HouseInformation
  */
 public class HouseInformation : MonoBehaviour {
     public float timeInterval;
@@ -22,11 +24,12 @@ public class HouseInformation : MonoBehaviour {
     public Sprite secondLevelHouse;
     public Sprite thirdLevelHouse;
     //add future house sprites here (aiming for at least 5 house levels... ideally more like 9)
-
-    private int numInhabitants;
+    
+    private List<OrcInhabitant> orcInhabitants;
+    private List<OrcInhabitant> unemployedInhabitants;
     private int numIncomingOrcs;
-    private Dictionary<GameObject, int> inhabWorkLocations;
-    private Dictionary<GameObject, int> sickInhabWorkLocations;
+    private Dictionary<GameObject, List<OrcInhabitant>> inhabWorkLocations;//TODO: instead of an int, have a list of OrcInhabitants?
+    private Dictionary<GameObject, int> sickInhabWorkLocations;//TODO: now that I have an OrcInhabitant class, do I need this? can it just be a list of work locations that have sick orcs from this house?
     private int numEmployedInhabitants;
     private int houseSize;
     private int houseLevel;
@@ -56,7 +59,7 @@ public class HouseInformation : MonoBehaviour {
     private int minSickRecoveryWait;
     private int maxSickRecoveryWait;
     private int sickRecoveryChance;
-    private List<SickOrc> sickInhabitants;
+    private List<OrcInhabitant> sickInhabitants;
     private Vector2 housePosition;
     private GameObject[,] constructArr;
 
@@ -66,18 +69,18 @@ public class HouseInformation : MonoBehaviour {
 
     private void Awake()
     {
-        sickInhabitants = new List<SickOrc>();
+        sickInhabitants = new List<OrcInhabitant>();
     }
 
     /**
      * Initializes the variables involving the house.
      */
     void Start() {
-        numInhabitants = 0;
+        orcInhabitants = new List<OrcInhabitant>();
+        unemployedInhabitants = new List<OrcInhabitant>();
         numIncomingOrcs = 0;
-        inhabWorkLocations = new Dictionary<GameObject, int>();//keeps a list of the gameObjects where inhabitants
+        inhabWorkLocations = new Dictionary<GameObject, List<OrcInhabitant>>();//keeps a list of the gameObjects where inhabitants
         sickInhabWorkLocations = new Dictionary<GameObject, int>();//keeps a list of where sick inhabitants work
-        // are working
         numEmployedInhabitants = 0;
         food = 0;
         numWaterSources = 0;
@@ -180,7 +183,7 @@ public class HouseInformation : MonoBehaviour {
             checkTime = Time.time + timeInterval;
 
             //TODO: update food information
-            if (storage.getFoodCount() > 0 && storage.getFoodCount() >= numInhabitants * inhabitantFoodConsumption)
+            if (storage.getFoodCount() > 0 && storage.getFoodCount() >= orcInhabitants.Count * inhabitantFoodConsumption)
             {
                 int numFoodTypes = 0;
                 if (storage.getMeatCount() > 0)
@@ -203,14 +206,14 @@ public class HouseInformation : MonoBehaviour {
                 {
                     multipleFoodTypes = false;
                 }
-                storage.removeResource("Meat", numInhabitants * inhabitantFoodConsumption * (storage.getMeatCount() / storage.getFoodCount()));
+                storage.removeResource("Meat", orcInhabitants.Count * inhabitantFoodConsumption * (storage.getMeatCount() / storage.getFoodCount()));
                 if (storage.getFoodCount() > 0)
                 {
-                    storage.removeResource("Wheat", numInhabitants * inhabitantFoodConsumption * (storage.getWheatCount() / storage.getFoodCount()));
+                    storage.removeResource("Wheat", orcInhabitants.Count * inhabitantFoodConsumption * (storage.getWheatCount() / storage.getFoodCount()));
                 }
                 if (storage.getFoodCount() > 0)
                 {
-                    storage.removeResource("Eggs", numInhabitants * inhabitantFoodConsumption * (storage.getEggCount() / storage.getFoodCount()));
+                    storage.removeResource("Eggs", orcInhabitants.Count * inhabitantFoodConsumption * (storage.getEggCount() / storage.getFoodCount()));
                 }
             }
             else if (storage.getFoodCount() > 0)
@@ -271,9 +274,9 @@ public class HouseInformation : MonoBehaviour {
                     houseLevel--;
                     updateHouseSprite();
                     houseSize /= 2;
-                    if (numInhabitants > houseSize)
+                    if (/*numInhabitants*/orcInhabitants.Count > houseSize)
                     {
-                        removeInhabitants(numInhabitants - houseSize);
+                        removeInhabitants(/*numInhabitants*/orcInhabitants.Count - houseSize);
                     }
                 }
                 else
@@ -306,17 +309,18 @@ public class HouseInformation : MonoBehaviour {
             }
 
             //Health (TODO: might need to slow this down later on by setting it to a different timer)
-            if (numInhabitants > 0)
+            if (orcInhabitants.Count > 0)
             {
+                //TODO: if an employment has to change how many workers it has, a sick orc might not realize... employments should keep track of which OrcInhabitant they have... OrcInhabitant will be a required class now
                 //If an orc is sick, it has a chance to improve on its own
                 List<int> recoveredOrcIndices = new List<int>();
-                List<SickOrc> sickOrcsNeedingHospitals = new List<SickOrc>();
+                List<OrcInhabitant> sickOrcsNeedingHospitals = new List<OrcInhabitant>();
                 for (int i = 0; i < sickInhabitants.Count; i++)
                 {
                     //Debug.Log("increasing wait time");
-                    sickInhabitants[i].increaseWaitTime();
+                    sickInhabitants[i].increaseSickTime();
                     //Check if the sick inhabitant has recovered
-                    if (sickInhabitants[i].getWaitTime() > minSickRecoveryWait && (Random.value * 100 < sickRecoveryChance || sickInhabitants[i].getWaitTime() > maxSickRecoveryWait))
+                    if (sickInhabitants[i].getSickTime() > minSickRecoveryWait && (Random.value * 100 < sickRecoveryChance || sickInhabitants[i].getSickTime() > maxSickRecoveryWait))
                     {
                         recoveredOrcIndices.Add(i);
                     }
@@ -354,7 +358,7 @@ public class HouseInformation : MonoBehaviour {
                 for (int i = 0; i < recoveredOrcIndices.Count; i++)
                 {
                     //Get the recovered orc index, but as it removes from sickInhabitants, the index will also lower
-                    SickOrc recoveredOrc = sickInhabitants[recoveredOrcIndices[i] - i];
+                    OrcInhabitant recoveredOrc = sickInhabitants[recoveredOrcIndices[i] - i];
                     GameObject recoveredOrcHospital = recoveredOrc.getHospital();
                     if (recoveredOrcHospital != null)
                     {
@@ -379,10 +383,10 @@ public class HouseInformation : MonoBehaviour {
                 //Orcs getting sick - 100 represents 100%. Health percentages add up to 99% because there is always a chance of sickness
                 //TODO: orcs that are already sick have make it more likely other orcs get sick... unless they are in a hospital
                 //TODO: the chance of sickness should be lower... way too many orcs getting sick... there should also probably be some sort of buffer at the beginning of a game
-                int chanceOfSickness = 100 - (baseHealthPercentage + bathHealthPercentage + barberHealthPercentage * (numCoveredByBarbers / numInhabitants));//TODO: these percentages only get used if the buildings are usable
-                if (sickInhabitants.Count < numInhabitants && Random.value * 100 <= chanceOfSickness)
+                int chanceOfSickness = 100 - (baseHealthPercentage + bathHealthPercentage + barberHealthPercentage * (numCoveredByBarbers / /*numInhabitants*/orcInhabitants.Count));//TODO: these percentages only get used if the buildings are usable
+                if (sickInhabitants.Count < orcInhabitants.Count && Random.value * 100 <= chanceOfSickness)
                 {
-                    SickOrc sickOrc = new SickOrc();
+                    OrcInhabitant sickOrc = new OrcInhabitant();
                     sickInhabitants.Add(sickOrc);
                     //Inform work location the inhabitant can't work right now
                     List<GameObject> workLocations = new List<GameObject>(inhabWorkLocations.Keys);
@@ -391,7 +395,7 @@ public class HouseInformation : MonoBehaviour {
                     while (!foundWorkLocationOfSickWorker && i < workLocations.Count)
                     {
                         //If there are still healthy workers from this household at the work location
-                        if (!sickInhabWorkLocations.ContainsKey(workLocations[i]) || sickInhabWorkLocations[workLocations[i]] < inhabWorkLocations[workLocations[i]])//<=?
+                        if (!sickInhabWorkLocations.ContainsKey(workLocations[i]) || sickInhabWorkLocations[workLocations[i]] < inhabWorkLocations[workLocations[i]].Count)//TODO: why was this <= instead of <?
                         {
                             //sickOrc works at this work location
                             Employment workLocationEmployment = workLocations[i].GetComponent<Employment>();
@@ -414,17 +418,17 @@ public class HouseInformation : MonoBehaviour {
         }
 
         //find places for unemployed inhabitants to work. if an orc is sick, it cannot find a job
-        if (numEmployedInhabitants < numInhabitants - sickInhabitants.Count)
+        if (numEmployedInhabitants < orcInhabitants.Count - sickInhabitants.Count)
         {
             Vector2 housePosition = gameObject.transform.position;
             GameObject world = GameObject.Find(World.WORLD_INFORMATION);
             World myWorld = world.GetComponent<World>();
             GameObject[,] constructArr = myWorld.constructNetwork.getConstructArr();
             int i = 0;
-            while (i <= jobSearchRadius * 2 && numEmployedInhabitants < numInhabitants)
+            while (i <= jobSearchRadius * 2 && numEmployedInhabitants < orcInhabitants.Count)
             {
                 int j = 0;
-                while (j <= jobSearchRadius * 2 && numEmployedInhabitants < numInhabitants)
+                while (j <= jobSearchRadius * 2 && numEmployedInhabitants < orcInhabitants.Count)
                 {
                     if (housePosition.x - jobSearchRadius + i >= 0 && housePosition.y - jobSearchRadius + j >= 0
                         && housePosition.x - jobSearchRadius + i <= myWorld.mapSize - 1 && housePosition.y - jobSearchRadius + j <= myWorld.mapSize - 1
@@ -436,35 +440,54 @@ public class HouseInformation : MonoBehaviour {
                         int numJobsAtEmployment = employment.numJobsAvailable();
                         if (employment.getOpenForBusiness() && numJobsAtEmployment > 0)
                         {
-                            int numUnemployed = numInhabitants - numEmployedInhabitants;
+                            int numUnemployed = unemployedInhabitants.Count;
                             int residentsToEmploy = numJobsAtEmployment - numUnemployed;
                             //Case #1: There are less job spots at the employment than the number of unemployed in this house
-                            if (residentsToEmploy < 0)
+                            if (numJobsAtEmployment - numUnemployed < 0)
                             {
-                                employment.addWorker(numUnemployed + residentsToEmploy, gameObject);
-                                if (inhabWorkLocations.ContainsKey(possibleEmployment))
+                                for (int k = 0; k < numJobsAtEmployment; k++)
                                 {
-                                    inhabWorkLocations[possibleEmployment] += numUnemployed + residentsToEmploy;
+                                    OrcInhabitant orcInhabitant = unemployedInhabitants[0];
+                                    unemployedInhabitants.Remove(orcInhabitant);
+                                    orcInhabitant.setWorkLocation(possibleEmployment);
+                                    employment.addWorker(1, gameObject);
+                                    numEmployedInhabitants++;
+                                    
+                                    if (inhabWorkLocations.ContainsKey(possibleEmployment))
+                                    {
+                                        inhabWorkLocations[possibleEmployment].Add(orcInhabitant);
+                                    }
+                                    else
+                                    {
+                                        List<OrcInhabitant> inhabitantsAtWorkLocation = new List<OrcInhabitant>();
+                                        inhabitantsAtWorkLocation.Add(orcInhabitant);
+                                        inhabWorkLocations.Add(possibleEmployment, inhabitantsAtWorkLocation);
+                                    }
                                 }
-                                else
-                                {
-                                    inhabWorkLocations.Add(possibleEmployment, numUnemployed + residentsToEmploy);
-                                }
-                                numEmployedInhabitants += numUnemployed + residentsToEmploy;
                             }
                             //Case #2:  There are more than enough job spots at the employment to employ all unemployed members of this house
                             else
                             {
-                                employment.addWorker(numUnemployed, gameObject);
-                                if (inhabWorkLocations.ContainsKey(possibleEmployment))
+                                for (int k = 0; k < unemployedInhabitants.Count; k++)
                                 {
-                                    inhabWorkLocations[possibleEmployment] += numUnemployed;
-                                }
-                                else
-                                {
-                                    inhabWorkLocations.Add(possibleEmployment, numUnemployed);
+                                    OrcInhabitant orcInhabitant = unemployedInhabitants[k];
+                                    orcInhabitant.setWorkLocation(possibleEmployment);
+                                    employment.addWorker(1, gameObject);
+
+                                    if (inhabWorkLocations.ContainsKey(possibleEmployment))
+                                    {
+                                        inhabWorkLocations[possibleEmployment].Add(orcInhabitant);
+                                    }
+                                    else
+                                    {
+                                        List<OrcInhabitant> inhabitantsAtWorkLocation = new List<OrcInhabitant>();
+                                        inhabitantsAtWorkLocation.Add(orcInhabitant);
+                                        inhabWorkLocations.Add(possibleEmployment, inhabitantsAtWorkLocation);
+                                    }
                                 }
                                 numEmployedInhabitants += numUnemployed;
+                                unemployedInhabitants = new List<OrcInhabitant>();
+                                numUnemployed = 0;
                             }
                         }
                     }
@@ -521,11 +544,16 @@ public class HouseInformation : MonoBehaviour {
      */
     public void addInhabitants(int num)
     {
-        if (numInhabitants == 0)
+        if (orcInhabitants.Count == 0)
         {
             updateHouseSprite();
         }
-        numInhabitants += num;
+        for (int i = 0; i < num; i++)
+        {
+            OrcInhabitant orcInhabitant = new OrcInhabitant();
+            orcInhabitants.Add(orcInhabitant);
+            unemployedInhabitants.Add(orcInhabitant);
+        }
         //populationChange = true;
         this.myWorld.updatePopulation(num);
     }
@@ -550,35 +578,25 @@ public class HouseInformation : MonoBehaviour {
 
     /**
      * Removes inhabitants from the house.
+     * @param num the number of inhabitants to remove
      */
-    public void removeInhabitants(int num)
+    public void removeInhabitants(int num)//TODO: remove an OrcInhabitant
     {
-        numInhabitants -= num;
-        int numRemovedSoFar = 0;
-        List<GameObject> keys = new List<GameObject>(inhabWorkLocations.Keys);
-        foreach (GameObject key in keys)
+        //TODO: should be able to just go through orcInhabitants and have them quit their jobs and remove them from the list
+        for (int i = 0; i < num; i++)
         {
-            if (numRemovedSoFar < num)
+            OrcInhabitant orcInhabitant = orcInhabitants[orcInhabitants.Count - i];//treating like a stack in case I want to add something for orcs that live in a house longer
+            orcInhabitants.Remove(orcInhabitant);
+            Employment employment = orcInhabitant.getWorkLocation().GetComponent<Employment>();
+            employment.removeWorkers(1, gameObject);
+            inhabWorkLocations[orcInhabitant.getWorkLocation()].Remove(orcInhabitant);
+            if (unemployedInhabitants.Contains(orcInhabitant))
             {
-                Employment employment = key.GetComponent<Employment>();
-                int numInhabsAtEmployment = inhabWorkLocations[key];
-                if (numRemovedSoFar + numInhabsAtEmployment <= num)
-                {
-                    employment.removeWorkers(inhabWorkLocations[key], gameObject);
-                    numRemovedSoFar += inhabWorkLocations[key];
-                    removeWorkLocation(key);
-                }
-                else
-                {
-                    employment.removeWorkers(num - numRemovedSoFar, gameObject);
-                    inhabWorkLocations[key] -= num - numRemovedSoFar;
-                    numRemovedSoFar = num;
-                }
+                unemployedInhabitants.Remove(orcInhabitant);
             }
         }
         //populationChange = true;
-        //TODO: create orc gameobjects leaving the house and exiting the map
-        if (numInhabitants > 0)
+        if (orcInhabitants.Count > 0)
         {
             Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
                 gameObject.transform.position.y + 0.4f), Quaternion.identity);
@@ -591,18 +609,17 @@ public class HouseInformation : MonoBehaviour {
      */
     public void destroyHouse()
     {
-        //TODO: create orc gameobjects leaving the house and exiting the map
-        foreach (KeyValuePair<GameObject, int> entry in inhabWorkLocations)
+        foreach (KeyValuePair<GameObject, List<OrcInhabitant>> entry in inhabWorkLocations)
         {
             Employment employment = entry.Key.GetComponent<Employment>();
-            employment.removeWorkers(entry.Value, gameObject);
+            employment.removeWorkers(entry.Value.Count, gameObject);
         }
-        if (numInhabitants > 0)
+        if (orcInhabitants.Count > 0)
         {
             Instantiate(orcEmigrant, new Vector2(gameObject.transform.position.x,
                 gameObject.transform.position.y + 0.4f), Quaternion.identity);
         }
-        this.myWorld.updatePopulation(-numInhabitants);
+        this.myWorld.updatePopulation(-orcInhabitants.Count);
         Destroy(gameObject);
     }
 
@@ -630,7 +647,7 @@ public class HouseInformation : MonoBehaviour {
      */
     public int getNumInhabitants()
     {
-        return numInhabitants;
+        return orcInhabitants.Count;
     }
 
     /**
@@ -649,7 +666,12 @@ public class HouseInformation : MonoBehaviour {
      */
     public void removeWorkLocation(GameObject employment)
     {
-        numEmployedInhabitants -= inhabWorkLocations[employment];
+        foreach (OrcInhabitant orcInhabitant in inhabWorkLocations[employment])
+        {
+            orcInhabitant.setWorkLocation(null);
+            unemployedInhabitants.Add(orcInhabitant);
+        }
+        numEmployedInhabitants -= inhabWorkLocations[employment].Count;
         if (numEmployedInhabitants < 0)
         {
             Debug.Log("A house has negative employed inhabitants.");

@@ -6,9 +6,9 @@ using UnityEngine;
  * This class should keep track of recoveries
  * If an orc is considered recovered by this class, notify its home and its hospital (if it has one)
  */
-public class SickOrc
+public class OrcInhabitant
 {
-    private int wait;
+    private int sickTime;
     private GameObject home;
     private GameObject hospital;
     private GameObject workLocation;
@@ -19,30 +19,48 @@ public class SickOrc
      * @param wait how long this inhabitant has been sick
      * @param atHospital whether the inhabitant is at a hospital
      */
-    public SickOrc()
+    public OrcInhabitant()
     {
-        this.wait = 0;
+        this.sickTime = 0;
         this.hospital = null;
         this.home = null;
         this.workLocation = null;
     }
 
     /**
+     * Sets this orc's home
+     * @param home the home this orc belongs to
+     */
+    public void setHome(GameObject home)
+    {
+        this.home = home;
+    }
+
+    /**
+     * Gets the home this orc belongs to
+     * @return home the home this orc belongs to
+     */
+    public GameObject getHome()
+    {
+        return this.home;
+    }
+
+    /**
      * Increase how long this inhabitant has spent recovering
      */
-    public void increaseWaitTime()
+    public void increaseSickTime()
     {
         //If the orc is at a hospital, it will recover faster
-        wait += (getHospital() != null ? 2 : 1);
+        sickTime += (getHospital() != null ? 2 : 1);
     }
 
     /**
      * Gets how long the inhabitant has spent recovering
      * @return wait how long the inhabitant has spent recovering
      */
-    public int getWaitTime()
+    public int getSickTime()
     {
-        return wait;
+        return sickTime;
     }
 
     /**

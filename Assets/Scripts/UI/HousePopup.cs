@@ -10,6 +10,7 @@ public class HousePopup : MonoBehaviour {
     public Text statusText;
     public Text inhabitantCount;
     public Text sickInhabitantCount;
+    //TODO: add a text for number at hospital (useful for seeing if any are spreading sickness or if they are recovering as fast as possible)
     public Text employedInhabCount;
     public Text storageCapacity;
     public Text foodCount;

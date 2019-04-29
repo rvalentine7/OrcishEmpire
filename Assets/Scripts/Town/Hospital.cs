@@ -10,14 +10,14 @@ public class Hospital : MonoBehaviour
 {
     public int numHospitalBeds;
 
-    private List<SickOrc> sickOrcs;
+    private List<OrcInhabitant> sickOrcs;
     private int numAvailableBeds;
     Employment employment;
     private int maxEmployeeNum;
 
     private void Awake()
     {
-        sickOrcs = new List<SickOrc>();
+        sickOrcs = new List<OrcInhabitant>();
     }
 
     // Start is called before the first frame update
@@ -46,10 +46,11 @@ public class Hospital : MonoBehaviour
      * @param sickOrc the orc to be admitted to this hospital
      * @return whether the orc was successfully admitted to the hospital
      */
-    public bool addSickOrc(SickOrc sickOrc)
+    public bool addSickOrc(OrcInhabitant sickOrc)
     {
         if (numAvailableBeds - sickOrcs.Count > 0)
         {
+            sickOrcs.Add(sickOrc);
             sickOrc.setHospital(gameObject);
             return true;
         }
@@ -61,7 +62,7 @@ public class Hospital : MonoBehaviour
      * or due to the orc recovering from sickness.
      * @param sickOrc the orc in question
      */
-    public void removeSickOrc(SickOrc sickOrc)
+    public void removeSickOrc(OrcInhabitant sickOrc)
     {
         sickOrcs.Remove(sickOrc);
         sickOrc.removeHospital();
