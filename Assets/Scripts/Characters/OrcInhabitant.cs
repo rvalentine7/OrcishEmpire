@@ -19,21 +19,12 @@ public class OrcInhabitant
      * @param wait how long this inhabitant has been sick
      * @param atHospital whether the inhabitant is at a hospital
      */
-    public OrcInhabitant()
+    public OrcInhabitant(GameObject home)//just pass in the HouseInformation object?
     {
         this.sickTime = 0;
         this.hospital = null;
-        this.home = null;
-        this.workLocation = null;
-    }
-
-    /**
-     * Sets this orc's home
-     * @param home the home this orc belongs to
-     */
-    public void setHome(GameObject home)
-    {
         this.home = home;
+        this.workLocation = null;
     }
 
     /**
@@ -78,6 +69,8 @@ public class OrcInhabitant
     public void setHospital(GameObject hospital)
     {
         this.hospital = hospital;
+        HouseInformation houseInformation = home.GetComponent<HouseInformation>();
+        houseInformation.updateNumInhabitantsAtHospital(1);
     }
 
     /**
@@ -86,6 +79,8 @@ public class OrcInhabitant
     public void removeHospital()
     {
         this.hospital = null;
+        HouseInformation houseInformation = home.GetComponent<HouseInformation>();
+        houseInformation.updateNumInhabitantsAtHospital(-1);
     }
 
     /**

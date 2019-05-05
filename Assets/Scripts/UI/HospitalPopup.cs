@@ -56,15 +56,15 @@ public class HospitalPopup : MonoBehaviour
         patientsNum.text = "" + hospitalClass.getNumPatients() + "/" + hospitalClass.getNumAvailableBeds();
         if (employment.getNumWorkers() == 0)
         {
-            status.text = "";
+            status.text = "This hospital needs workers in order to help cure sick orcs.";
         }
-        else if (employment.getWorkerCap() > employment.getNumWorkers())
+        else if (employment.getWorkerCap() > employment.getNumHealthyWorkers())
         {
-            status.text = "";
+            status.text = "This hospital has less available beds due to a lack of healthy employees.";
         }
         else
         {
-            status.text = "";
+            status.text = "This hospital is running at peak efficiency.";
         }
     }
 

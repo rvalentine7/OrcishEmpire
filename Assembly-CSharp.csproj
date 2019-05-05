@@ -100,6 +100,7 @@
     <Compile Include="Assets\Scripts\Town\Clicking Objects\HospitalClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\IronMineClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\LumberMillClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\MudBathClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\OchrePitClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\PigFarmClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\PubClick.cs" />
@@ -141,6 +142,7 @@
     <Compile Include="Assets\Scripts\UI\IronMinePopup.cs" />
     <Compile Include="Assets\Scripts\UI\LumberMillPopup.cs" />
     <Compile Include="Assets\Scripts\UI\MarketPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\MudBathPopup.cs" />
     <Compile Include="Assets\Scripts\UI\OchrePitPopup.cs" />
     <Compile Include="Assets\Scripts\UI\PigFarmPopup.cs" />
     <Compile Include="Assets\Scripts\UI\PopulationAndCurrency.cs" />

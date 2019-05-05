@@ -10,7 +10,7 @@ public class HousePopup : MonoBehaviour {
     public Text statusText;
     public Text inhabitantCount;
     public Text sickInhabitantCount;
-    //TODO: add a text for number at hospital (useful for seeing if any are spreading sickness or if they are recovering as fast as possible)
+    public Text atHospitalCount;
     public Text employedInhabCount;
     public Text storageCapacity;
     public Text foodCount;
@@ -66,6 +66,7 @@ public class HousePopup : MonoBehaviour {
         }
         inhabitantCount.text = "" + houseInfo.getNumInhabitants() + "/" + houseInfo.getHouseSize();
         sickInhabitantCount.text = "" + houseInfo.getNumSickInhabitants() + "/" + houseInfo.getNumInhabitants();
+        atHospitalCount.text = "" + houseInfo.getNumInhabitantsAtHospital();
         employedInhabCount.text = "" + houseInfo.getNumEmployedInhabs();
         foodCount.text = "" + storage.getFoodCount();
         waterCount.text = "" + houseInfo.getWaterCount();

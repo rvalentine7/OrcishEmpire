@@ -337,11 +337,11 @@ public class Employment : MonoBehaviour {
                 }
             }
         }
-        if (gameObject.GetComponent<Fountain>() != null && hasWaterAccess/* && numWaterSources == 0*/)
+        if (gameObject.GetComponent<Fountain>() != null && !hasWaterAccess/* && numWaterSources == 0*/)
         {
             gameObject.GetComponent<Fountain>().updateFilled(false);
         }
-        else if (gameObject.GetComponent<MudBath>() != null && hasWaterAccess)
+        else if (gameObject.GetComponent<MudBath>() != null && !hasWaterAccess)
         {
             gameObject.GetComponent<MudBath>().updateFilled(false);
         }

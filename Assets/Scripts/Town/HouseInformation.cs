@@ -106,9 +106,9 @@ public class HouseInformation : MonoBehaviour {
         numCoveredByBarbers = 0;
         nearbyBaths = new List<GameObject>();
         nearbyHospitals = new List<GameObject>();
-        baseHealthPercentage = 39;
-        bathHealthPercentage = 30;
-        barberHealthPercentage = 30;
+        baseHealthPercentage = 39;//69
+        bathHealthPercentage = 30;//15
+        barberHealthPercentage = 30;//15
         numSickInhabitantsAtHospital = 0;
         minSickRecoveryWait = 2;
         maxSickRecoveryWait = 5;
@@ -308,10 +308,9 @@ public class HouseInformation : MonoBehaviour {
 
             }
 
-            //Health (TODO: might need to slow this down later on by setting it to a different timer)
+            //Health (TODO: might need to slow this down later on by setting it to a different timer and giving a new house/new game some time before sickness becomes a factor)
             if (orcInhabitants.Count > 0)
             {
-                //TODO: if an employment has to change how many workers it has, a sick orc might not realize... employments should keep track of which OrcInhabitant they have... OrcInhabitant will be a required class now
                 //If an orc is sick, it has a chance to improve on its own
                 List<int> recoveredOrcIndices = new List<int>();
                 List<OrcInhabitant> sickOrcsNeedingHospitals = new List<OrcInhabitant>();
@@ -365,10 +364,8 @@ public class HouseInformation : MonoBehaviour {
                         Hospital hospital = recoveredOrcHospital.GetComponent<Hospital>();
                         hospital.removeSickOrc(recoveredOrc);
                     }
-                    //Debug.Log("recovered");
                     recoveredOrc.informWorkLocationHealthy();
-                    //Updating sickInhabWorkLocations to remove this orc so that the house does not believe the location is unavailable
-                    //TODO: does this cause issues between houses?
+                    //Updating sickInhabWorkLocations to remove this orc
                     if (recoveredOrc.getWorkLocation() != null && sickInhabWorkLocations[recoveredOrc.getWorkLocation()] > 1)
                     {
                         sickInhabWorkLocations[recoveredOrc.getWorkLocation()]--;
@@ -381,12 +378,12 @@ public class HouseInformation : MonoBehaviour {
                 }
 
                 //Orcs getting sick - 100 represents 100%. Health percentages add up to 99% because there is always a chance of sickness
-                //TODO: orcs that are already sick have make it more likely other orcs get sick... unless they are in a hospital
-                //TODO: the chance of sickness should be lower... way too many orcs getting sick... there should also probably be some sort of buffer at the beginning of a game
-                int chanceOfSickness = 100 - (baseHealthPercentage + bathHealthPercentage + barberHealthPercentage * (numCoveredByBarbers / /*numInhabitants*/orcInhabitants.Count));//TODO: these percentages only get used if the buildings are usable
+                //Sick orcs that are not at a hospital have a greater chance of getting other orcs sick
+                int chanceOfSickness = 100 - (baseHealthPercentage - (sickInhabitants.Count - numSickInhabitantsAtHospital * 5)
+                    + bathHealthPercentage + barberHealthPercentage * (numCoveredByBarbers / orcInhabitants.Count));
                 if (sickInhabitants.Count < orcInhabitants.Count && Random.value * 100 <= chanceOfSickness)
                 {
-                    OrcInhabitant sickOrc = new OrcInhabitant();
+                    OrcInhabitant sickOrc = new OrcInhabitant(gameObject);
                     sickInhabitants.Add(sickOrc);
                     //Inform work location the inhabitant can't work right now
                     List<GameObject> workLocations = new List<GameObject>(inhabWorkLocations.Keys);
@@ -441,7 +438,6 @@ public class HouseInformation : MonoBehaviour {
                         if (employment.getOpenForBusiness() && numJobsAtEmployment > 0)
                         {
                             int numUnemployed = unemployedInhabitants.Count;
-                            int residentsToEmploy = numJobsAtEmployment - numUnemployed;
                             //Case #1: There are less job spots at the employment than the number of unemployed in this house
                             if (numJobsAtEmployment - numUnemployed < 0)
                             {
@@ -550,7 +546,7 @@ public class HouseInformation : MonoBehaviour {
         }
         for (int i = 0; i < num; i++)
         {
-            OrcInhabitant orcInhabitant = new OrcInhabitant();
+            OrcInhabitant orcInhabitant = new OrcInhabitant(gameObject);
             orcInhabitants.Add(orcInhabitant);
             unemployedInhabitants.Add(orcInhabitant);
         }
@@ -882,5 +878,27 @@ public class HouseInformation : MonoBehaviour {
     public int getNumSickInhabitants()
     {
         return sickInhabitants.Count;
+    }
+
+    /**
+     * Updates how many inhabitants are at a hospital
+     * @param num the number of inhabitants to update by
+     */
+    public void updateNumInhabitantsAtHospital(int num)
+    {
+        numSickInhabitantsAtHospital += num;
+        //Just for warning of an issue that might not get caught:
+        if (numSickInhabitantsAtHospital < 0 || numSickInhabitantsAtHospital > orcInhabitants.Count)
+        {
+            Debug.Log("Issue with adding and removing inhabitants to/from hospitals");
+        }
+    }
+
+    /**
+     * Gets the number of inhabitants currently at a hospital
+     */
+    public int getNumInhabitantsAtHospital()
+    {
+        return numSickInhabitantsAtHospital;
     }
 }
