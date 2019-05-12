@@ -19,13 +19,13 @@ public class MudBath : MonoBehaviour
     private Employment employment;
     private bool hasWaterAccess;
     private Condition currentCondition;
-    private Condition previousCondition;
     private enum Condition {WET, DRY};
     private bool hadPriorWorkers;
-    private float timeSinceLastWorkerWasPresent;
     private float timeOfLastRefill;
     private float timeLeftToRefill;
     private float timeUntilDry;
+    private float amountLeftToRefill;
+    private float previousCheckTime;
 
     private void Awake()
     {
@@ -37,15 +37,14 @@ public class MudBath : MonoBehaviour
     void Start()
     {
         currentCondition = Condition.DRY;
-        previousCondition = Condition.DRY;
         hadPriorWorkers = false;
-        timeSinceLastWorkerWasPresent = 0;
+        amountLeftToRefill = timeToKeepWet;
+        previousCheckTime = 0f;
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         employment = gameObject.GetComponent<Employment>();
         if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasPipes())
         {
             hasWaterAccess = true;
-            //gameObject.GetComponent<Employment>().addWaterSource();
         }
         else
         {
@@ -54,15 +53,14 @@ public class MudBath : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()//TODO: fix the time issue (time is ticking and counting towards progress before workers even start working)
+    void Update()
     {
         //If there are no workers, the bath should dry up
-        if (employment.getNumHealthyWorkers() == 0/* || !hasWaterAccess*/)
+        if (employment.getNumHealthyWorkers() == 0 || !hasWaterAccess)
         {
             //If no workers or no workers able to refill (lack of water), time left to refill should increase to timeToKeepWet's value
             if (hadPriorWorkers)
             {
-                timeSinceLastWorkerWasPresent = Time.time;
                 hadPriorWorkers = false;
                 handleServices(false);//doing this here because no worker to provide services even if the bath was still wet
             }
@@ -80,19 +78,25 @@ public class MudBath : MonoBehaviour
             }
         }
         //If it is not alraedy wet or the number of workers is not at its max, we need to keep track of refilling
-        else if (/*hasWaterAccess && */(currentCondition == Condition.DRY || employment.getNumHealthyWorkers() != employment.getWorkerCap()))
+        else if (hasWaterAccess && (currentCondition == Condition.DRY || employment.getNumHealthyWorkers() != employment.getWorkerCap()))
         {
+            if (!hadPriorWorkers)
+            {
+                timeOfLastRefill = Time.time;
+            }
             hadPriorWorkers = true;//there are workers here now
+            //If there were previously no workers or water, start with the time required to refill
             if (timeLeftToRefill == Mathf.Infinity)
             {
-                timeLeftToRefill = timeToKeepWet + (employment.getWorkerCap() - employment.getNumHealthyWorkers()) * employment.getWorkerValue();
+                amountLeftToRefill = timeToKeepWet;
             }
             else
             {
-                timeLeftToRefill = (timeToKeepWet + (employment.getWorkerCap() - employment.getNumHealthyWorkers()) * employment.getWorkerValue()) - (Time.time - timeOfLastRefill);
+                amountLeftToRefill -= (Time.time - previousCheckTime) * ((employment.getNumHealthyWorkers() * 1.0f) / employment.getWorkerCap());
             }
+            previousCheckTime = Time.time;
+            timeLeftToRefill = amountLeftToRefill / ((employment.getNumHealthyWorkers() * 1.0f) / employment.getWorkerCap());
             //Update progress on refilling
-            //timeLeftToRefill = (timeToKeepWet + (employment.getWorkerCap() - employment.getNumHealthyWorkers()) * employment.getWorkerValue()) - (Time.time - timeOfLastRefill);
             if (timeLeftToRefill < 0)
             {
                 timeLeftToRefill = 0;
@@ -101,7 +105,8 @@ public class MudBath : MonoBehaviour
             {
                 timeOfLastRefill = Time.time;
                 currentCondition = Condition.WET;
-                timeLeftToRefill = employment.getNumHealthyWorkers() * employment.getWorkerValue();
+                amountLeftToRefill = timeToKeepWet;
+                timeLeftToRefill = amountLeftToRefill;
                 timeUntilDry = timeToKeepWet;
                 gameObject.GetComponent<SpriteRenderer>().sprite = wetBath;
                 handleServices(true);

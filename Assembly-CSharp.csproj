@@ -90,6 +90,7 @@
     <Compile Include="Assets\Scripts\Town\Barber.cs" />
     <Compile Include="Assets\Scripts\Town\Bridge.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\BarberClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BreweryClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\EggFarmClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FarmClick.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Assets\Scripts\Town\Warehouse.cs" />
     <Compile Include="Assets\Scripts\Town\Well.cs" />
     <Compile Include="Assets\Scripts\UI\ArenaPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\BarberPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BreweryPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ChangeTabs.cs" />
     <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />

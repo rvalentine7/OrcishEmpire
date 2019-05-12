@@ -19,8 +19,8 @@ public class BreweryClick : MonoBehaviour {
                 Destroy(popupObject);
             }
             GameObject popup = Instantiate(productionPopupObject) as GameObject;
-            BreweryPopup weaponsmithPopup = popup.GetComponent<BreweryPopup>();
-            weaponsmithPopup.setBrewery(gameObject);
+            BreweryPopup breweryPopup = popup.GetComponent<BreweryPopup>();
+            breweryPopup.setBrewery(gameObject);
         }
     }
 }

@@ -12,6 +12,7 @@ public class OrcInhabitant
     private GameObject home;
     private GameObject hospital;
     private GameObject workLocation;
+    private Barber barber;
 
     /**
      * Constructor
@@ -25,6 +26,7 @@ public class OrcInhabitant
         this.hospital = null;
         this.home = home;
         this.workLocation = null;
+        this.barber = null;
     }
 
     /**
@@ -81,6 +83,44 @@ public class OrcInhabitant
         this.hospital = null;
         HouseInformation houseInformation = home.GetComponent<HouseInformation>();
         houseInformation.updateNumInhabitantsAtHospital(-1);
+    }
+
+    /**
+     * TODO
+     */
+    public void setBarber(Barber barber)
+    {
+        //set in here and set at the barber
+        if (barber.getNumAvailableCustomerSpots() > 0)
+        {
+            this.barber = barber;
+            barber.addCustomer(this);
+        }
+    }
+
+    /**
+     * TODO
+     */
+    public void removeBarber()
+    {
+        //remove in here and in HouseInformation
+        if (barber != null)
+        {
+            this.home.GetComponent<HouseInformation>().removeOrcCoveredByBarber(this);
+            barber = null;
+        }
+    }
+
+    /**
+     * TODO
+     */
+    public void evictFromHouse()
+    {
+        //remove barber
+        if (barber != null)
+        {
+            barber.removeCustomer(this);
+        }
     }
 
     /**

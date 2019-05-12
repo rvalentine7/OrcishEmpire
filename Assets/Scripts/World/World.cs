@@ -24,6 +24,9 @@ public class World : MonoBehaviour {
     public List<string> mountainousTerrain;
     public List<string> wateryTerrain;
 
+    //Value used by multiple different buildings
+    public const int HEALTH_BUILDING_RADIUS = 15;
+
     //Strings that are used in multiple places
     public const string WORLD_INFORMATION = "WorldInformation";
     public const string JOB_PAYMENT = "Job Payment";

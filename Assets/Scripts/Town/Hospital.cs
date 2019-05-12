@@ -26,6 +26,27 @@ public class Hospital : MonoBehaviour
         numAvailableBeds = 0;
         employment = gameObject.GetComponent<Employment>();
         maxEmployeeNum = employment.getWorkerCap();
+
+        //Search for houses to add this hospital to the nearbyHospitals list
+        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
+        World myWorld = world.GetComponent<World>();
+        GameObject[,] constructArr = myWorld.constructNetwork.getConstructArr();
+        Vector2 hospitalPosition = gameObject.transform.position;
+        int healthBuildingRadius = World.HEALTH_BUILDING_RADIUS + 1;//+1 because it is a 3x3 building unlike the house which is 1x1
+        for (int i = -healthBuildingRadius; i < healthBuildingRadius; i++)
+        {
+            for (int j = -healthBuildingRadius; j < healthBuildingRadius; j++)
+            {
+                if (hospitalPosition.x + i >= 0 && hospitalPosition.y + j >= 0
+                        && hospitalPosition.x + i <= myWorld.mapSize - 1 && hospitalPosition.y + j <= myWorld.mapSize - 1
+                        && constructArr[(int)hospitalPosition.x + i, (int)hospitalPosition.y + j] != null
+                        && constructArr[(int)hospitalPosition.x + i, (int)hospitalPosition.y + j].tag == World.HOUSE)
+                {
+                    HouseInformation houseInfo = constructArr[(int)hospitalPosition.x + i, (int)hospitalPosition.y + j].GetComponent<HouseInformation>();
+                    houseInfo.addHospital(gameObject);
+                }
+            }
+        }
     }
 
     // Update is called once per frame

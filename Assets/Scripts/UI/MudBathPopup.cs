@@ -19,7 +19,6 @@ public class MudBathPopup : MonoBehaviour
     public Sprite activateSprite;
     public Sprite deactivateSprite;
     private bool initialClick;
-    private bool currentlyWet;
 
     // Start is called before the first frame update
     void Start()
@@ -30,7 +29,6 @@ public class MudBathPopup : MonoBehaviour
             panel.SetActive(false);
         }
         initialClick = true;
-        currentlyWet = false;
     }
 
     // Update is called once per frame
@@ -61,18 +59,13 @@ public class MudBathPopup : MonoBehaviour
 
         //The currentlyWet variable will always match up with whether the bath is dry or wet
         MudBath mudBathClass = mudBath.GetComponent<MudBath>();
-        if (currentlyWet != mudBathClass.getWet())
-        {
-            currentlyWet = mudBathClass.getWet();
-            imageOnCanvas.GetComponent<Image>().sprite = (currentlyWet ? wetImage : dryImage);
-        }
         float timeToRefill = mudBathClass.getTimeLeftToRefill();
         timeToRefillNum.text = "" + (timeToRefill < 0 ? "--" : ("" + timeToRefill + "s"));
         float timeUntilDry = mudBathClass.getTimeUntilDry();
         timeUntilDryNum.text = "" + (timeUntilDry == 0 ? "--" : ("" + timeUntilDry + "s"));
         if (employment.getNumWorkers() == 0)
         {
-            status.text = "This mud bath needs workers in order to be open for orcs to bathe in.";
+            status.text = "This mud bath needs workers and water access in order to be open for orcs to bathe in.";
         }
         else if (employment.getWorkerCap() > employment.getNumHealthyWorkers())
         {
