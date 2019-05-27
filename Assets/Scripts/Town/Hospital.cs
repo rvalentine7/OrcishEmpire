@@ -89,6 +89,11 @@ public class Hospital : MonoBehaviour
         sickOrc.removeHospital();
     }
 
+    public void sickOrcLeft(OrcInhabitant sickOrc)
+    {
+        sickOrcs.Remove(sickOrc);
+    }
+
     /**
      * Gets the number of sick orcs recovering at this hospital
      */

@@ -52,17 +52,19 @@ public class BarberPopup : MonoBehaviour
         }
         employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
+        Barber barberClass = barber.GetComponent<Barber>();
+        this.customersNum.text = "" + barberClass.getNumCustomers() + "/" + barberClass.getNumMaxCustomers();
         if (employment.getNumWorkers() == 0)
         {
-            status.text = "";
+            status.text = "No orcs can visit this barber while it has no employees.";
         }
         else if (employment.getWorkerCap() > employment.getNumHealthyWorkers())
         {
-            status.text = "";
+            status.text = "This barber is not serving as many customers as it could due to its lack of employees.";
         }
         else
         {
-            status.text = "";
+            status.text = "This barber is providing haircuts to nearby orcs.";
         }
 
     }

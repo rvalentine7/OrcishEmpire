@@ -198,6 +198,7 @@ public class Employment : MonoBehaviour {
         }
         workerHouses = new Dictionary<GameObject, int>();
         numWorkers = 0;
+        numSickWorkers = 0;
     }
 
     /**

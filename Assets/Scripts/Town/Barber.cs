@@ -2,9 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+ * Helps keep orcs healthy
+ */
 public class Barber : MonoBehaviour
 {
     public int numCustomersPerWorker;
+
+    private Employment employment;
+    private int maxCustomers;
+    private List<OrcInhabitant> customers;
 
     // Start is called before the first frame update
     void Start()
@@ -31,26 +38,76 @@ public class Barber : MonoBehaviour
                 }
             }
         }
+
+        employment = gameObject.GetComponent<Employment>();
+        maxCustomers = employment.getNumHealthyWorkers() * numCustomersPerWorker;
+        customers = new List<OrcInhabitant>();
     }
 
     // Update is called once per frame
     void Update()
     {
         //if there are available customer positions, check houses to see if they have any orcs needing barbers
+        maxCustomers = employment.getNumHealthyWorkers() * numCustomersPerWorker;
+        int numCustomersToRemove = customers.Count - maxCustomers;
+        while (numCustomersToRemove > 0)
+        {
+            OrcInhabitant customer = customers[0];
+            customer.removeBarber();
+            customers.RemoveAt(0);
+            numCustomersToRemove--;
+        }
     }
 
-    public double getNumAvailableCustomerSpots()
+    /**
+     * Gets the number of available customer spots
+     * 
+     * @return the number of available customer spots
+     */
+    public int getNumAvailableCustomerSpots()
     {
-        return 0;
+        return maxCustomers - customers.Count;
     }
 
+    /**
+     * Removes a customer from the barber
+     * 
+     * @param orcInhabitant the customer to remove
+     */
     public void removeCustomer(OrcInhabitant orcInhabitant)
     {
-
+        if (customers.Contains(orcInhabitant))
+        {
+            customers.Remove(orcInhabitant);
+        }
     }
 
+    /**
+     * Adds a customer to the barber
+     * 
+     * @param orcInhabitant the customer to add
+     */
     public void addCustomer(OrcInhabitant orcInhabitant)
     {
+        if (customers.Count < maxCustomers && !customers.Contains(orcInhabitant))
+        {
+            customers.Add(orcInhabitant);
+        }
+    }
 
+    /**
+     * Gets the number of customers using this barber
+     */
+    public int getNumCustomers()
+    {
+        return customers.Count;
+    }
+
+    /**
+     * Gets the maximum number of customers this barber can support
+     */
+    public int getNumMaxCustomers()
+    {
+        return maxCustomers;
     }
 }

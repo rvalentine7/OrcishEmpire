@@ -5,9 +5,12 @@ using UnityEngine;
 /**
  * This class should keep track of recoveries
  * If an orc is considered recovered by this class, notify its home and its hospital (if it has one)
+ * TODO: make sure orcs leaving houses/houses being destroyed results in sick values at health buildings and employments updates correctly
+ * TODO: make sure the health system is updating values correctly
  */
 public class OrcInhabitant
 {
+    private bool healthy;
     private int sickTime;
     private GameObject home;
     private GameObject hospital;
@@ -22,6 +25,7 @@ public class OrcInhabitant
      */
     public OrcInhabitant(GameObject home)//just pass in the HouseInformation object?
     {
+        this.healthy = true;
         this.sickTime = 0;
         this.hospital = null;
         this.home = home;
@@ -86,7 +90,9 @@ public class OrcInhabitant
     }
 
     /**
-     * TODO
+     * Sets the barber this orc visits
+     * 
+     * @param barber the barer this orc visits
      */
     public void setBarber(Barber barber)
     {
@@ -99,7 +105,7 @@ public class OrcInhabitant
     }
 
     /**
-     * TODO
+     * Removes the barber this orc visits
      */
     public void removeBarber()
     {
@@ -112,7 +118,7 @@ public class OrcInhabitant
     }
 
     /**
-     * TODO
+     * Updates information on an orc when it is removed from a house
      */
     public void evictFromHouse()
     {
@@ -120,6 +126,17 @@ public class OrcInhabitant
         if (barber != null)
         {
             barber.removeCustomer(this);
+        }
+        if (hospital != null)
+        {
+            Hospital hospitalClass = hospital.GetComponent<Hospital>();
+            hospitalClass.removeSickOrc(this);
+        }
+        if (workLocation != null && !healthy)
+        {
+            Employment employment = workLocation.GetComponent<Employment>();
+            employment.updateSickWorkers(-1);
+            Debug.Log("updating sick workers");
         }
     }
 
@@ -141,15 +158,51 @@ public class OrcInhabitant
     }
 
     /**
+     * Sets the health status of the orc
+     * @param healthy whether the orc is healthy or sick
+     */
+    public void setHealthy(bool healthy)
+    {
+        this.healthy = healthy;
+        if (this.workLocation != null)
+        {
+            Employment workLocationEmployment = workLocation.GetComponent<Employment>();
+            if (healthy)
+            {
+                workLocationEmployment.updateSickWorkers(-1);
+            }
+            else
+            {
+                workLocationEmployment.updateSickWorkers(1);
+            }
+        }
+    }
+
+    /**
+     * Gets whether the orc is healthy or sick
+     */
+    public bool getHealthy()
+    {
+        return this.healthy;
+    }
+
+    /**
      * Informs the work location this orc works at that it is now healthy
      */
-    public void informWorkLocationHealthy()
+    public void informWorkLocationOfHealth(bool healthy)
     {
         //It is possible this orc is unemployed and will not have a work location
         if (workLocation != null)
         {
             Employment workLocationEmployment = workLocation.GetComponent<Employment>();
-            workLocationEmployment.updateSickWorkers(-1);
+            if (healthy)
+            {
+                workLocationEmployment.updateSickWorkers(1);
+            }
+            else
+            {
+                workLocationEmployment.updateSickWorkers(-1);
+            }
         }
     }
 }
