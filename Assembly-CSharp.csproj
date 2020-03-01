@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\Building\PreConstructedRoads.cs" />
     <Compile Include="Assets\Scripts\Building\ReservoirPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\RoadPlacement.cs" />
+    <Compile Include="Assets\Scripts\Building\WaterBuildingPlacement.cs" />
     <Compile Include="Assets\Scripts\Camera\Controls.cs" />
     <Compile Include="Assets\Scripts\Characters\AstarResult.cs" />
     <Compile Include="Assets\Scripts\Characters\AstarSearch.cs" />
@@ -91,9 +92,11 @@
     <Compile Include="Assets\Scripts\Town\Bridge.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BarberClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\BoatyardClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BreweryClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\EggFarmClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FarmClick.cs" />
+    <Compile Include="Assets\Scripts\Town\Clicking Objects\FishingWharfClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FountainClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\FurnitureWorkshopClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\GladiatorPitClick.cs" />
@@ -129,12 +132,14 @@
     <Compile Include="Assets\Scripts\Town\Well.cs" />
     <Compile Include="Assets\Scripts\UI\ArenaPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BarberPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\BoatyardPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BreweryPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ChangeTabs.cs" />
     <Compile Include="Assets\Scripts\UI\CitizenPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ClosePanel.cs" />
     <Compile Include="Assets\Scripts\UI\EggFarmPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FarmPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\FishingWharfPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FountainPopup.cs" />
     <Compile Include="Assets\Scripts\UI\FurnitureWorkshopPopup.cs" />
     <Compile Include="Assets\Scripts\UI\GladiatorPitPopup.cs" />

@@ -170,7 +170,6 @@ public class BuildingPlacement : MonoBehaviour {
         {
             validPlacement = checkForRawResources("Trees", mousePos, terrainArr);
         }
-        //docks need to be built next to water (Tag: "Water")
 
         //can't place a building on other constructs or water
         int r = 0;
