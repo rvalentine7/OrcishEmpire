@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+/**
+ * Lets the player place buildings that attach to water in the world.
+ */
 public class WaterBuildingPlacement : MonoBehaviour
 {
     public int width;
@@ -52,13 +55,6 @@ public class WaterBuildingPlacement : MonoBehaviour
         {
             //exits out of construction mode if the right mouse button or escape is clicked
             Destroy(gameObject);
-        }
-        //Rotate the building
-        if (Input.GetKey(KeyCode.R))
-        {
-            int tempWidth = this.width;
-            width = height;
-            height = tempWidth;
         }
 
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -179,135 +175,219 @@ public class WaterBuildingPlacement : MonoBehaviour
     {
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
-        
+
+        int tempHeight = 2;
+        int tempWidth = 3;
+
+        direction validWidthDirection = direction.down;
+
         //can't place a building on other constructs or water
-        int waterUnderPlacementCount = 0;
+        bool validPlacementWidth = true;
+        int waterUnderRightCount = 0;
+        int waterUnderLeftCount = 0;
         int r = 0;
-        while (validPlacement && r < height)
+        while (validPlacementWidth && r < tempHeight)
         {
             int c = 0;
-            while (validPlacement && c < width)
+            while (validPlacementWidth && c < tempWidth)
             {
-                //Water should be under the far top or bottom (exclusive or)
-                if (height > width && (r == height - 1 || r == 0)
-                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                    && myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)
-                    && structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] == null)
+                //Water should be under the far top xor bottom
+                if ((c == tempWidth - 1 || c == 0)
+                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] != null
+                    && myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r].tag)
+                    && structureArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] == null)
                 {
-                    waterUnderPlacementCount++;
-                    if (waterUnderPlacementCount == 2)
+                    if (c == tempWidth - 1)
                     {
-                        if (r == height - 1)
-                        {
-                            spriteRenderer.sprite = possibleSpriteNS;
-                            validDirection = direction.up;
-                        }
-                        else
-                        {
-                            spriteRenderer.sprite = possibleSpriteSN;
-                            validDirection = direction.down;
-                        }
-                    }
-                }
-                //Water should be under the far right or left (exclusive or)
-                else if (width > height && (c == width - 1 || c == 0)
-                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                    && myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)
-                    && structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] == null)
-                {
-                    waterUnderPlacementCount++;
-                    if (waterUnderPlacementCount == 2)
-                    {
-                        if (c == width - 1)
+                        waterUnderRightCount++;
+                        if (waterUnderRightCount == 2)
                         {
                             spriteRenderer.sprite = possibleSpriteWE;
-                            validDirection = direction.left;
+                            validWidthDirection = direction.left;
                         }
-                        else
+                    }
+                    else
+                    {
+                        waterUnderLeftCount++;
+                        if (waterUnderLeftCount == 2)
                         {
                             spriteRenderer.sprite = possibleSpriteEW;
-                            validDirection = direction.right;
+                            validWidthDirection = direction.right;
                         }
                     }
                 }
-                //Should be normal, buildable terrain
+                //Should be normal, buildable terrain (the other 4 grid spaces)
                 else
                 {
                     //Mathf.CeilToInt(width / 2.0f - 1) finds the middle square and then that is subtracted from x to get to the edge to start checking the structure array
-                    if (structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                        && (!myWorld.buildableTerrain.Contains(structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
+                    if (structureArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] != null
+                        && (!myWorld.buildableTerrain.Contains(structureArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r].tag)))
                     {
-                        validPlacement = false;
+                        validPlacementWidth = false;
                     }
-                    if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                        && (!myWorld.buildableTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
+                    if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] != null
+                        && (!myWorld.buildableTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r].tag)))
                     {
-                        validPlacement = false;
+                        validPlacementWidth = false;
                     }
                 }
                 c++;
             }
             r++;
         }
-
-        //Need to make sure this doesn't cut off a water route (needs to go 1 row/column further than normal buildings and check if that spot is land or a building)
-        if (validPlacement)
+        if (validWidthDirection == direction.down
+                || (waterUnderRightCount > 0 && waterUnderLeftCount > 0)
+                || (waterUnderRightCount == 1)
+                || (waterUnderRightCount > 2)
+                || (waterUnderLeftCount == 1)
+                || (waterUnderLeftCount > 2))
         {
-            if (height > width)
+            validPlacementWidth = false;
+        }
+        
+        tempHeight = 3;
+        tempWidth = 2;
+        bool validPlacementHeight = true;
+        direction validHeightDirection = direction.left;
+        int waterUnderBotCount = 0;
+        int waterUnderTopCount = 0;
+        r = 0;
+        while (validPlacementHeight && r < tempHeight)
+        {
+            int c = 0;
+            while (validPlacementHeight && c < tempWidth)
             {
-                int c = 0;
-                while (validPlacement && c < width)
+                //Water should be under the far top xor bottom
+                if ((r == tempHeight - 1 || r == 0)
+                    && terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] != null
+                    && myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r].tag)
+                    && structureArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] == null)
                 {
-                    //Check 1 beyond the valid end (r = -1 && r = height)
-                    r = -1;
-                    if (validDirection == direction.up
-                        && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                        && (!myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
-                        || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null)
+                    if (r == tempHeight - 1)
                     {
-                        validPlacement = false;
+                        waterUnderTopCount++;
+                        if (waterUnderTopCount == 2)
+                        {
+                            spriteRenderer.sprite = possibleSpriteSN;
+                            validHeightDirection = direction.up;
+                        }
                     }
-                    r = height;
-                    if (validDirection == direction.down
-                        && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                        && (!myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
-                        || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null)
+                    else
                     {
-                        validPlacement = false;
+                        waterUnderBotCount++;
+                        if (waterUnderBotCount == 2)
+                        {
+                            spriteRenderer.sprite = possibleSpriteNS;
+                            validHeightDirection = direction.down;
+                        }
                     }
-                    c++;
+                }
+                //Should be normal, buildable terrain (the other 4 grid spaces)
+                else
+                {
+                    //Mathf.CeilToInt(width / 2.0f - 1) finds the middle square and then that is subtracted from x to get to the edge to start checking the structure array
+                    if (structureArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] != null
+                        && (!myWorld.buildableTerrain.Contains(structureArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r].tag)))
+                    {
+                        validPlacementHeight = false;
+                    }
+                    if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r] != null
+                        && (!myWorld.buildableTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(tempWidth / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(tempHeight / 2.0f - 1) + r].tag)))
+                    {
+                        validPlacementHeight = false;
+                    }
+                }
+                c++;
+            }
+            r++;
+        }
+        if (validHeightDirection == direction.left
+                || (waterUnderBotCount > 0 && waterUnderTopCount > 0)
+                || (waterUnderBotCount == 1)
+                || (waterUnderBotCount > 2)
+                || (waterUnderTopCount == 1)
+                || (waterUnderTopCount > 2))
+        {
+            validPlacementHeight = false;
+        }
+
+        if (validPlacementHeight && validPlacementWidth)
+        {
+            //Determine which one the mouse is closer to
+            float closestDistanceToWater = float.MaxValue;
+            Vector2 floatMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //"2" and "3" are for width and height.  when checking top/bot, 2 is width.  when checking left/right, 2 is height
+            if (waterUnderBotCount == 2)
+            {
+                float distanceToWater = distance(floatMousePos, new Vector2(mousePos.x - (2 / 2.0f - 1), mousePos.y - (3 / 2.0f - 1)));
+                if (distanceToWater < closestDistanceToWater)
+                {
+                    closestDistanceToWater = distanceToWater;
+                    spriteRenderer.sprite = possibleSpriteNS;
+                    width = 2;
+                    height = 3;
                 }
             }
-            else
+            if (waterUnderRightCount == 2)
             {
-                r = 0;
-                while (validPlacement && r < height)
+                float distanceToWater = distance(floatMousePos, new Vector2(mousePos.x - (3 / 2.0f - 1) + 3 - 1, mousePos.y - (2 / 2.0f - 1)));
+                if (distanceToWater < closestDistanceToWater)
                 {
-                    //Check 1 beyond the valid end (c = -1 && c = width)
-                    int c = -1;
-                    if (validDirection == direction.right
-                        && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                        && (!myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
-                        || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null)
-                    {
-                        validPlacement = false;
-                    }
-                    c = width;
-                    if (validDirection == direction.left
-                        && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                        && (!myWorld.wateryTerrain.Contains(terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag)))
-                        || structureArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null)
-                    {
-                        validPlacement = false;
-                    }
-                    r++;
+                    closestDistanceToWater = distanceToWater;
+                    spriteRenderer.sprite = possibleSpriteWE;
+                    width = 3;
+                    height = 2;
+                }
+            }
+            if (waterUnderLeftCount == 2)
+            {
+                float distanceToWater = distance(floatMousePos, new Vector2(mousePos.x - (3 / 2.0f - 1), mousePos.y - (2 / 2.0f - 1)));
+                if (distanceToWater < closestDistanceToWater)
+                {
+                    closestDistanceToWater = distanceToWater;
+                    spriteRenderer.sprite = possibleSpriteEW;
+                    width = 3;
+                    height = 2;
+                }
+            }
+            if (waterUnderTopCount == 2)
+            {
+                float distanceToWater = distance(floatMousePos, new Vector2(mousePos.x - (2 / 2.0f - 1), mousePos.y - (3 / 2.0f - 1) + 3 - 1));
+                if (distanceToWater < closestDistanceToWater)
+                {
+                    closestDistanceToWater = distanceToWater;
+                    spriteRenderer.sprite = possibleSpriteSN;
+                    width = 2;
+                    height = 3;
                 }
             }
         }
-
-        if (waterUnderPlacementCount != 2)
+        else if (validPlacementHeight)
+        {
+            height = 3;
+            width = 2;
+        }
+        else if (validPlacementWidth)
+        {
+            height = 2;
+            width = 3;
+        }
+        else
         {
             validPlacement = false;
         }
+    }
+
+    /**
+     * Checks the distance between two points.
+     * @param point1 is the first point
+     * @param point2 is the second point
+     * @return the distance between the two points
+     */
+    float distance(Vector2 point1, Vector2 point2)
+    {
+        return Mathf.Sqrt((point2.x - point1.x)
+            * (point2.x - point1.x) + (point2.y - point1.y)
+            * (point2.y - point1.y));
     }
 }
