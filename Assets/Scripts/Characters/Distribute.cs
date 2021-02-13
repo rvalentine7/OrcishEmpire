@@ -8,7 +8,7 @@ using UnityEngine;
 /**
  * Sends a worker from the marketplace to nearby houses to deliver goods.
  */
-public class Distribute : MonoBehaviour {
+public class Distribute : Animated {
     //private Dictionary<string, int> resources;
     private GameObject[,] network;
     private Vector2 originalLocation;
@@ -25,6 +25,7 @@ public class Distribute : MonoBehaviour {
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
     private Dictionary<GameObject, GameObject> locationsToVisit;
+    private Animator animator;
     public float stepSize;
     public int searchRadius;
     public int foodNumToDistribute;//the amount of food distributed based on potential inhabitant count
@@ -41,11 +42,13 @@ public class Distribute : MonoBehaviour {
         changePath = false;
         runningAStar = false;
         headingHome = false;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         locationsToVisit = new Dictionary<GameObject, GameObject>();
+        animator = gameObject.GetComponent<Animator>();
+        gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
 
         /**
          * Get a list of all squares in the worker's travel radius that have houses in a proximity of two
@@ -58,44 +61,44 @@ public class Distribute : MonoBehaviour {
                 if (i > 0 && i < structureArr.GetLength(0) && j > 0 && j < structureArr.GetLength(1))
                 {
                     //TODO: this will need to be updated if I decide to include houses with sizes different from 1x1
-                    if (structureArr[i, j] != null && structureArr[i, j].tag == "House")
+                    if (structureArr[i, j] != null && structureArr[i, j].tag.Equals(World.HOUSE))
                     {
                         Storage houseStorage = structureArr[i, j].GetComponent<Storage>();
-                        if (houseStorage.acceptsResource("Meat", foodNumToDistribute))//only need to check for meat because houses accept all types of food
+                        if (houseStorage.acceptsResource(World.MEAT, foodNumToDistribute))//only need to check for meat because houses accept all types of food
                         {
-                            if (i - 1 > 0 && structureArr[i - 1, j] != null && structureArr[i - 1, j].tag == "Road")
+                            if (i - 1 > 0 && structureArr[i - 1, j] != null && structureArr[i - 1, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i - 1, j]);
                             }
                             else if (i + 1 < structureArr.GetLength(0) && structureArr[i + 1, j] != null
-                                && structureArr[i + 1, j].tag == "Road")
+                                && structureArr[i + 1, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i + 1, j]);
                             }
-                            else if (j - 1 > 0 && structureArr[i, j - 1] != null && structureArr[i, j - 1].tag == "Road")
+                            else if (j - 1 > 0 && structureArr[i, j - 1] != null && structureArr[i, j - 1].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j - 1]);
                             }
                             else if (j + 1 < structureArr.GetLength(1) && structureArr[i, j + 1] != null
-                                && structureArr[i, j + 1].tag == "Road")
+                                && structureArr[i, j + 1].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j + 1]);
                             }
-                            else if (i - 2 > 0 && structureArr[i - 2, j] != null && structureArr[i - 2, j].tag == "Road")
+                            else if (i - 2 > 0 && structureArr[i - 2, j] != null && structureArr[i - 2, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i - 2, j]);
                             }
                             else if (i + 2 < structureArr.GetLength(0) && structureArr[i + 2, j] != null
-                                && structureArr[i + 2, j].tag == "Road")
+                                && structureArr[i + 2, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i + 2, j]);
                             }
-                            else if (j - 2 > 0 && structureArr[i, j - 2] != null && structureArr[i, j - 2].tag == "Road")
+                            else if (j - 2 > 0 && structureArr[i, j - 2] != null && structureArr[i, j - 2].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j - 2]);
                             }
                             else if (j + 2 < structureArr.GetLength(1) && structureArr[i, j + 2] != null
-                                && structureArr[i, j + 2].tag == "Road")
+                                && structureArr[i, j + 2].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j + 2]);
                             }
@@ -105,11 +108,6 @@ public class Distribute : MonoBehaviour {
             }
         }
     }
-
-    
-    void Start () {
-		
-	}
 	
 	/**
      * Runs the distribution orc
@@ -145,6 +143,12 @@ public class Distribute : MonoBehaviour {
         //plan a path to the closest value in locationsToVisit
         if (path == null || path.Count == 0 || changePath == true)
         {
+            animator.SetBool(Animated.MOVING_DOWN, false);
+            animator.SetBool(Animated.MOVING_UP, false);
+            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+            animator.SetBool(Animated.IDLE, true);
+            currentCharacterAnimation = characterAnimation.Idle;
+
             network = new GameObject[myWorld.mapSize, myWorld.mapSize];
             for (int i = 0; i < network.GetLength(0); i++)
             {
@@ -154,7 +158,7 @@ public class Distribute : MonoBehaviour {
                     {
                         network[i, j] = terrainArr[i, j];
                     }
-                    else if (structureArr[i, j].tag != "House")
+                    else if (structureArr[i, j].tag != World.HOUSE)
                     {
                         network[i, j] = structureArr[i, j];
                     }
@@ -249,7 +253,7 @@ public class Distribute : MonoBehaviour {
                 }
                 //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
                 if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                    && (network[(int)nextLocation.x, (int)nextLocation.y].tag != "Building"
+                    && (!network[(int)nextLocation.x, (int)nextLocation.y].tag.Equals(World.BUILDING)
                     || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
                 {
                     //take a step towards the nextLocation
@@ -259,6 +263,57 @@ public class Distribute : MonoBehaviour {
                     Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
                         + unitVector.y * stepSize);
                     gameObject.transform.position = newLocation;
+
+                    //animation
+                    if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Right;
+                    }
+                    else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                    {
+                        //left. needs to flip sprite because it reuses the sprite for moving right
+                        if (!flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Left;
+                    }
+                    else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, true);
+                        currentCharacterAnimation = characterAnimation.Up;
+                    }
+                    else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_DOWN, true);
+                        currentCharacterAnimation = characterAnimation.Down;
+                    }
 
                     //if the agent gets to the next vector then delete it from the path
                     // and go to the next available vector

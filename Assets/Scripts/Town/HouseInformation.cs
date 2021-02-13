@@ -102,9 +102,9 @@ public class HouseInformation : MonoBehaviour {
         nearbyBarbers = new List<GameObject>();
         nearbyBaths = new List<GameObject>();
         nearbyHospitals = new List<GameObject>();
-        baseHealthPercentage = 69;
-        bathHealthPercentage = 15;
-        barberHealthPercentage = 15;
+        baseHealthPercentage = 79;
+        bathHealthPercentage = 10;
+        barberHealthPercentage = 10;
         numSickInhabitantsAtHospital = 0;
         minSickRecoveryWait = 2;
         maxSickRecoveryWait = 5;

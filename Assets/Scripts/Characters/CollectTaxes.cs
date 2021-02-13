@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CollectTaxes : MonoBehaviour {
+/// <summary>
+/// Behavior for an orc to collect taxes from nearby houses
+/// </summary>
+public class CollectTaxes : Animated {
     private GameObject[,] network;
     private Vector2 originalLocation;
     private GameObject placeOfEmployment;
@@ -20,13 +23,14 @@ public class CollectTaxes : MonoBehaviour {
     private Dictionary<GameObject, GameObject> locationsToVisit;
     private float taxPercentage;
     private int goldFromTaxes;
+    private Animator animator;
 
     public float stepSize;
     public int searchRadius;
 
-    /**
-     * Initializes the collect taxes class
-     */
+    /// <summary>
+    /// Initializes the collect taxes class
+    /// </summary>
     private void Awake()
     {
         originalLocation = new Vector2();
@@ -34,12 +38,14 @@ public class CollectTaxes : MonoBehaviour {
         changePath = false;
         runningAStar = false;
         headingHome = false;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         locationsToVisit = new Dictionary<GameObject, GameObject>();
         goldFromTaxes = 0;
+        animator = gameObject.GetComponent<Animator>();
+        gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
 
         /**
          * Get a list of all squares in the worker's travel radius that have houses in a proximity of two
@@ -52,44 +58,44 @@ public class CollectTaxes : MonoBehaviour {
                 if (i > 0 && i < structureArr.GetLength(0) && j > 0 && j < structureArr.GetLength(1))
                 {
                     //TODO: this will need to be updated if I decide to include houses with sizes different from 1x1
-                    if (structureArr[i, j] != null && structureArr[i, j].tag == "House")
+                    if (structureArr[i, j] != null && structureArr[i, j].tag == World.HOUSE)
                     {
                         HouseInformation houseInfo = structureArr[i, j].GetComponent<HouseInformation>();
                         if (houseInfo.getHouseholdCurrency() > 1)//if the house has any money that can be collected. > 1 because it won't take money if only at 1 gold
                         {
-                            if (i - 1 > 0 && structureArr[i - 1, j] != null && structureArr[i - 1, j].tag == "Road")
+                            if (i - 1 > 0 && structureArr[i - 1, j] != null && structureArr[i - 1, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i - 1, j]);
                             }
                             else if (i + 1 < structureArr.GetLength(0) && structureArr[i + 1, j] != null
-                                && structureArr[i + 1, j].tag == "Road")
+                                && structureArr[i + 1, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i + 1, j]);
                             }
-                            else if (j - 1 > 0 && structureArr[i, j - 1] != null && structureArr[i, j - 1].tag == "Road")
+                            else if (j - 1 > 0 && structureArr[i, j - 1] != null && structureArr[i, j - 1].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j - 1]);
                             }
                             else if (j + 1 < structureArr.GetLength(1) && structureArr[i, j + 1] != null
-                                && structureArr[i, j + 1].tag == "Road")
+                                && structureArr[i, j + 1].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j + 1]);
                             }
-                            else if (i - 2 > 0 && structureArr[i - 2, j] != null && structureArr[i - 2, j].tag == "Road")
+                            else if (i - 2 > 0 && structureArr[i - 2, j] != null && structureArr[i - 2, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i - 2, j]);
                             }
                             else if (i + 2 < structureArr.GetLength(0) && structureArr[i + 2, j] != null
-                                && structureArr[i + 2, j].tag == "Road")
+                                && structureArr[i + 2, j].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i + 2, j]);
                             }
-                            else if (j - 2 > 0 && structureArr[i, j - 2] != null && structureArr[i, j - 2].tag == "Road")
+                            else if (j - 2 > 0 && structureArr[i, j - 2] != null && structureArr[i, j - 2].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j - 2]);
                             }
                             else if (j + 2 < structureArr.GetLength(1) && structureArr[i, j + 2] != null
-                                && structureArr[i, j + 2].tag == "Road")
+                                && structureArr[i, j + 2].tag.Equals(World.ROAD))
                             {
                                 locationsToVisit.Add(structureArr[i, j], structureArr[i, j + 2]);
                             }
@@ -99,11 +105,6 @@ public class CollectTaxes : MonoBehaviour {
             }
         }
     }
-
-    // Use this for initialization
-    void Start () {
-        
-	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -113,9 +114,10 @@ public class CollectTaxes : MonoBehaviour {
         }
 	}
 
-    /**
-     * Sends the tax collector orc to each house with gold within its radius to collect taxes
-     */
+    /// <summary>
+    /// Sends the tax collector orc to each house with gold within its radius to collect taxes
+    /// </summary>
+    /// <returns>The delay before continuing to run the method</returns>
     private IEnumerator runCollectTaxes()
     {
         //if the place of employment is destroyed, this gameobject should be as well
@@ -126,6 +128,12 @@ public class CollectTaxes : MonoBehaviour {
         //plan a path to the closest value in locationsToVisit
         if (path == null || path.Count == 0 || changePath == true)
         {
+            animator.SetBool(Animated.MOVING_DOWN, false);
+            animator.SetBool(Animated.MOVING_UP, false);
+            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+            animator.SetBool(Animated.IDLE, true);
+            currentCharacterAnimation = characterAnimation.Idle;
+
             network = new GameObject[myWorld.mapSize, myWorld.mapSize];
             for (int i = 0; i < network.GetLength(0); i++)
             {
@@ -135,7 +143,7 @@ public class CollectTaxes : MonoBehaviour {
                     {
                         network[i, j] = terrainArr[i, j];
                     }
-                    else if (structureArr[i, j].tag != "House")
+                    else if (!structureArr[i, j].tag.Equals(World.HOUSE))
                     {
                         network[i, j] = structureArr[i, j];
                     }
@@ -231,7 +239,7 @@ public class CollectTaxes : MonoBehaviour {
                 }
                 //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
                 if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                    && (network[(int)nextLocation.x, (int)nextLocation.y].tag != "Building"
+                    && (!network[(int)nextLocation.x, (int)nextLocation.y].tag.Equals(World.BUILDING)
                     || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
                 {
                     //take a step towards the nextLocation
@@ -241,6 +249,57 @@ public class CollectTaxes : MonoBehaviour {
                     Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
                         + unitVector.y * stepSize);
                     gameObject.transform.position = newLocation;
+
+                    //animation
+                    if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Right;
+                    }
+                    else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                    {
+                        //left. needs to flip sprite because it reuses the sprite for moving right
+                        if (!flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Left;
+                    }
+                    else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, true);
+                        currentCharacterAnimation = characterAnimation.Up;
+                    }
+                    else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_DOWN, true);
+                        currentCharacterAnimation = characterAnimation.Down;
+                    }
 
                     //if the agent gets to the next vector then delete it from the path
                     // and go to the next available vector
@@ -309,9 +368,9 @@ public class CollectTaxes : MonoBehaviour {
         yield return null;
     }
 
-    /**
-     * Tax nearby houses that have not yet been taxed
-     */
+    /// <summary>
+    /// Tax nearby houses that have not yet been taxed
+    /// </summary>
     private void tax()
     {
         Vector2 currentLocation = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x), Mathf.RoundToInt(gameObject.transform.position.y));
@@ -355,51 +414,51 @@ public class CollectTaxes : MonoBehaviour {
         }
     }
 
-    /**
-     * Updates the gold count of the city based on how much gold has been collected in taxes
-     */
+    /// <summary>
+    /// Updates the gold count of the city based on how much gold has been collected in taxes
+    /// </summary>
     private void updateCityGold()
     {
         TaxCollector taxCollector = placeOfEmployment.GetComponent<TaxCollector>();
         taxCollector.updateCityCurrencyFromTaxes(goldFromTaxes);
         //myWorld.updateCurrency(goldFromTaxes);
     }
-
-    /**
-     * Checks the distance between two points.
-     * @param point1 is the first point
-     * @param point2 is the second point
-     * @return the distance between the two points rounded to an int
-     */
+    
+    /// <summary>
+    /// Checks the distance between two points.
+    /// </summary>
+    /// <param name="point1">point1 is the first point</param>
+    /// <param name="point2">point2 is the second point</param>
+    /// <returns>the distance between the two points rounded to an int</returns>
     int distance(Vector2 point1, Vector2 point2)
     {
         return Mathf.RoundToInt(Mathf.Sqrt((point2.x - point1.x)
             * (point2.x - point1.x) + (point2.y - point1.y)
             * (point2.y - point1.y)));
     }
-
-    /**
-     * Sets the tax percentage this tax collector will be using to collect taxes from houses
-     * @param is the tax percentage (0.0-1.0)
-     */
+    
+    /// <summary>
+    /// Sets the tax percentage this tax collector will be using to collect taxes from houses
+    /// </summary>
+    /// <param name="taxPercentage">the tax percentage (0.0-1.0)</param>
     public void setTaxPercentage(float taxPercentage)
     {
         this.taxPercentage = taxPercentage;
     }
-
-    /**
-     * Sets the place the distribution orc starts at.
-     * @param position is the position the distribution orc spawned in at
-     */
+    
+    /// <summary>
+    /// Sets the place the distribution orc starts at.
+    /// </summary>
+    /// <param name="position">position is the position the distribution orc spawned in at</param>
     public void setOriginalLocation(Vector2 position)
     {
         originalLocation = position;
     }
-
-    /**
-     * Sets the place of employment this distribution orc works for.
-     * @param employment the place of employment
-     */
+    
+    /// <summary>
+    /// Sets the place of employment this distribution orc works for.
+    /// </summary>
+    /// <param name="employment">employment the place of employment</param>
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;

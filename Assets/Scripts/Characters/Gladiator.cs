@@ -41,6 +41,7 @@ public class Gladiator : Animated {
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
+        gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
     }
 
     /**
