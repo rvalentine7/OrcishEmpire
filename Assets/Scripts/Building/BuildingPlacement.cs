@@ -83,7 +83,7 @@ public class BuildingPlacement : MonoBehaviour {
             validPlacement = false;
         }
         //houses can only be built within a distance of 2 from a road in horizontal and vertical directions
-        if (validPlacement && gameObject.name == "BuildHouse(Clone)")
+        if (validPlacement && gameObject.name.Equals("BuildHouse(Clone)"))
         {
             if ((mousePos.x >= myWorld.mapSize - 1 || (mousePos.x + 1 > 0 && mousePos.x + 1 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
                 && (structureArr[(int)mousePos.x + 1, (int)mousePos.y] == null || structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag != "Road")))
@@ -106,7 +106,7 @@ public class BuildingPlacement : MonoBehaviour {
             }
         }
         //iron mines need to be next to "Rocks" terrain
-        if (validPlacement && gameObject.name == "BuildIronMine(Clone)")
+        if (validPlacement && gameObject.name.Equals("BuildIronMine(Clone)"))
         {
             int i = 0;
             bool nearbyMountains = false;
@@ -156,19 +156,24 @@ public class BuildingPlacement : MonoBehaviour {
             }
         }
         //gem mines need to be built next to "GemVein" terrain
-        if (validPlacement && gameObject.name == "BuildGemMine(Clone)")
+        if (validPlacement && gameObject.name.Equals("BuildGemMine(Clone)"))
         {
             validPlacement = checkForRawResources("GemVein", mousePos, terrainArr);
         }
         //ochre pits need to be built next to "OchreHills" terrain
-        if (validPlacement && gameObject.name == "BuildOchrePit(Clone)")
+        if (validPlacement && gameObject.name.Equals("BuildOchrePit(Clone)"))
         {
             validPlacement = checkForRawResources("OchreHills", mousePos, terrainArr);
         }
         //lumberyards need to be built next to "Trees" terrain
-        if (validPlacement && gameObject.name == "BuildLumberMill(Clone)")
+        if (validPlacement && gameObject.name.Equals("BuildLumberMill(Clone)"))
         {
             validPlacement = checkForRawResources("Trees", mousePos, terrainArr);
+        }
+        //buildings using boats must be built next to water
+        if (validPlacement && (gameObject.name.Equals("BuildBoatyard(Clone)") || gameObject.name.Equals("BuildFishingWharf(Clone)")))
+        {
+            validPlacement = checkForRawResources("Water", mousePos, terrainArr);
         }
 
         //can't place a building on other constructs or water
@@ -193,7 +198,7 @@ public class BuildingPlacement : MonoBehaviour {
                 if (validPlacement && gameObject.GetComponent<Farm>() != null)
                 {
                     if (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r] != null
-                        && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag != "FertileLand")
+                        && !terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + c, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + r].tag.Equals("FertileLand"))
                     {
                         validPlacement = false;
                     }
@@ -205,11 +210,11 @@ public class BuildingPlacement : MonoBehaviour {
 
         //reservoirs appear filled when next to water
         bool useFirstSprites = true;
-        if (gameObject.name == "BuildReservoir(Clone)")
+        if (gameObject.name.Equals("BuildReservoir(Clone)"))
         {
             useFirstSprites = checkForRawResources("Water", mousePos, terrainArr);
         }
-        if (gameObject.name == "BuildFountain(Clone)"
+        if (gameObject.name.Equals("BuildFountain(Clone)")
             && !terrainArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Tile>().hasPipes())
         {
             useFirstSprites = false;
@@ -307,7 +312,7 @@ public class BuildingPlacement : MonoBehaviour {
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i < myWorld.mapSize - 1
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i > 0
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }
@@ -316,7 +321,7 @@ public class BuildingPlacement : MonoBehaviour {
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i < myWorld.mapSize - 1
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i > 0
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }
@@ -325,7 +330,7 @@ public class BuildingPlacement : MonoBehaviour {
                 && (int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i > 0
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height < myWorld.mapSize - 1
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }
@@ -334,7 +339,7 @@ public class BuildingPlacement : MonoBehaviour {
                 && (int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i > 0
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1 > 0
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }

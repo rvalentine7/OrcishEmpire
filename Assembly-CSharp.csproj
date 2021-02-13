@@ -89,6 +89,7 @@
     <Compile Include="Assets\Scripts\Town\AStarForWaterBuildings.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
     <Compile Include="Assets\Scripts\Town\Barber.cs" />
+    <Compile Include="Assets\Scripts\Town\Boatyard.cs" />
     <Compile Include="Assets\Scripts\Town\Bridge.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BarberClick.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Assets\Scripts\UI\WeaponsmithPopup.cs" />
     <Compile Include="Assets\Scripts\UI\WellPopup.cs" />
     <Compile Include="Assets\Scripts\UI\WheatFarmPopup.cs" />
+    <Compile Include="Assets\Scripts\World\Animated.cs" />
     <Compile Include="Assets\Scripts\World\ConstructNetwork.cs" />
     <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />
     <Compile Include="Assets\Scripts\World\TerrainSegment.cs" />

@@ -6,7 +6,7 @@ using UnityEngine;
  * A Gladiator is used to move gladiators from a GladiatorPit to an Arena in order to perform
  * fights for entertainment.
  */
-public class Gladiator : MonoBehaviour {
+public class Gladiator : Animated {
     private int numGladiators;
     private bool returnHome;
     private GameObject[,] network;
@@ -23,6 +23,7 @@ public class Gladiator : MonoBehaviour {
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
     public float stepSize;
+    private Animator animator;
 
     /**
      * Initializes the deliver class
@@ -35,7 +36,8 @@ public class Gladiator : MonoBehaviour {
         changePath = false;
         runningAStar = false;
         headingHome = false;
-        world = GameObject.Find("WorldInformation");
+        animator = gameObject.GetComponent<Animator>();
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
@@ -88,6 +90,12 @@ public class Gladiator : MonoBehaviour {
         }
         if (path == null || path.Count == 0 || changePath == true)
         {
+            animator.SetBool(Animated.MOVING_DOWN, false);
+            animator.SetBool(Animated.MOVING_UP, false);
+            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+            animator.SetBool(Animated.IDLE, true);
+            currentCharacterAnimation = characterAnimation.Idle;
+
             //Go to to the arena
             if (!returnHome && runningAStar == false)
             {
@@ -162,6 +170,57 @@ public class Gladiator : MonoBehaviour {
                 Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
                     + unitVector.y * stepSize);
                 gameObject.transform.position = newLocation;
+
+                //animation
+                if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                {
+                    if (flipped)
+                    {
+                        flipSprite();
+                    }
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.MOVING_DOWN, false);
+                    animator.SetBool(Animated.MOVING_UP, false);
+                    animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                    currentCharacterAnimation = characterAnimation.Right;
+                }
+                else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                {
+                    //left. needs to flip sprite because it reuses the sprite for moving right
+                    if (!flipped)
+                    {
+                        flipSprite();
+                    }
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.MOVING_DOWN, false);
+                    animator.SetBool(Animated.MOVING_UP, false);
+                    animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                    currentCharacterAnimation = characterAnimation.Left;
+                }
+                else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                {
+                    if (flipped)
+                    {
+                        flipSprite();
+                    }
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.MOVING_DOWN, false);
+                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                    animator.SetBool(Animated.MOVING_UP, true);
+                    currentCharacterAnimation = characterAnimation.Up;
+                }
+                else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
+                {
+                    if (flipped)
+                    {
+                        flipSprite();
+                    }
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                    animator.SetBool(Animated.MOVING_UP, false);
+                    animator.SetBool(Animated.MOVING_DOWN, true);
+                    currentCharacterAnimation = characterAnimation.Down;
+                }
 
                 //if the agent gets to the next vector then delete it from the path
                 // and go to the next available vector

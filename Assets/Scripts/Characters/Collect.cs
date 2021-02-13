@@ -6,7 +6,7 @@ using UnityEngine;
  * Collect sends the orc to take a resource from another building and return it to the building the orc
  *  originated from.
  */
-public class Collect : MonoBehaviour {
+public class Collect : Animated {
     private Dictionary<string, int> resources;
     private string resourcesToCollect;
     //private int carryingCapacity;
@@ -25,11 +25,9 @@ public class Collect : MonoBehaviour {
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
-    private bool hasGoods;
     public float stepSize;
     public int searchRadius;
-    public Sprite collectorWithGoods;
-    public Sprite collectorWithoutGoods;
+    private Animator animator;
 
     /**
      * Initializes the collector class
@@ -45,12 +43,12 @@ public class Collect : MonoBehaviour {
         reachedGoal = false;
         changePath = false;
         headingHome = false;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
-        hasGoods = false;
-        gameObject.GetComponent<SpriteRenderer>().sprite = collectorWithoutGoods;
+        animator = gameObject.GetComponent<Animator>();
+        gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
     }
 
     /**
@@ -86,6 +84,24 @@ public class Collect : MonoBehaviour {
         }
         if (path == null || path.Count == 0 || changePath == true)
         {
+            animator.SetBool(Animated.MOVING_DOWN, false);
+            animator.SetBool(Animated.MOVING_UP, false);
+            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+            animator.SetBool(Animated.DOWN_OBJECT, false);
+            animator.SetBool(Animated.UP_OBJECT, false);
+            animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+            if (resources.Count == 0)
+            {
+                animator.SetBool(Animated.IDLE, true);
+                animator.SetBool(Animated.IDLE_OBJECT, false);
+            }
+            else
+            {
+                animator.SetBool(Animated.IDLE_OBJECT, true);
+                animator.SetBool(Animated.IDLE, false);
+            }
+            currentCharacterAnimation = characterAnimation.Idle;
+
             if (!reachedGoal && runningAStar == false)
             {
                 yield return StartCoroutine(findPathToStorage(returnPath =>
@@ -139,7 +155,7 @@ public class Collect : MonoBehaviour {
             Vector2 nextLocation = path[0];
             //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
             if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                && (network[(int)nextLocation.x, (int)nextLocation.y].tag != "Building"
+                && (network[(int)nextLocation.x, (int)nextLocation.y].tag != World.BUILDING
                 || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
             {
                 //take a step towards the nextLocation
@@ -149,6 +165,117 @@ public class Collect : MonoBehaviour {
                 Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
                     + unitVector.y * stepSize);
                 gameObject.transform.position = newLocation;
+
+                //animation
+                if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
+                {
+                    if (flipped)
+                    {
+                        flipSprite();
+                    }
+
+                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Right)
+                    {
+                        currentCharacterAnimation = characterAnimation.Right;
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                    }
+                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.RightObject)
+                    {
+                        currentCharacterAnimation = characterAnimation.RightObject;
+                        animator.SetBool(Animated.SIDEWAYS_OBJECT, true);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                    }
+
+                    animator.SetBool(Animated.MOVING_DOWN, false);
+                    animator.SetBool(Animated.MOVING_UP, false);
+                    animator.SetBool(Animated.DOWN_OBJECT, false);
+                    animator.SetBool(Animated.UP_OBJECT, false);
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.IDLE_OBJECT, false);
+                }
+                else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
+                {
+                    //left. needs to flip sprite because it reuses the sprite for moving right
+                    if (!flipped)
+                    {
+                        flipSprite();
+                    }
+
+                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Left)
+                    {
+                        currentCharacterAnimation = characterAnimation.Left;
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                    }
+                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.LeftObject)
+                    {
+                        currentCharacterAnimation = characterAnimation.LeftObject;
+                        animator.SetBool(Animated.SIDEWAYS_OBJECT, true);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                    }
+
+                    animator.SetBool(Animated.MOVING_DOWN, false);
+                    animator.SetBool(Animated.MOVING_UP, false);
+                    animator.SetBool(Animated.DOWN_OBJECT, false);
+                    animator.SetBool(Animated.UP_OBJECT, false);
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.IDLE_OBJECT, false);
+                }
+                else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x))
+                {
+                    if (flipped)
+                    {
+                        flipSprite();
+                    }
+
+                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Up)
+                    {
+                        currentCharacterAnimation = characterAnimation.Up;
+                        animator.SetBool(Animated.MOVING_UP, true);
+                        animator.SetBool(Animated.UP_OBJECT, false);
+                    }
+                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.UpObject)
+                    {
+                        currentCharacterAnimation = characterAnimation.UpObject;
+                        animator.SetBool(Animated.UP_OBJECT, true);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                    }
+
+                    animator.SetBool(Animated.MOVING_DOWN, false);
+                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                    animator.SetBool(Animated.DOWN_OBJECT, false);
+                    animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.IDLE_OBJECT, false);
+                }
+                else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x))
+                {
+                    if (flipped)
+                    {
+                        flipSprite();
+                    }
+
+                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Down)
+                    {
+                        currentCharacterAnimation = characterAnimation.Down;
+                        animator.SetBool(Animated.MOVING_DOWN, true);
+                        animator.SetBool(Animated.DOWN_OBJECT, false);
+                    }
+                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.DownObject)
+                    {
+                        currentCharacterAnimation = characterAnimation.DownObject;
+                        animator.SetBool(Animated.DOWN_OBJECT, true);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                    }
+                    
+                    animator.SetBool(Animated.MOVING_UP, false);
+                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                    animator.SetBool(Animated.UP_OBJECT, false);
+                    animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                    animator.SetBool(Animated.IDLE, false);
+                    animator.SetBool(Animated.IDLE_OBJECT, false);
+                }
 
                 //if the agent gets to the next vector then delete it from the path
                 // and go to the next available vector
@@ -357,10 +484,6 @@ public class Collect : MonoBehaviour {
                         if (resources.Count > 0)
                         {
                             reachedGoal = true;
-                            if (!hasGoods)
-                            {
-                                gameObject.GetComponent<SpriteRenderer>().sprite = collectorWithGoods;
-                            }
                         }
                         yield return StartCoroutine(findPathHome(returnPath =>
                         {
@@ -426,7 +549,7 @@ public class Collect : MonoBehaviour {
                 }
                 //collector workers should not travel over houses during their trip.  as such,
                 // houses are not included in the network
-                else if (structureArr[i, j].tag != "House")
+                else if (structureArr[i, j].tag != World.HOUSE)
                 {
                     network[i, j] = structureArr[i, j];
                 }
@@ -444,7 +567,7 @@ public class Collect : MonoBehaviour {
                         && structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j] != null
                         && structureArr[(int)originalLocation.x - searchRadius + i,
-                        (int)originalLocation.y - searchRadius + j].tag == "Building"
+                        (int)originalLocation.y - searchRadius + j].tag == World.BUILDING
                         && !discoveredDeliveryLocs.Contains(structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j])
                         && structureArr[(int)originalLocation.x - searchRadius + i,

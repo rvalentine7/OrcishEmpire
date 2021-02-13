@@ -5,7 +5,7 @@ using UnityEngine;
 /**
  * Uses A* to form a path which the orc immigrant will then use to move in to a house.
  */
-public class Immigrate : MonoBehaviour {
+public class Immigrate : Animated {
     //TODO: If a part of its path is destroyed at any point in time, it should find a new path.
     private GameObject[,] network;
     private GameObject[,] structureArr;
@@ -15,6 +15,7 @@ public class Immigrate : MonoBehaviour {
     public float stepSize;
     private bool changePath;
     private bool runningAStar;
+    private Animator animator;
 
     /**
      * Instantiates the information necessary for the orc to find its way to its new house.
@@ -23,7 +24,8 @@ public class Immigrate : MonoBehaviour {
         path = new List<Vector2>();
         changePath = false;
         runningAStar = false;
-        GameObject world = GameObject.Find("WorldInformation");
+        animator = gameObject.GetComponent<Animator>();
+        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
@@ -53,6 +55,12 @@ public class Immigrate : MonoBehaviour {
             Vector2 goal = goalObject.transform.position;
             if (path == null || path.Count == 0 || changePath == true)
             {
+                animator.SetBool(Animated.MOVING_DOWN, false);
+                animator.SetBool(Animated.MOVING_UP, false);
+                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                animator.SetBool(Animated.IDLE, true);
+                currentCharacterAnimation = characterAnimation.Idle;
+
                 //What if I had a class attached to this gameobject that A* could call? It would get the path and be able to tell this class when A* is done.
                 // In this case, I would need to have another variable here that says A* is running so I don't keep calling it.  When the special class
                 // used to get data from A* is updated, that class tells the variable A* is done running and updates the "path" variable in this class.
@@ -98,12 +106,12 @@ public class Immigrate : MonoBehaviour {
             {
                 if ((network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)] == null)
                     || (!myWorld.walkableTerrain.Contains(network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag)
-                    && network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag != "House"))
+                    && !network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag.Equals(World.HOUSE)))
                 {
                     changePath = true;
                 }
                 if (changePath && structureArr[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)] != null
-                    && structureArr[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag == "Road")
+                    && structureArr[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag.Equals(World.ROAD))
                 {
                     changePath = false;
                 }
@@ -119,6 +127,57 @@ public class Immigrate : MonoBehaviour {
                     Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
                         + unitVector.y * stepSize);
                     gameObject.transform.position = newLocation;
+                    
+                    //animation
+                    if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Right;
+                    }
+                    else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                    {
+                        //left. needs to flip sprite because it reuses the sprite for moving right
+                        if (!flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Left;
+                    }
+                    else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, true);
+                        currentCharacterAnimation = characterAnimation.Up;
+                    }
+                    else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_DOWN, true);
+                        currentCharacterAnimation = characterAnimation.Down;
+                    }
 
                     //if the agent gets to the next vector2 then delete it from the path
                     // and go to the next available vector2
@@ -132,7 +191,7 @@ public class Immigrate : MonoBehaviour {
                     //the agent has arrived at the goal location
                     if (path.Count == 0)
                     {
-                        if (goalObject.tag == "Building" || goalObject.tag == "House")
+                        if (goalObject.tag.Equals(World.BUILDING) || goalObject.tag.Equals(World.HOUSE))
                         {
                             HouseInformation houseInfo = goalObject.GetComponent<HouseInformation>();
                             OrcInformation orcInfo = gameObject.GetComponent<OrcInformation>();
@@ -147,7 +206,7 @@ public class Immigrate : MonoBehaviour {
         else if (goalObject == null)//house was deleted, find a new place to go to
         {
             //Debug.Log("goal object was deleted, making new goal object");
-            GameObject world = GameObject.Find("WorldInformation");
+            GameObject world = GameObject.Find(World.WORLD_INFORMATION);
             World myWorld = world.GetComponent<World>();
             Vector2 goal = myWorld.exitLocation;
             GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();

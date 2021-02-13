@@ -5,7 +5,7 @@ using UnityEngine;
 /**
  * Uses A* to form a path which the orc emigrant will then use to leave the city.
  */
-public class Emigrate : MonoBehaviour {
+public class Emigrate : Animated {
     //TODO: If a part of its path is destroyed at any point in time, it should find a new path.
     private GameObject[,] network;
     private Vector2 exitLocation;
@@ -14,6 +14,7 @@ public class Emigrate : MonoBehaviour {
     public float stepSize;
     private bool changePath;
     private bool runningAStar;
+    private Animator animator;
 
     /**
      * Instantiates the information necessary for the orc to find its way to its new house.
@@ -23,7 +24,8 @@ public class Emigrate : MonoBehaviour {
         path = new List<Vector2>();
         changePath = false;
         runningAStar = false;
-        GameObject world = GameObject.Find("WorldInformation");
+        animator = gameObject.GetComponent<Animator>();
+        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         exitLocation = myWorld.exitLocation;
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
@@ -57,6 +59,12 @@ public class Emigrate : MonoBehaviour {
         {
             if (path == null || path.Count == 0 || changePath == true)
             {
+                animator.SetBool(Animated.MOVING_DOWN, false);
+                animator.SetBool(Animated.MOVING_UP, false);
+                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                animator.SetBool(Animated.IDLE, true);
+                currentCharacterAnimation = characterAnimation.Idle;
+
                 AstarSearch aStarSearch = new AstarSearch();
                 //y in the following line of code is floored to an int in case I decide to bump up the position by 0.5 when the agent
                 // spawns so that it is walking in the middle of the block (so that it doesn't appear to walk just below the road)
@@ -102,6 +110,57 @@ public class Emigrate : MonoBehaviour {
                     Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
                         + unitVector.y * stepSize);
                     gameObject.transform.position = newLocation;
+
+                    //animation
+                    if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Right;
+                    }
+                    else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                    {
+                        //left. needs to flip sprite because it reuses the sprite for moving right
+                        if (!flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                        currentCharacterAnimation = characterAnimation.Left;
+                    }
+                    else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_DOWN, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, true);
+                        currentCharacterAnimation = characterAnimation.Up;
+                    }
+                    else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
+                    {
+                        if (flipped)
+                        {
+                            flipSprite();
+                        }
+                        animator.SetBool(Animated.IDLE, false);
+                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                        animator.SetBool(Animated.MOVING_UP, false);
+                        animator.SetBool(Animated.MOVING_DOWN, true);
+                        currentCharacterAnimation = characterAnimation.Down;
+                    }
 
                     //if the agent gets to the next vector2 then delete it from the path
                     // and go to the next available vector2

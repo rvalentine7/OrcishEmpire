@@ -17,6 +17,7 @@ public class OrcInformation : MonoBehaviour {
      */
 	void Start () {
         //orcCount = 0;
+        gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
 	}
 	
     /**

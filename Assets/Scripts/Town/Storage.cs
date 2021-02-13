@@ -20,6 +20,7 @@ public class Storage : MonoBehaviour {
     private int ironCount;
     private int ochreCount;
     private int hopsCount;
+    private int boatCount;
     //sellable goods
     private int furnitureCount;
     private int weaponsCount;
@@ -193,7 +194,6 @@ public class Storage : MonoBehaviour {
         }
         if (storageType.Equals("WarPaintWorkshop"))
         {
-            Debug.Log("war paint workshop storage");
             if (name.Equals("Ochre") && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;

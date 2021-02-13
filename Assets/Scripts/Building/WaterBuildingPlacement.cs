@@ -24,7 +24,7 @@ public class WaterBuildingPlacement : MonoBehaviour
     private GameObject world;
     private World myWorld;
     private SpriteRenderer spriteRenderer;
-    private direction validDirection;
+    //private direction validDirection;
 
     private enum direction
     {
@@ -40,10 +40,10 @@ public class WaterBuildingPlacement : MonoBehaviour
     void Start()
     {
         //validPlacement = true;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        validDirection = direction.up;
+        //validDirection = direction.up;
     }
 
     /**
