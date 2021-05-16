@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controls the road sprite and aqueduct information
+/// </summary>
 public class RoadInformation : MonoBehaviour {
     public Sprite cornerRoad;
     public Sprite crossRoad;
@@ -16,20 +19,10 @@ public class RoadInformation : MonoBehaviour {
     private void Awake()
     {
         aqueduct = null;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         mySpriteRenderer = gameObject.GetComponent<SpriteRenderer>();
     }
-
-    // Use this for initialization
-    void Start () {
-        
-    }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     /**
      * Updates the appearance of the roads as they are added so that they line up with one another

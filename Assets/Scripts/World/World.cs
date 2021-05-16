@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * Contains information about the world the player is in.
- */
+/// <summary>
+/// Contains information about the world the player is in.
+/// </summary>
 public class World : MonoBehaviour {
     private int populationCount;
     private float paymentTime;
+
+    //Contains lists of each of the water sections in the map
+    private List<List<WaterTile>> waterSections = new List<List<WaterTile>>();
+    private int lowestEmptyWaterSection = 0;
 
     public float paymentInterval;
     public float taxPercentage;
@@ -47,9 +51,9 @@ public class World : MonoBehaviour {
 
     private PopulationAndCurrency populationAndCurrency;
 
-    /**
-     * Initializes the necessary information for a world.
-     */
+    /// <summary>
+    /// Initializes the necessary information for a world.
+    /// </summary>
     void Awake()
     {
         populationCount = 0;
@@ -73,62 +77,146 @@ public class World : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        //Updates the time at which workers should be paid
 		if (paymentInterval > 0.0f && Time.time > paymentTime)
         {
             paymentTime = Time.time + paymentInterval;
         }
-	}
+    }
 
-    /**
-     * Gets the current population in the city
-     * @return the city's current population
-     */
+    /// <summary>
+    /// Gets the current population in the city
+    /// </summary>
+    /// <returns>the city's current population</returns>
     public int getPopulation()
     {
         return this.populationCount;
     }
 
-    /**
-     * Updates the city's population count
-     * @param populationChange how much the population count should change by
-     */
+    /// <summary>
+    /// Updates the city's population count
+    /// </summary>
+    /// <param name="populationChange">how much the population count should change by</param>
     public void updatePopulation(int populationChange)
     {
         this.populationCount += populationChange;
         populationAndCurrency.updatePopulationCount(this.populationCount);
     }
 
-    /**
-     * Gets the city's currency count
-     * @return currencyCount the amount of currency the city currently has
-     */
+    /// <summary>
+    /// Gets the city's currency count
+    /// </summary>
+    /// <returns>The amount of currency the city currently has</returns>
     public int getCurrency()
     {
         return this.currencyCount;
     }
 
-    /**
-     * Updates the amount of currency in the city
-     * @param currencyChange how much the currency will change by
-     */
+    /// <summary>
+    /// Updates the amount of currency in the city
+    /// </summary>
+    /// <param name="currencyChange">how much the currency will change by</param>
     public void updateCurrency(int currencyChange)
     {
         this.currencyCount += currencyChange;
         populationAndCurrency.updateCurrencyCount(this.currencyCount);
     }
 
-    /**
-     * Get the time at which upkeep should occur and workers should be paid
-     * @return paymentTime the time for pay to go out
-     */
+    /// <summary>
+    /// Get the time at which upkeep should occur and workers should be paid
+    /// </summary>
+    /// <returns>The time for pay to go out</returns>
     public float getPaymentTime()
     {
         return paymentTime;
     }
 
+    /// <summary>
+    /// Gets the tax percentage for the city
+    /// </summary>
+    /// <returns>The tax percentage for the city</returns>
     public float getTaxPercentage()
     {
         return taxPercentage;
+    }
+
+    /// <summary>
+    /// Adds a water tile to a water section based on its number
+    /// </summary>
+    /// <param name="waterTile">The water tile to add</param>
+    public void addToWaterSection(WaterTile waterTile)
+    {
+        int waterSectionIndex = waterTile.getWaterSectionNum();
+        //If the water section index is >= the number of water sections, a new list is needed
+        if (waterSectionIndex == waterSections.Count)
+        {
+            List<WaterTile> waterTiles = new List<WaterTile>();
+            waterTiles.Add(waterTile);
+            waterSections.Add(waterTiles);
+        }
+        else if (waterSectionIndex < waterSections.Count)
+        {
+            waterSections[waterSectionIndex].Add(waterTile);
+        }
+        else
+        {
+            Debug.LogError("World.cs: Trying to add a water section more than 1 index beyond the current highest number index");
+        }
+
+        //If a water section was just added to an empty index. Find the new lowest index after this one
+        if (waterSectionIndex == lowestEmptyWaterSection)
+        {
+            lowestEmptyWaterSection++;
+            bool foundLowest = false;
+            while (lowestEmptyWaterSection < waterSections.Count && !foundLowest)
+            {
+                if (waterSections[lowestEmptyWaterSection].Count == 0)
+                {
+                    foundLowest = true;
+                }
+                lowestEmptyWaterSection++;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Removes a water tile from the associated water section
+    /// </summary>
+    /// <param name="waterTile">The water tile to remove</param>
+    public void removeFromWaterSection(WaterTile waterTile)
+    {
+        int waterSectionIndex = waterTile.getWaterSectionNum();
+        //Index -1 is not stored in the data structure and the index must exist
+        if (waterSectionIndex != -1 && waterSectionIndex < waterSections.Count)
+        {
+            waterSections[waterSectionIndex].Remove(waterTile);
+            //If this becomes empty and is a lower index than the current lowest empty index
+            if (waterSections[waterSectionIndex].Count == 0 && waterSectionIndex < lowestEmptyWaterSection)
+            {
+                lowestEmptyWaterSection = waterSectionIndex;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the number of water tiles in a section
+    /// </summary>
+    /// <param name="waterSectionIndex"></param>
+    /// <returns>The number of water tiles in a section</returns>
+    public int getNumInWaterSection(int waterSectionIndex)
+    {
+        //Can only return a number for water sections that exist and are not part of -1
+        return (waterSectionIndex == -1 || waterSectionIndex >= waterSections.Count) ? -1 : waterSections[waterSectionIndex].Count;
+    }
+
+    /// <summary>
+    /// Gets the lowest empty water section number
+    /// </summary>
+    /// <returns>The lowest empty water section</returns>
+    public int getFirstEmptyWaterSection()
+    {
+        //return waterSections.Count;
+        return lowestEmptyWaterSection;
     }
 
     //with a level manager, I will need getters and setters for information such as "spawnLocation" so that

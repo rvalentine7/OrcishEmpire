@@ -89,8 +89,10 @@
     <Compile Include="Assets\Scripts\Town\AStarForWaterBuildings.cs" />
     <Compile Include="Assets\Scripts\Town\AvailableHome.cs" />
     <Compile Include="Assets\Scripts\Town\Barber.cs" />
+    <Compile Include="Assets\Scripts\Town\BoatRequester.cs" />
     <Compile Include="Assets\Scripts\Town\Boatyard.cs" />
     <Compile Include="Assets\Scripts\Town\Bridge.cs" />
+    <Compile Include="Assets\Scripts\Town\Building.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\ArenaClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BarberClick.cs" />
     <Compile Include="Assets\Scripts\Town\Clicking Objects\BoatyardClick.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Assets\Scripts\Town\Clicking Objects\WheatFarmClick.cs" />
     <Compile Include="Assets\Scripts\Town\Employment.cs" />
     <Compile Include="Assets\Scripts\Town\Farm.cs" />
+    <Compile Include="Assets\Scripts\Town\FishingWharf.cs" />
     <Compile Include="Assets\Scripts\Town\Fountain.cs" />
     <Compile Include="Assets\Scripts\Town\GladiatorPit.cs" />
     <Compile Include="Assets\Scripts\Town\Hospital.cs" />
@@ -167,9 +170,9 @@
     <Compile Include="Assets\Scripts\World\Animated.cs" />
     <Compile Include="Assets\Scripts\World\ConstructNetwork.cs" />
     <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />
-    <Compile Include="Assets\Scripts\World\TerrainSegment.cs" />
     <Compile Include="Assets\Scripts\World\Tile.cs" />
     <Compile Include="Assets\Scripts\World\TreeRemoval.cs" />
+    <Compile Include="Assets\Scripts\World\WaterTile.cs" />
     <Compile Include="Assets\Scripts\World\World.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>D:/GitHub/OrcishEmpire/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>

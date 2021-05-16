@@ -2,22 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Controls information specific to each grid square
+/// </summary>
 public class Tile : MonoBehaviour {
     private GameObject world;
-    private World myWorld;
+    protected World myWorld;
     private GameObject[,] structureArr;
     private int numWaterPipes;//from reservoirs with the purpose of being used by fountains to supply water (numWaterSources)
     private int numWaterSources;//from wells/fountains
     private int desirability;
 
-	// Use this for initialization
-	void Start () {
-        world = GameObject.Find("WorldInformation");
+    //Sprites this tile can appear as
+    public List<Sprite> spriteChoices;
+
+    // Use this for initialization
+    public void Start () {
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         numWaterPipes = 0;
         numWaterSources = 0;
-	}
+
+        //Adds the tile to the terrain array.
+        Vector2 terrainPos = transform.position;
+        myWorld.terrainNetwork.setTerrainArr((int)terrainPos.x, (int)terrainPos.y, gameObject);
+
+        //Assigns a random sprite from the spriteChoices
+        if (spriteChoices.Count > 0)
+        {
+            SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+            int groundSpriteNum = Mathf.FloorToInt(Random.value * spriteChoices.Count);
+            spriteRenderer.sprite = spriteChoices[groundSpriteNum];
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {

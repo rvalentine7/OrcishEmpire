@@ -9,14 +9,9 @@ public class TreeRemoval : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
     }
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
     /**
      * Removes the trees gameobject this script is attached to and replaces it with a ground tile

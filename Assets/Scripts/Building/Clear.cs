@@ -46,7 +46,7 @@ public class Clear : MonoBehaviour {
             }
         }
 
-        GameObject world = GameObject.Find("WorldInformation");
+        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
         World myWorld = world.GetComponent<World>();
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
@@ -130,14 +130,14 @@ public class Clear : MonoBehaviour {
                 }
             }
             //Deleting bridges
-            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HIGH_BRIDGE
-                || structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.LOW_BRIDGE)
+            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag.Equals(World.HIGH_BRIDGE)
+                || structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag.Equals(World.LOW_BRIDGE))
             {
                 structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Bridge>().destroyBridge();
             }
             //If the deleted object is a road, the surrounding roads need to be updated to reflect
             // the fact there is no longer a road where the deleted one was
-            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag == "Road")
+            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag.Equals(World.ROAD))
             {
                 if (structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().getAqueduct() == null
                     && !delayDeletion.ContainsKey(structureArr[(int)mousePos.x, (int)mousePos.y]))
@@ -147,25 +147,25 @@ public class Clear : MonoBehaviour {
                     //go through roads attached to the deleted road to update them visibly
                     //do not update the roads outside building limits
                     if ((int)mousePos.y + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
-                       && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag == "Road")
+                       && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag.Equals(World.ROAD))
                     {
                         //update road above the one you are trying to build
                         structureArr[(int)mousePos.x, (int)mousePos.y + 1].GetComponent<RoadInformation>().updateRoadConnection();
                     }
                     if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
-                        && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag == "Road")
+                        && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag.Equals(World.ROAD))
                     {
                         //update road below the one you are trying to build
                         structureArr[(int)mousePos.x, (int)mousePos.y - 1].GetComponent<RoadInformation>().updateRoadConnection(); ;
                     }
                     if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
-                        && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag == "Road")
+                        && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag.Equals(World.ROAD))
                     {
                         //update road to the left of the one you are trying to build
                         structureArr[(int)mousePos.x - 1, (int)mousePos.y].GetComponent<RoadInformation>().updateRoadConnection();
                     }
                     if ((int)mousePos.x + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
-                        && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag == "Road")
+                        && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag.Equals(World.ROAD))
                     {
                         //update road to the right of the one you are trying to build
                         structureArr[(int)mousePos.x + 1, (int)mousePos.y].GetComponent<RoadInformation>().updateRoadConnection();
@@ -224,7 +224,7 @@ public class Clear : MonoBehaviour {
         if (Input.GetMouseButton(0)
             && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1
             && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
-            && (terrainArr[(int)mousePos.x, (int)mousePos.y].tag == "Trees"))
+            && (terrainArr[(int)mousePos.x, (int)mousePos.y].tag.Equals("Trees")))
         {
             GameObject terrainToClear = terrainArr[(int)mousePos.x, (int)mousePos.y];
             TreeRemoval treeToClear = terrainToClear.GetComponent<TreeRemoval>();

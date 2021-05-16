@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-/**
- * Used to place bridges in the world
- */
+/// <summary>
+/// Used to place bridges in the world
+/// </summary>
 public class BridgePlacement : MonoBehaviour {
     public GameObject bridgeObject;
     public int bridgeSegmentCost;
@@ -36,7 +36,7 @@ public class BridgePlacement : MonoBehaviour {
     void Start () {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         validPlacement = true;
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         placedStartingLocation = false;
         tempBridgeSegments = new Dictionary<Vector2, GameObject>();
@@ -112,9 +112,8 @@ public class BridgePlacement : MonoBehaviour {
         //need to make sure there isn't a road/building already in the place where the bridge is currently located
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
-
-        //bool valid = true;
-        if ((mousePos.x <= 0 && mousePos.x >= myWorld.mapSize && mousePos.y <= 0 && mousePos.y >= myWorld.mapSize))
+        
+        if ((mousePos.x <= 0 && mousePos.x >= myWorld.mapSize && mousePos.y <= 0 && mousePos.y >= myWorld.mapSize))//TODO: when would this if statement ever be true?
         {
             valid = false;
         }
@@ -351,6 +350,12 @@ public class BridgePlacement : MonoBehaviour {
                     placedStartingLocation = false;
                     tempBridgeSegments = new Dictionary<Vector2, GameObject>();
                     spriteRenderer.enabled = true;
+
+                    //If this is a low bridge, we need to update the water sections
+                    if (confirmedBridgeSegments[0].tag.Contains(World.LOW_BRIDGE))
+                    {
+                        updateWaterSections(structureArr, terrainArr, confirmedBridgeSegments);
+                    }
                 }
             }
         }
@@ -500,6 +505,171 @@ public class BridgePlacement : MonoBehaviour {
                         endBridgeSegment.GetComponent<SpriteRenderer>().sprite = validPlacement ? possibleWestConnection : impossibleWestConnection;
                         tempBridgeSegments.Add(endPosition, endBridgeSegment);
                         endingPosition = endPosition;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates the water sections so that only connected bodies of water have the same section number
+    /// </summary>
+    /// <param name="structureArr">The grid for the world that has structures saved in it</param>
+    /// <param name="terrainArr">The grid for the world that has the terrain saved in it</param>
+    /// <param name="bridgeSegments">Each piece of a bridge</param>
+    private void updateWaterSections(GameObject[,] structureArr, GameObject[,] terrainArr, List<GameObject> bridgeSegments)
+    {
+        //Getting all of the water tiles that are under or adjacent to the bridge
+        List<WaterTile> waterTilesUnderTheBridge = new List<WaterTile>();
+        List<WaterTile> waterTiles = new List<WaterTile>();
+        foreach (GameObject bridgeSegment in bridgeSegments)
+        {
+            Vector3 bridgePos = bridgeSegment.transform.position;
+            GameObject firstTerrainObj = terrainArr[(int)bridgePos.x, (int)bridgePos.y];
+            if (myWorld.wateryTerrain.Contains(firstTerrainObj.tag))
+            {
+                waterTilesUnderTheBridge.Add(firstTerrainObj.GetComponent<WaterTile>());
+            }
+            if (bridgePos.x + 1 < myWorld.mapSize - 1)
+            {
+                GameObject secondTerrainObj = terrainArr[(int)bridgePos.x + 1, (int)bridgePos.y];
+                if (myWorld.wateryTerrain.Contains(secondTerrainObj.tag)
+                    && (structureArr[(int)bridgePos.x + 1, (int)bridgePos.y] == null || structureArr[(int)bridgePos.x + 1, (int)bridgePos.y].tag.Equals(World.HIGH_BRIDGE))
+                    && !waterTiles.Contains(secondTerrainObj.GetComponent<WaterTile>()))
+                {
+                    waterTiles.Add(secondTerrainObj.GetComponent<WaterTile>());
+                }
+            }
+            if (bridgePos.x - 1 > 0)
+            {
+                GameObject thirdTerrainObj = terrainArr[(int)bridgePos.x - 1, (int)bridgePos.y];
+                if (myWorld.wateryTerrain.Contains(thirdTerrainObj.tag)
+                    && (structureArr[(int)bridgePos.x - 1, (int)bridgePos.y] == null || structureArr[(int)bridgePos.x - 1, (int)bridgePos.y].tag.Equals(World.HIGH_BRIDGE))
+                    && !waterTiles.Contains(thirdTerrainObj.GetComponent<WaterTile>()))
+                {
+                    waterTiles.Add(thirdTerrainObj.GetComponent<WaterTile>());
+                }
+            }
+            if (bridgePos.y + 1 < myWorld.mapSize - 1)
+            {
+                GameObject fourthTerrainObj = terrainArr[(int)bridgePos.x, (int)bridgePos.y + 1];
+                if (myWorld.wateryTerrain.Contains(fourthTerrainObj.tag)
+                    && (structureArr[(int)bridgePos.x, (int)bridgePos.y + 1] == null || structureArr[(int)bridgePos.x, (int)bridgePos.y + 1].tag.Equals(World.HIGH_BRIDGE))
+                    && !waterTiles.Contains(fourthTerrainObj.GetComponent<WaterTile>()))
+                {
+                    waterTiles.Add(fourthTerrainObj.GetComponent<WaterTile>());
+                }
+            }
+            if (bridgePos.y - 1 > 0)
+            {
+                GameObject fifthTerrainObj = terrainArr[(int)bridgePos.x, (int)bridgePos.y - 1];
+                if (myWorld.wateryTerrain.Contains(fifthTerrainObj.tag)
+                    && (structureArr[(int)bridgePos.x, (int)bridgePos.y - 1] == null || structureArr[(int)bridgePos.x, (int)bridgePos.y - 1].tag.Equals(World.HIGH_BRIDGE))
+                    && !waterTiles.Contains(fifthTerrainObj.GetComponent<WaterTile>()))
+                {
+                    waterTiles.Add(fifthTerrainObj.GetComponent<WaterTile>());
+                }
+            }
+        }
+
+        //Tiles under the bridge get a water section of -1
+        foreach (WaterTile waterUnderTheBridge in waterTilesUnderTheBridge)
+        {
+            //-1 does not go into a water section in World so I don't need to add it to World
+            waterUnderTheBridge.setWaterSectionNum(-1);
+        }
+
+        //updatedTiles is all of the tiles that get their section number updated due to the new bridge
+        List<WaterTile> updatedTiles = new List<WaterTile>();
+        //Updating the sections for the water tiles around the bridge
+        foreach (WaterTile waterTile in waterTiles)
+        {
+            //If the tile hasn't already been accounted for in the floodfill
+            if (!updatedTiles.Contains(waterTile))
+            {
+                List<WaterTile> floodFillList = new List<WaterTile>();
+                floodFillList.Add(waterTile);
+                //Run floodfill with the tile if it hasn't already been updated
+                //fillTiles is the tiles from the current fill
+                List<WaterTile> fillTiles = new List<WaterTile>();
+                while (floodFillList.Count > 0)
+                {
+                    WaterTile nextTile = floodFillList[0];
+                    floodFillList.Remove(nextTile);
+                    //Don't want to repeat tiles that have already been checked
+                    if (!updatedTiles.Contains(nextTile))
+                    {
+                        updatedTiles.Add(nextTile);
+                        fillTiles.Add(nextTile);
+
+                        //Adding adjacent water tiles
+                        Vector3 waterTilePos = nextTile.transform.position;
+                        if (waterTilePos.x + 1 < myWorld.mapSize - 1)
+                        {
+                            GameObject secondTerrainObj = terrainArr[(int)waterTilePos.x + 1, (int)waterTilePos.y];
+                            if (myWorld.wateryTerrain.Contains(secondTerrainObj.tag))
+                            {
+                                WaterTile potentialTile = secondTerrainObj.GetComponent<WaterTile>();
+                                if (potentialTile.getWaterSectionNum() != -1)
+                                {
+                                    floodFillList.Add(potentialTile);
+                                }
+                            }
+                        }
+                        if (waterTilePos.x - 1 > 0)
+                        {
+                            GameObject thirdTerrainObj = terrainArr[(int)waterTilePos.x - 1, (int)waterTilePos.y];
+                            if (myWorld.wateryTerrain.Contains(thirdTerrainObj.tag))
+                            {
+                                WaterTile potentialTile = thirdTerrainObj.GetComponent<WaterTile>();
+                                if (potentialTile.getWaterSectionNum() != -1)
+                                {
+                                    floodFillList.Add(potentialTile);
+                                }
+                            }
+                        }
+                        if (waterTilePos.y + 1 < myWorld.mapSize - 1)
+                        {
+                            GameObject fourthTerrainObj = terrainArr[(int)waterTilePos.x, (int)waterTilePos.y + 1];
+                            if (myWorld.wateryTerrain.Contains(fourthTerrainObj.tag))
+                            {
+                                WaterTile potentialTile = fourthTerrainObj.GetComponent<WaterTile>();
+                                if (potentialTile.getWaterSectionNum() != -1)
+                                {
+                                    floodFillList.Add(potentialTile);
+                                }
+                            }
+                        }
+                        if (waterTilePos.y - 1 > 0)
+                        {
+                            GameObject fifthTerrainObj = terrainArr[(int)waterTilePos.x, (int)waterTilePos.y - 1];
+                            if (myWorld.wateryTerrain.Contains(fifthTerrainObj.tag))
+                            {
+                                WaterTile potentialTile = fifthTerrainObj.GetComponent<WaterTile>();
+                                if (potentialTile.getWaterSectionNum() != -1)
+                                {
+                                    floodFillList.Add(potentialTile);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //Updating water section numbers for the fill tiles
+                int newFillCount = fillTiles.Count;
+                if (newFillCount > 0)
+                {
+                    //Getting the current water section number for these tiles
+                    int waterSectionIndex = fillTiles[0].getWaterSectionNum();
+                    //If there is a different number of tiles here than those for the same section in world, create a new section number based on the first available number
+                    if (newFillCount != myWorld.getNumInWaterSection(waterSectionIndex)) {
+                        waterSectionIndex = myWorld.getFirstEmptyWaterSection();
+
+                        //Go through the tiles from the recent fill and update their section numbers.  These are all a part of the same section
+                        foreach (WaterTile fillTile in fillTiles)
+                        {
+                            fillTile.setWaterSectionNum(waterSectionIndex);
+                        }
                     }
                 }
             }
