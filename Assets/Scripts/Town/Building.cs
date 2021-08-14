@@ -20,4 +20,9 @@ public class Building : MonoBehaviour
     {
         
     }
+
+    public GameObject getGameObject()
+    {
+        return this.gameObject;
+    }
 }

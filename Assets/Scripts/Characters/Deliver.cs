@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * Sends a delivery orc from its current location to the goal where it will deliver goods
- * before returning to its original location.
- */
+/// <summary>
+/// Sends a delivery orc from its current location to the goal where it will deliver goods
+/// before returning to its original location.
+/// </summary>
 public class Deliver : Animated {
     private Dictionary<string, int> resources;
     private GameObject[,] network;
@@ -27,9 +27,9 @@ public class Deliver : Animated {
     public int searchRadius;
     private Animator animator;
 
-    /**
-     * Initializes the deliver class
-     */
+    /// <summary>
+    /// Initializes the deliver class
+    /// </summary>
     void Awake ()
     {
         resources = new Dictionary<string, int>();
@@ -47,9 +47,9 @@ public class Deliver : Animated {
         gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
     }
 
-    /**
-     * Attempts to find the first place to go to
-     */
+    /// <summary>
+    /// Attempts to find the first place to go to
+    /// </summary>
     void Start () {
         animator.SetBool(Animated.MOVING_DOWN, false);
         animator.SetBool(Animated.MOVING_UP, false);
@@ -75,20 +75,21 @@ public class Deliver : Animated {
             path = returnPath;
         }));
     }
-	
-	/**
-     * Runs the delivery orc
-     */
-	void Update () {
+
+    /// <summary>
+    /// Runs the delivery orc
+    /// </summary>
+    void Update () {
         if (runningAStar == false)
         {
             StartCoroutine(runDeliver());
         }
     }
 
-    /**
-     * Plans out the movement and deliver of resources for the delivery orc
-     */
+    /// <summary>
+    /// Plans out the movement and deliver of resources for the delivery orc
+    /// </summary>
+    /// <returns>A delay before resuming method execution</returns>
     private IEnumerator runDeliver()
     {
         //if the place of employment is destroyed, this gameobject should be as well
@@ -391,10 +392,11 @@ public class Deliver : Animated {
         yield return null;
     }
 
-    /**
-     * Finds a place for the delivery orc to go to and creates a path to it.
-     * @parameter returnPath a callback returning the path to the closest storage facility
-     */
+    /// <summary>
+    /// Finds a place for the delivery orc to go to and creates a path to it.
+    /// </summary>
+    /// <param name="returnPath">a callback returning the path to the closest storage facility</param>
+    /// <returns>A delay before resuming method execution</returns>
     private IEnumerator findPathToStorage(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -408,7 +410,7 @@ public class Deliver : Animated {
                 }
                 //delivery workers should not travel over houses during their trip.  as such,
                 // houses are not included in the network
-                else if (structureArr[i, j].tag != "House")
+                else if (!structureArr[i, j].tag.Equals(World.HOUSE))
                 {
                     network[i, j] = structureArr[i, j];
                 }
@@ -426,7 +428,7 @@ public class Deliver : Animated {
                         && structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j] != null
                         && structureArr[(int)originalLocation.x - searchRadius + i,
-                        (int)originalLocation.y - searchRadius + j].tag == "Building"
+                        (int)originalLocation.y - searchRadius + j].tag.Equals(World.BUILDING)
                         && !discoveredDeliverLocs.Contains(structureArr[(int)originalLocation.x - searchRadius + i,
                         (int)originalLocation.y - searchRadius + j])
                         && structureArr[(int)originalLocation.x - searchRadius + i,
@@ -499,10 +501,11 @@ public class Deliver : Animated {
         yield return null;
     }
 
-    /**
-     * Finds a way back to the building that spawned the delivery orc.
-     * @parameter returnPath a callback returning the path to the original location
-     */
+    /// <summary>
+    /// Finds a way back to the building that spawned the delivery orc.
+    /// </summary>
+    /// <param name="returnPath">a callback returning the path to the original location</param>
+    /// <returns>A delay before resuming method execution</returns>
     private IEnumerator findPathHome(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -514,7 +517,7 @@ public class Deliver : Animated {
                 {
                     network[i, j] = terrainArr[i, j];
                 }
-                else if (structureArr[i, j].tag != "House")
+                else if (!structureArr[i, j].tag.Equals(World.HOUSE))
                 {
                     network[i, j] = structureArr[i, j];
                 }
@@ -537,11 +540,11 @@ public class Deliver : Animated {
         yield return new WaitForSeconds(0.05f);
     }
 
-    /**
-     * Adds to the resources the delivery orc is carrying.
-     * @param resourceName is the name of the resource
-     * @param num is the number of a type of resource being carried
-     */
+    /// <summary>
+    /// Adds to the resources the delivery orc is carrying.
+    /// </summary>
+    /// <param name="resourceName">the name of the resource</param>
+    /// <param name="num">the number of a type of resource being carried</param>
     public void addResources(string resourceName, int num)
     {
         if (resources.ContainsKey(resourceName))
@@ -554,11 +557,11 @@ public class Deliver : Animated {
         }
     }
 
-    /**
-     * Removes a resource from the delivery orc.
-     * @param resourceName the resource to be removed
-     * @param num the number of the specific resource to remove
-     */
+    /// <summary>
+    /// Removes a resource from the delivery orc.
+    /// </summary>
+    /// <param name="resourceName">the resource to be removed</param>
+    /// <param name="num">the number of the specific resource to remove</param>
     public void removeResources(string resourceName, int num)
     {
         if (resources.ContainsKey(resourceName))
@@ -571,19 +574,19 @@ public class Deliver : Animated {
         }
     }
 
-    /**
-     * Sets the place the deliver orc starts at.
-     * @param position is the position the delivery orc spawned in at
-     */
+    /// <summary>
+    /// Sets the place the deliver orc starts at.
+    /// </summary>
+    /// <param name="position">the position the delivery orc spawned in at</param>
     public void setOriginalLocation(Vector2 position)
     {
         originalLocation = position;
     }
 
-    /**
-     * Sets the place of employment this delivery orc works for.
-     * @param employment the place of employment
-     */
+    /// <summary>
+    /// Sets the place of employment this delivery orc works for.
+    /// </summary>
+    /// <param name="employment">the place of employment</param>
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;

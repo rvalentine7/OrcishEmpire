@@ -48,6 +48,7 @@ public class World : MonoBehaviour {
     public const string MEAT = "Meat";
     public const string WHEAT = "Wheat";
     public const string EGGS = "Eggs";
+    public const string LUMBER = "Lumber";
 
     private PopulationAndCurrency populationAndCurrency;
 

@@ -137,8 +137,11 @@ public class Bridge : MonoBehaviour {
         structureArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y] = null;
         updateNearbyRoads(gameObject);
 
-        //Updating the water sections under and around the bridge
-        updateWaterSections(terrainArr, waterTilesUnderBridge);
+        //Updating the water sections under and around the bridge.  Only low bridges have to deal with this because boats can't travel under them
+        if (gameObject.tag.Equals(World.LOW_BRIDGE))
+        {
+            updateWaterSections(terrainArr, waterTilesUnderBridge);
+        }
 
         Destroy(gameObject);
     }

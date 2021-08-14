@@ -52,7 +52,7 @@ public class Aqueduct : MonoBehaviour {
 
     private void Awake()
     {
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         topConnection = null;
         botConnection = null;
@@ -235,7 +235,7 @@ public class Aqueduct : MonoBehaviour {
         }
 
         bool overRoad = false;
-        if (structureArr[(int)aqueductPos.x, (int)aqueductPos.y].tag == "Road")
+        if (structureArr[(int)aqueductPos.x, (int)aqueductPos.y].tag.Equals(World.ROAD))
         {
             overRoad = true;
         }

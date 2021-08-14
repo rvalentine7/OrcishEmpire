@@ -38,7 +38,7 @@ public class AstarSearch {
             {
                 //can either make this what characters cannot travel over (buildings)
                 // or make it what they can (roads)
-                if (network[i, j] != null && (network[i, j].tag != World.BUILDING || new Vector2(i, j) == goal
+                if (network[i, j] != null && (!network[i, j].tag.Equals(World.BUILDING) || new Vector2(i, j) == goal
                     || network[i, j] == goalObject))
                 {
                     gScore.Add(new Vector2(i, j), int.MaxValue);
@@ -82,32 +82,32 @@ public class AstarSearch {
             List<Vector2> neighbors = new List<Vector2>();
             //Check neighboring locations to see if they are viable locations
             // to move to.
-            GameObject world = GameObject.Find("WorldInformation");
+            GameObject world = GameObject.Find(World.WORLD_INFORMATION);
             World myWorld = world.GetComponent<World>();
             if (current.x + 1 < myWorld.mapSize && current.y > 0
                 && network[(int)current.x + 1, (int)current.y] != null
-                && (network[(int)current.x + 1, (int)current.y].tag != World.BUILDING || new Vector2(current.x + 1, current.y).Equals(goal)
+                && (!network[(int)current.x + 1, (int)current.y].tag.Equals(World.BUILDING) || new Vector2(current.x + 1, current.y).Equals(goal)
                 || network[(int)current.x + 1, (int)current.y] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x + 1, current.y));
             }
             if (current.x - 1 > 0 && current.y > 0
                 && network[(int)current.x - 1, (int)current.y] != null
-                && (network[(int)current.x - 1, (int)current.y].tag != World.BUILDING || new Vector2(current.x - 1, current.y).Equals(goal)
+                && (!network[(int)current.x - 1, (int)current.y].tag.Equals(World.BUILDING) || new Vector2(current.x - 1, current.y).Equals(goal)
                 || network[(int)current.x - 1, (int)current.y] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x - 1, current.y));
             }
             if (current.y + 1 < myWorld.mapSize && current.x > 0
                 && network[(int)current.x, (int)current.y + 1] != null
-                && (network[(int)current.x, (int)current.y + 1].tag != World.BUILDING || new Vector2(current.x, current.y + 1).Equals(goal)
+                && (!network[(int)current.x, (int)current.y + 1].tag.Equals(World.BUILDING) || new Vector2(current.x, current.y + 1).Equals(goal)
                 || network[(int)current.x, (int)current.y + 1] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x, current.y + 1));
             }
             if (current.y - 1 > 0 && current.x > 0
                 && network[(int)current.x, (int)current.y - 1] != null
-                && (network[(int)current.x, (int)current.y - 1].tag != World.BUILDING || new Vector2(current.x, current.y - 1).Equals(goal)
+                && (!network[(int)current.x, (int)current.y - 1].tag.Equals(World.BUILDING) || new Vector2(current.x, current.y - 1).Equals(goal)
                 || network[(int)current.x, (int)current.y - 1] == goalObject))
             {
                 neighbors.Add(new Vector2(current.x, current.y - 1));
@@ -122,10 +122,10 @@ public class AstarSearch {
                 //If the neighbor location is a road, it is easier for the character
                 // to travel on.
                 int tentativeGScore = 0;
-                if (network[(int)neighbor.x, (int)neighbor.y].tag == World.ROAD
-                    || network[(int)neighbor.x, (int)neighbor.y].tag == World.STAIRS
-                    || network[(int)neighbor.x, (int)neighbor.y].tag == World.HIGH_BRIDGE
-                    || network[(int)neighbor.x, (int)neighbor.y].tag == World.LOW_BRIDGE)
+                if (network[(int)neighbor.x, (int)neighbor.y].tag.Equals(World.ROAD)
+                    || network[(int)neighbor.x, (int)neighbor.y].tag.Equals(World.STAIRS)
+                    || network[(int)neighbor.x, (int)neighbor.y].tag.Equals(World.HIGH_BRIDGE)
+                    || network[(int)neighbor.x, (int)neighbor.y].tag.Equals(World.LOW_BRIDGE))
                 {
                     tentativeGScore = gScore[current] + 1;
                 }

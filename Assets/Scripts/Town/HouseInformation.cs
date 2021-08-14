@@ -102,13 +102,13 @@ public class HouseInformation : MonoBehaviour {
         nearbyBarbers = new List<GameObject>();
         nearbyBaths = new List<GameObject>();
         nearbyHospitals = new List<GameObject>();
-        baseHealthPercentage = 79;
-        bathHealthPercentage = 10;
-        barberHealthPercentage = 10;
+        baseHealthPercentage = 89;
+        bathHealthPercentage = 5;
+        barberHealthPercentage = 5;
         numSickInhabitantsAtHospital = 0;
         minSickRecoveryWait = 2;
         maxSickRecoveryWait = 5;
-        sickRecoveryChance = 25;
+        sickRecoveryChance = 33;
 
         world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();

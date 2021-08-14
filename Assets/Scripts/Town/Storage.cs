@@ -90,18 +90,18 @@ public class Storage : MonoBehaviour {
     public bool acceptsResource(string name, int num)
     {
         bool accepts = false;
-        if (storageType.Equals("Market") || storageType.Equals("Warehouse") || storageType.Equals("House"))
+        if (storageType.Equals("Market") || storageType.Equals("Warehouse") || storageType.Equals(World.HOUSE))
         {
             //foods
-            if (name.Equals("Meat") && num <= storageMax - getCurrentAmountStored())
+            if (name.Equals(World.MEAT) && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
-            if (name.Equals("Wheat") && num <= storageMax - getCurrentAmountStored())
+            if (name.Equals(World.WHEAT) && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
-            if (name.Equals("Eggs") && num <= storageMax - getCurrentAmountStored())
+            if (name.Equals(World.EGGS) && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -119,10 +119,10 @@ public class Storage : MonoBehaviour {
                 accepts = true;
             }
         }
-        if (storageType.Equals("House"))
+        if (storageType.Equals(World.HOUSE))
         {
             HouseInformation houseInfo = GetComponent<HouseInformation>();
-            if (name.Equals("Water") && num <= storageMax && houseInfo.getNumInhabitants() > 0)
+            if (name.Equals(World.WATER) && num <= storageMax && houseInfo.getNumInhabitants() > 0)
             {
                 accepts = true;
             }
@@ -139,7 +139,7 @@ public class Storage : MonoBehaviour {
         if (storageType.Equals("Warehouse"))
         {
             //crafting resources
-            if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
+            if (name.Equals(World.LUMBER) && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -171,9 +171,9 @@ public class Storage : MonoBehaviour {
                 accepts = true;
             }
         }
-        if (storageType.Equals("FurnitureWorkshop"))
+        if (storageType.Equals("FurnitureWorkshop") || storageType.Equals("Boatyard"))
         {
-            if (name.Equals("Lumber") && num <= storageMax - getCurrentAmountStored())
+            if (name.Equals(World.LUMBER) && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -210,15 +210,15 @@ public class Storage : MonoBehaviour {
      */
     public void addResource(string name, int num)
     {
-        if (name.Equals("Meat"))
+        if (name.Equals(World.MEAT))
         {
             meatCount += num;
         }
-        else if (name.Equals("Wheat"))
+        else if (name.Equals(World.WHEAT))
         {
             wheatCount += num;
         }
-        else if (name.Equals("Eggs"))
+        else if (name.Equals(World.EGGS))
         {
             eggCount += num;
         }
@@ -249,7 +249,7 @@ public class Storage : MonoBehaviour {
         {
             weaponsCount += num;
         }
-        else if (name.Equals("Lumber"))
+        else if (name.Equals(World.LUMBER))
         {
             lumberCount += num;
         }
@@ -278,15 +278,15 @@ public class Storage : MonoBehaviour {
      */
     public void removeResource(string name, int num)
     {
-        if (name.Equals("Meat"))
+        if (name.Equals(World.MEAT))
         {
             meatCount -= num;
         }
-        else if (name.Equals("Wheat"))
+        else if (name.Equals(World.WHEAT))
         {
             wheatCount -= num;
         }
-        else if (name.Equals("Eggs"))
+        else if (name.Equals(World.EGGS))
         {
             eggCount -= num;
         }
@@ -310,7 +310,7 @@ public class Storage : MonoBehaviour {
         {
             weaponsCount -= num;
         }
-        else if (name.Equals("Lumber"))
+        else if (name.Equals(World.LUMBER))
         {
             lumberCount -= num;
         }
@@ -339,15 +339,15 @@ public class Storage : MonoBehaviour {
      */
     public int getResourceCount(string resourceName)
     {
-        if (resourceName.Equals("Meat"))
+        if (resourceName.Equals(World.MEAT))
         {
             return getMeatCount();
         }
-        else if (resourceName.Equals("Wheat"))
+        else if (resourceName.Equals(World.WHEAT))
         {
             return getWheatCount();
         }
-        else if (resourceName.Equals("Eggs"))
+        else if (resourceName.Equals(World.EGGS))
         {
             return getEggCount();
         }
@@ -371,7 +371,7 @@ public class Storage : MonoBehaviour {
         {
             return getWeaponCount();
         }
-        else if (resourceName.Equals("Lumber"))
+        else if (resourceName.Equals(World.LUMBER))
         {
             return getLumberCount();
         }
