@@ -15,7 +15,6 @@ public class StandardBoat : Animated
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
     private bool runningAStar;
-    private Vector2 goal;
     private List<Vector2> path;
     private bool changePath;
 
@@ -46,7 +45,7 @@ public class StandardBoat : Animated
     /// </summary>
     void Update()
     {
-        if (runningAStar == false)
+        if (!runningAStar)
         {
             StartCoroutine(travelToRequester());
         }
@@ -108,7 +107,7 @@ public class StandardBoat : Animated
                 + unitVector.y * stepSize);
             gameObject.transform.position = newLocation;
 
-            //animation. TODO: change sprites
+            //animation
             if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
             {
                 //Moving right
@@ -161,7 +160,7 @@ public class StandardBoat : Animated
                     changePath = true;
                 }
             }
-            if (path.Count == 0)
+            if (path.Count == 1)//0 would be the building itself.  We don't want the boat to sail on top of the building
             {
                 //Boat has arrived at its requester
                 boatRequester.standardBoatArrived();
@@ -225,7 +224,6 @@ public class StandardBoat : Animated
         }
 
         //A path exists
-        goal = path[path.Count - 1];
         returnPath(path);
         yield break;
     }

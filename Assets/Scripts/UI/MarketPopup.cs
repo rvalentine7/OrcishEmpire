@@ -74,6 +74,7 @@ public class MarketPopup : MonoBehaviour {
         meatNum.text = "" + storage.getMeatCount();
         wheatNum.text = "" + storage.getWheatCount();
         eggsNum.text = "" + storage.getEggCount();
+        fishNum.text = "" + storage.getFishCount();
     }
 
     /**

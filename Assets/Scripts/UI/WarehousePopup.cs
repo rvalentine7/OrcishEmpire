@@ -81,6 +81,7 @@ public class WarehousePopup : MonoBehaviour {
         meatNum.text = "" + storage.getMeatCount();
         wheatNum.text = "" + storage.getWheatCount();
         eggsNum.text = "" + storage.getEggCount();
+        fishNum.text = "" + storage.getFishCount();
         ironNum.text = "" + storage.getIronCount();
         lumberNum.text = "" + storage.getLumberCount();
         weaponsNum.text = "" + storage.getWeaponCount();

@@ -105,7 +105,7 @@ public class Storage : MonoBehaviour {
             {
                 accepts = true;
             }
-            if (name.Equals("Fish") && num <= storageMax - getCurrentAmountStored())
+            if (name.Equals(World.FISH) && num <= storageMax - getCurrentAmountStored())
             {
                 accepts = true;
             }
@@ -222,6 +222,10 @@ public class Storage : MonoBehaviour {
         {
             eggCount += num;
         }
+        else if (name.Equals(World.FISH))
+        {
+            fishCount += num;
+        }
         else if (name.Equals("Hops"))
         {
             hopsCount += num;
@@ -290,6 +294,10 @@ public class Storage : MonoBehaviour {
         {
             eggCount -= num;
         }
+        else if (name.Equals(World.FISH))
+        {
+            fishCount -= num;
+        }
         else if (name.Equals("Hops"))
         {
             hopsCount -= num;
@@ -298,7 +306,7 @@ public class Storage : MonoBehaviour {
         {
             beerCount -= num;
         }
-        else if (name.Equals("Water"))
+        else if (name.Equals(World.WATER))
         {
             waterCount -= num;
         }
@@ -350,6 +358,10 @@ public class Storage : MonoBehaviour {
         else if (resourceName.Equals(World.EGGS))
         {
             return getEggCount();
+        }
+        else if (resourceName.Equals(World.FISH))
+        {
+            return getFishCount();
         }
         else if (resourceName.Equals("Hops"))
         {
@@ -419,6 +431,15 @@ public class Storage : MonoBehaviour {
     public int getEggCount()
     {
         return eggCount;
+    }
+
+    /// <summary>
+    /// Returns the total amount of fish in storage
+    /// </summary>
+    /// <returns>The amount of fish in storage</returns>
+    public int getFishCount()
+    {
+        return fishCount;
     }
 
     /**

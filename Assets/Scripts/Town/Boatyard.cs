@@ -120,7 +120,6 @@ public class Boatyard : MonoBehaviour
                 //It's your lucky day! We already have a boat waiting to be delivered to your loving hands.
                 if (progress == 100)
                 {
-                    bool canReceiveBoat = boatRequester.canReceiveBoat();
                     spawnBoat(boatRequester, connectionLocation);
                     progress = 0;
                 }

@@ -2,46 +2,103 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Uses boats to gather fish from fishing spots in the water
+/// </summary>
 public class FishingWharf : BoatRequester
 {
     private World myWorld;
-    private StandardBoat standardBoat;//TODO: make standardboat and fishing boat inherit Boat
+    private StandardBoat standardBoat;//TODO: make standardboat and fishing boat inherit Boat?
     private FishingBoat fishingBoat;
     private bool hasBoat;
+    private int numFishingTripsTakenByBoat;
+    private bool hasFish;
+    private Employment employment;
+    private bool fishingBoatWaiting;
 
     public int numFishingTripsBeforeBoatBreaks;
+    public GameObject fishingBoatGameObject;
     public int searchRadius;
+    public GameObject deliveryOrc;
+    public int numResourceProduced;
 
     /// <summary>
-    /// 
+    /// Initializes the building
     /// </summary>
     void Start()
     {
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         hasBoat = false;
+        numFishingTripsTakenByBoat = 0;
+        hasFish = false;
+        employment = gameObject.GetComponent<Employment>();
+        fishingBoatWaiting = false;
     }
 
     /// <summary>
-    /// 
+    /// Logic for what action the building should take at any given point in time
     /// </summary>
     void Update()
     {
-        //TODO: When I look for boatyards, check the water section number.  If the boatyard doesn't have a boat already waiting, give the boatyard the list
-        //      When the boatyard checks if the 
-
-        /*
-         Look for Boatyards
-         Ask if they share a water section
-         If they do, request a boat.
-         If the boat has to cancel (a low bridge was constructed and blocks the path), update() should once again look for viable boatyards
-         */
-
-        //Search for a boat
-        if (!hasBoat)
+        if (employment.getNumHealthyWorkers() > 0)
         {
-            StartCoroutine(findStandardBoat());
+            //Handling delivery orcs
+            if (hasFish && !employment.getWorkerDeliveringGoods())
+            {
+                //We got fish to deliver
+                createDeliveryOrc();
+                hasFish = false;
+            }
+
+            //Handling boats
+            if (!hasBoat)
+            {
+                //Search for a boat
+                StartCoroutine(findStandardBoat());
+            }
+            else if (hasBoat)
+            {
+                if (fishingBoatWaiting)
+                {
+                    if (!hasFish)
+                    {
+                        takeFishFromBoat();
+                    }
+                }
+                else if (standardBoat == null && fishingBoat == null && !hasFish)
+                {
+                    //We have a boat, but we're not fishing. Try to fish
+                    Vector2 fishingBoatSpawnLocation = findBoatSpawnPosition();
+                    GameObject newFishingBoat = Instantiate(fishingBoatGameObject, new Vector2(fishingBoatSpawnLocation.x, fishingBoatSpawnLocation.y), Quaternion.identity);
+                    fishingBoat = newFishingBoat.GetComponent<FishingBoat>();
+                    fishingBoat.setFishingWharf(gameObject);
+                }
+            }
         }
-        
+    }
+
+    /// <summary>
+    /// The fishing boat returned with fish.  This updates numbers associated with the fishing boat successfully returning from a fishing trip
+    /// </summary>
+    public void fishingBoatReturnedWithFish()
+    {
+        fishingBoatWaiting = true;
+    }
+
+    /// <summary>
+    /// Takes the fish from the fishing boat
+    /// </summary>
+    private void takeFishFromBoat()
+    {
+        fishingBoatWaiting = false;
+        fishingBoat.destroyFishingBoat();
+        fishingBoat = null;
+        hasFish = true;
+        if (++numFishingTripsTakenByBoat >= numFishingTripsBeforeBoatBreaks)
+        {
+            numFishingTripsTakenByBoat = 0;
+            hasBoat = false;
+        }
     }
 
     /// <summary>
@@ -50,7 +107,7 @@ public class FishingWharf : BoatRequester
     /// <returns>A time delay to split this search over multiple frames</returns>
     private IEnumerator findStandardBoat()
     {
-        //checks for the closest warehouse
+        //checks for the closest boatyard
         List<GameObject> discoveredDeliverLocs = new List<GameObject>();
         Vector2 fishingWharfLocation = gameObject.transform.position;
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
@@ -154,9 +211,9 @@ public class FishingWharf : BoatRequester
     }
 
     /// <summary>
-    /// 
+    /// Receive a StandardBoat that can be used by this building
     /// </summary>
-    /// <param name="boat"></param>
+    /// <param name="boat">The boat to be used by this building</param>
     public override void receiveBoat(StandardBoat boat)
     {
         standardBoat = boat;
@@ -164,17 +221,16 @@ public class FishingWharf : BoatRequester
     }
 
     /// <summary>
-    /// 
+    /// A standard boat has arrived.  We can forget about the standard boat now
+    /// as we still know hasBoat is true
     /// </summary>
     public override void standardBoatArrived()
     {
-        //TODO: convert to fishing boat
         standardBoat = null;
-        Debug.Log("Standard boat arrived!");
     }
 
     /// <summary>
-    /// 
+    /// Removes a standard boat from this building and updates hasBoat to be false
     /// </summary>
     public override void cancelStandardBoat()
     {
@@ -183,7 +239,16 @@ public class FishingWharf : BoatRequester
     }
 
     /// <summary>
-    /// 
+    /// Removes a fishing boat from this building and updates hasBoat to be false
+    /// </summary>
+    public void removeFishingBoat()
+    {
+        fishingBoat = null;
+        hasBoat = false;
+    }
+
+    /// <summary>
+    /// Returns the location a boat will be received by this building
     /// </summary>
     /// <param name="waterSection"></param>
     /// <returns></returns>
@@ -252,20 +317,10 @@ public class FishingWharf : BoatRequester
     }
 
     /// <summary>
-    /// 
-    /// </summary>
-    public void removeBoat()
-    {
-        standardBoat = null;
-        //TODO: fishingboat should be null, too
-        hasBoat = false;
-    }
-
-    /// <summary>
     /// Finds a valid position to spawn a boat
     /// </summary>
     /// <returns>A valid position to spawn a boat</returns>
-    private Vector2 findBoatSpawnPosition()//TODO: this will need to consider water section numbers
+    private Vector2 findBoatSpawnPosition()
     {
         GameObject world = GameObject.Find(World.WORLD_INFORMATION);
         World myWorld = world.GetComponent<World>();
@@ -331,11 +386,138 @@ public class FishingWharf : BoatRequester
     }
 
     /// <summary>
+    /// Creates an orc to carry resources from the production site to a storage location.
+    /// This building favors placing an orc at the first available road segment
+    /// it finds in the order of: bottom, top, left, right
+    /// </summary>
+    private void createDeliveryOrc()
+    {
+        GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
+        int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
+        int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
+        //checking areas around the farm to place an orc on a road
+        Vector2 employmentPos = gameObject.transform.position;
+        bool foundSpawn = false;
+        Vector2 spawnPosition = new Vector2();
+        int i = 0;
+        while (!foundSpawn && i < width)
+        {
+            //checking the row below the gameObject
+            if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)] != null
+                && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)].tag.Equals(World.ROAD))
+            {
+                spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1));
+                foundSpawn = true;
+            }
+            //checking the row above the gameObject
+            else if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)] != null
+                && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)].tag.Equals(World.ROAD))
+            {
+                spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1));
+                foundSpawn = true;
+            }
+            i++;
+        }
+        int j = 0;
+        while (!foundSpawn && j < height)
+        {
+            //checking the column to the left of the gameObject
+            if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)] != null
+                && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag.Equals(World.ROAD))
+            {
+                spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j));
+                foundSpawn = true;
+            }
+            //checking the column to the right of the gameObject
+            else if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 0.5f) + 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)] != null
+                && structArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 0.5f) + 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag.Equals(World.ROAD))
+            {
+                spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 0.5f) + 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j));
+                foundSpawn = true;
+            }
+            j++;
+        }
+
+        GameObject newDeliveryOrc = Instantiate(deliveryOrc, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
+        Deliver deliver = newDeliveryOrc.GetComponent<Deliver>();
+        deliver.addResources(World.FISH, numResourceProduced);
+        deliver.setOriginalLocation(spawnPosition);
+        deliver.setOrcEmployment(gameObject);
+        employment.setWorkerDeliveringGoods(true);
+    }
+
+    /// <summary>
+    /// Gets the employment for the fishing wharf
+    /// </summary>
+    /// <returns>The employment for the fishing wharf</returns>
+    public Employment getEmployment()
+    {
+        return employment;
+    }
+
+    /// <summary>
+    /// Gets whether this building has a boat tied to it
+    /// </summary>
+    /// <returns>Whether the building has a boat tied to it</returns>
+    public bool getHasBoat()
+    {
+        return this.hasBoat;
+    }
+
+    /// <summary>
+    /// Gets whether the fishing boat is waiting to drop off fish at the building
+    /// </summary>
+    /// <returns>Whether the fishing boat is waiting to drop off fish at the building</returns>
+    public bool getFishingBoatWaiting()
+    {
+        return this.fishingBoatWaiting;
+    }
+
+    /// <summary>
+    /// Gets whether the fishing boat is out fishing
+    /// </summary>
+    /// <returns>Whether the fishing boat is out fishing</returns>
+    public bool getFishingBoatOutFishing()
+    {
+        return fishingBoat;
+    }
+
+    /// <summary>
+    /// Gets whether a standard boat exists
+    /// </summary>
+    /// <returns>Whether a standard boat exists</returns>
+    public bool getStandardBoat()
+    {
+        return standardBoat;
+    }
+
+    /// <summary>
     /// Returns the progress the fishing boat has made in gathering fish
     /// </summary>
     /// <returns>The progress the fishing boat has made in gathering fish</returns>
     public double getProgressNum()
     {
-        return 0.0;
+        double progressNum = 0.0;
+        if (hasFish)
+        {
+            progressNum = 100.0;
+        }
+        else if (fishingBoat != null)
+        {
+            progressNum = fishingBoat.getProgressNum();
+        }
+        return progressNum;
     }
 }

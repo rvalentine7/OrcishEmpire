@@ -447,7 +447,6 @@ public class Distribute : Animated {
                     houseStorage.addResource("Wheat", employmentStorage.getWheatCount());
                     employmentStorage.removeResource("Wheat", employmentStorage.getWheatCount());
                 }
-                //
                 if (employmentStorage.getEggCount() >= foodNumToDistribute * houseSize
                     && houseStorage.acceptsResource("Eggs", foodNumToDistribute * houseSize))
                 {
@@ -459,6 +458,18 @@ public class Distribute : Animated {
                 {
                     houseStorage.addResource("Eggs", employmentStorage.getEggCount());
                     employmentStorage.removeResource("Eggs", employmentStorage.getEggCount());
+                }
+                if (employmentStorage.getFishCount() >= foodNumToDistribute * houseSize
+                    && houseStorage.acceptsResource(World.FISH, foodNumToDistribute * houseSize))
+                {
+                    houseStorage.addResource(World.FISH, foodNumToDistribute * houseSize);
+                    employmentStorage.removeResource(World.FISH, foodNumToDistribute * houseSize);
+                }
+                else if (employmentStorage.getFishCount() > 0
+                    && houseStorage.acceptsResource(World.FISH, foodNumToDistribute * houseSize))
+                {
+                    houseStorage.addResource(World.FISH, employmentStorage.getFishCount());
+                    employmentStorage.removeResource(World.FISH, employmentStorage.getFishCount());
                 }
                 //TODO: add other types of food
             }

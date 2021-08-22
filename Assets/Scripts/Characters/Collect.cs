@@ -350,6 +350,22 @@ public class Collect : Animated {
                                     remainingCapacity -= eggCount;
                                 }
                             }
+                            if (storage.getFishCount() > 0)
+                            {
+                                int fishCount = storage.getFishCount();
+                                if (fishCount > remainingCapacity)
+                                {
+                                    resources.Add(World.FISH, remainingCapacity);
+                                    storage.removeResource(World.FISH, remainingCapacity);
+                                    remainingCapacity = 0;
+                                }
+                                else
+                                {
+                                    resources.Add(World.FISH, fishCount);
+                                    storage.removeResource(World.FISH, fishCount);
+                                    remainingCapacity -= fishCount;
+                                }
+                            }
                             //TODO: when more types of food are added, account for those here
                         }
                         if (resourcesToCollect.Equals("Iron") && storage.getIronCount() > 0)
@@ -714,7 +730,7 @@ public class Collect : Animated {
                 {
                     network[i, j] = terrainArr[i, j];
                 }
-                else if (structureArr[i, j].tag != "House")
+                else if (!structureArr[i, j].tag.Equals(World.HOUSE))
                 {
                     network[i, j] = structureArr[i, j];
                 }

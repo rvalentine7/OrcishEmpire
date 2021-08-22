@@ -42,12 +42,14 @@ public class World : MonoBehaviour {
     public const string LOW_BRIDGE = "LowBridge";
     public const string HIGH_BRIDGE = "HighBridge";
     public const string WATER = "Water";
+    public const string FISHING_SPOT = "FishingSpot";
     public const string BUILD_OBJECT = "BuildObject";
     public const string POPUP = "Popup";
     public const string BUILD_PANEL = "BuildPanel";
     public const string MEAT = "Meat";
     public const string WHEAT = "Wheat";
     public const string EGGS = "Eggs";
+    public const string FISH = "Fish";
     public const string LUMBER = "Lumber";
 
     private PopulationAndCurrency populationAndCurrency;
@@ -72,14 +74,14 @@ public class World : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+    void Start() {
+
+    }
+
+    // Update is called once per frame
+    void Update() {
         //Updates the time at which workers should be paid
-		if (paymentInterval > 0.0f && Time.time > paymentTime)
+        if (paymentInterval > 0.0f && Time.time > paymentTime)
         {
             paymentTime = Time.time + paymentInterval;
         }
@@ -218,6 +220,16 @@ public class World : MonoBehaviour {
     {
         //return waterSections.Count;
         return lowestEmptyWaterSection;
+    }
+
+    /// <summary>
+    /// Gets the distance between two points
+    /// </summary>
+    /// <param name="firstLocation">The first point</param>
+    /// <param name="secondLocation">The second point</param>
+    /// <returns>The distance between two points</returns>
+    public float getDistanceBetweenPoints(Vector2 firstLocation, Vector2 secondLocation) {
+        return Mathf.Sqrt(Mathf.Pow(secondLocation.x - firstLocation.x, 2) + Mathf.Pow(secondLocation.y - firstLocation.y, 2));
     }
 
     //with a level manager, I will need getters and setters for information such as "spawnLocation" so that

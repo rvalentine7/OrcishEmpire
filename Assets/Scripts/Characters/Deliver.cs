@@ -301,9 +301,7 @@ public class Deliver : Animated {
 
                 //if the agent gets to the next vector then delete it from the path
                 // and go to the next available vector
-                float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
-                    * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
-                    * (nextLocation.y - gameObject.transform.position.y));
+                float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, nextLocation);
                 bool nextIsGoal = false;
                 if (nextLocation == goal || (network[(int)nextLocation.x, (int)nextLocation.y] != null
                     && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))

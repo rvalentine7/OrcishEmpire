@@ -64,15 +64,15 @@ public class BoatyardPopup : MonoBehaviour
         lumberNum.text = "" + storage.getLumberCount();
         if (employment.getNumWorkers() == 0)
         {
-            status.text = "Without any employees, this workshop cannot produce any furniture.";
+            status.text = "Without any employees, this boatyard cannot produce any boats.";
         }
         else if (employment.getWorkerCap() > employment.getNumWorkers())
         {
-            status.text = "This workshop is producing slowly due to a lack of employees.";
+            status.text = "This boatyard is producing slowly due to a lack of employees.";
         }
         else
         {
-            status.text = "This workshop is producing furniture at peak efficiency.";
+            status.text = "This boatyard is producing boats at peak efficiency.";
         }
     }
 
