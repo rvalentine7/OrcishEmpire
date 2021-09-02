@@ -65,15 +65,15 @@ public class FishingWharfPopup : MonoBehaviour
         }
         else if (fishingWharf.getStandardBoat())
         {
-            status.text = "This fishing wharf is waiting on a boat to arrive in order to start fishing";
+            status.text = "This fishing wharf is waiting on a boat to arrive in order to start fishing.";
         }
         else if (fishingWharf.getFishingBoatWaiting())
         {
-            status.text = "The fishing boat is waiting on a delivery orc to take the fish from the boat";
+            status.text = "The fishing boat is waiting on a delivery orc to take the fish from the boat.";
         }
         else if (fishingWharf.getFishingBoatOutFishing())
         {
-            status.text = "The fishing boat is out fishing";
+            status.text = "The fishing boat is out fishing.";
         }
         else if (fishingWharf.getProgressNum() == 100 && !fishingWharf.getFishingBoatOutFishing())
         {

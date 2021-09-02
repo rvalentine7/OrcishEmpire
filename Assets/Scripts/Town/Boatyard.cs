@@ -10,12 +10,10 @@ public class Boatyard : MonoBehaviour
     public GameObject collectorOrc;
     public GameObject boat;
     public int collectorCarryCapacity;
-    public float timeInterval;
+    public float timeToProduce;
     public string requiredResourceName;
-    private int progress;
-    private float checkTime;
-    private int numWorkers;
-    private int workerValue;
+    private float progress;
+    private float prevUpdateTime;
     private Employment employment;
     private Storage storage;
     private int requiredResourcesInUse;
@@ -33,10 +31,8 @@ public class Boatyard : MonoBehaviour
     {
         employment = gameObject.GetComponent<Employment>();
         storage = gameObject.GetComponent<Storage>();
-        progress = 0;
-        checkTime = 0.0f;
-        numWorkers = employment.getNumHealthyWorkers();
-        workerValue = employment.getWorkerValue();
+        progress = 0.0f;
+        prevUpdateTime = 0.0f;
         requiredResourcesInUse = 0;
         orcMovingGoods = false;
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
@@ -49,12 +45,12 @@ public class Boatyard : MonoBehaviour
     /// <summary>
     /// Collects lumber, creates boats, and delivers boats to any buildings waiting on them
     /// </summary>
-    void Update()
+    void Update()//TODO: enable/disable
     {
         orcMovingGoods = employment.getWorkerDeliveringGoods();
-        numWorkers = employment.getNumHealthyWorkers();
+        int numHealthyWorkers = employment.getNumHealthyWorkers();
         //Collect goods
-        if (numWorkers > 0 && storage.getResourceCount(requiredResourceName) < storage.getStorageMax() && orcMovingGoods == false)
+        if (numHealthyWorkers > 0 && storage.getResourceCount(requiredResourceName) < storage.getStorageMax() && orcMovingGoods == false)
         {
             employment.setWorkerDeliveringGoods(true);
             createCollectionOrc();
@@ -87,21 +83,21 @@ public class Boatyard : MonoBehaviour
             storage.removeResource(requiredResourceName, collectorCarryCapacity);
         }
         //Work on producing goods
-        if (numWorkers > 0 && Time.time > checkTime && requiredResourcesInUse == collectorCarryCapacity)
+        if (numHealthyWorkers > 0 && requiredResourcesInUse == collectorCarryCapacity)
         {
-            checkTime = Time.time + timeInterval;
             if (progress < 100)
             {
-                if (progress + numWorkers * workerValue > 100)
+                float progressedTime = Time.unscaledTime - prevUpdateTime;
+                float effectiveTimeToFinish = timeToProduce / (employment.getNumWorkers() / numHealthyWorkers);
+                progress += progressedTime / effectiveTimeToFinish * 100;
+                if (progress >= 100)
                 {
                     progress = 100;
                 }
-                else
-                {
-                    progress += numWorkers * workerValue;
-                }
             }
         }
+
+        prevUpdateTime = Time.unscaledTime;
     }
 
     /// <summary>
@@ -291,6 +287,6 @@ public class Boatyard : MonoBehaviour
     /// <returns>progress how far the production is to completion</returns>
     public int getProgressNum()
     {
-        return progress;
+        return Mathf.FloorToInt(progress);
     }
 }

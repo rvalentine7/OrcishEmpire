@@ -72,11 +72,17 @@ public class ArenaPopup : MonoBehaviour {
             && arenaScript.getNumGladiators() < arenaScript.getNumGladiatorsRequired())
         {
             setupProgress = "Need gladiators";
+            progressNum.resizeTextForBestFit = true;
         }
         else if (arenaScript.getSetupProgress() >= 100
             && arenaScript.getNumGladiators() == arenaScript.getNumGladiatorsRequired())
         {
             setupProgress = "Fight in progress";
+            progressNum.resizeTextForBestFit = true;
+        }
+        else
+        {
+            progressNum.resizeTextForBestFit = false;
         }
         progressNum.text = setupProgress;
         string fightDurationTime = "Waiting on next fight";

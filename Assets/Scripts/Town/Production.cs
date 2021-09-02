@@ -3,45 +3,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-/**
- * Production creates goods from a raw resource production type building (farm, lumbermill, iron mine, etc.) and then
- * creates a delivery worker to deliver the goods upon completion of the goods.
- */
+/// <summary>
+/// Production creates goods from a raw resource production type building (farm, lumbermill, iron mine, etc.) and then
+/// creates a delivery worker to deliver the goods upon completion of the goods.
+/// </summary>
 public class Production : MonoBehaviour {
     public GameObject deliveryOrc;
-    public float timeInterval;
+    public float timeToProduce;
     public string resourceName;
     public int resourceProduced;
-    private int progress;
-    private float checkTime;
+    private World myWorld;
+    private float progress;
+    private float prevUpdateTime;
     private int numWorkers;
-    private int workerValue;
     private Employment employment;
     private bool orcOutForDelivery;
-    //private bool nearTrees;//TODO: use nearTrees to update the status of the building in the UI popup for lumbermills
+    //private bool nearTrees;//TODO: use nearTrees to update the status of the building in the UI popup for lumbermills//TODO: have a new class inherit this one for lumbermills?
     private bool active;
 
-    /**
-     * Initializes the production site.
-     */
+    /// <summary>
+    /// Initializes the production site.
+    /// </summary>
     void Start () {
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         employment = gameObject.GetComponent<Employment>();
-        progress = 0;
-        checkTime = 0.0f;
+        progress = 0.0f;
+        prevUpdateTime = 0.0f;
         numWorkers = employment.getNumWorkers();
-        workerValue = employment.getWorkerValue();
         orcOutForDelivery = false;
         //nearTrees = true;
         active = true;
     }
 	
-	/**
-     * Updates progress on the production and sends out a worker to deliver
-     *  the goods upon progress completion.
-     */
+	/// <summary>
+    /// Updates progress on the production and sends out a worker to deliver
+    /// the goods upon progress completion.
+    /// </summary>
 	void Update () {
         orcOutForDelivery = employment.getWorkerDeliveringGoods();
-        numWorkers = employment.getNumHealthyWorkers();
+        numWorkers = employment.getNumWorkers();
         if (active)
         {
             //Lumber mills need to be near trees in order to function
@@ -53,40 +53,38 @@ public class Production : MonoBehaviour {
                 World myWorld = world.GetComponent<World>();
                 GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
                 Vector2 millPos = gameObject.transform.position;
-                if (terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag != "Trees"//below bottom left corner
-                    && terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//above top left corner
-                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag != "Trees"//below bottom right corner
-                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//above top right corner
-                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//to the right of bottom right corner
-                    && terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag != "Trees"//to the right of the top right corner
-                    && terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag != "Trees"//to the left of the bottom left corner
-                    && terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag != "Trees")//to the left of the top left corner
+                if (!terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//below bottom left corner
+                    && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//above top left corner
+                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//below bottom right corner
+                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//above top right corner
+                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//to the right of bottom right corner
+                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//to the right of the top right corner
+                    && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
+                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//to the left of the bottom left corner
+                    && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
+                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES))//to the left of the top left corner
                 {
                     //nearTrees = false;
                     active = false;
                 }
             }
         }
-		if (numWorkers > 0 && Time.time > checkTime && active)
+		if (numWorkers > 0 && active)
         {
-            checkTime = Time.time + timeInterval;
             if (progress < 100)
             {
-                if (progress + numWorkers * workerValue > 100)
+                float progressedTime = Time.unscaledTime - prevUpdateTime;
+                float effectiveTimeToFinish = timeToProduce / (numWorkers / employment.getNumHealthyWorkers());
+                progress += progressedTime / effectiveTimeToFinish * 100;
+                if (progress >= 100)
                 {
                     progress = 100;
-                }
-                else
-                {
-                    progress += numWorkers * workerValue;
                 }
             }
         }
@@ -97,17 +95,17 @@ public class Production : MonoBehaviour {
             employment.setWorkerDeliveringGoods(true);
             createDeliveryOrc();
         }
-	}
 
-    /**
-     * Creates an orc to carry resources from the production site to a storage location.
-     * This building favors placing an orc at the first available road segment
-     *  it finds in the order of: bottom, top, left, right
-     */
+        prevUpdateTime = Time.unscaledTime;
+    }
+
+    /// <summary>
+    /// Creates an orc to carry resources from the production site to a storage location.
+    /// This building favors placing an orc at the first available road segment
+    /// it finds in the order of: bottom, top, left, right
+    /// </summary>
     private void createDeliveryOrc()
     {
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
@@ -173,22 +171,22 @@ public class Production : MonoBehaviour {
         deliver.setOrcEmployment(gameObject);
     }
 
-    /**
-     * Sets the boolean status of whether or not the delivery worker
-     * is out for delivery or at the production site.
-     * @param status is whether or not the orc is out for delivery
-     */
+    /// <summary>
+    /// Sets the boolean status of whether or not the delivery worker
+    /// is out for delivery or at the production site.
+    /// </summary>
+    /// <param name="status">whether or not the orc is out for delivery</param>
     public void setDeliveryStatus(bool status)
     {
         orcOutForDelivery = status;
     }
 
-    /**
-     * Gets the progress towards completion out of 100.
-     * @return progress how far the production is to completion
-     */
+    /// <summary>
+    /// Gets the progress towards completion out of 100.
+    /// </summary>
+    /// <returns>how far the production is to completion</returns>
     public int getProgressNum()
     {
-        return progress;
+        return Mathf.FloorToInt(progress);
     }
 }

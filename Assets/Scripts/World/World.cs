@@ -42,6 +42,7 @@ public class World : MonoBehaviour {
     public const string LOW_BRIDGE = "LowBridge";
     public const string HIGH_BRIDGE = "HighBridge";
     public const string WATER = "Water";
+    public const string TREES = "Trees";
     public const string FISHING_SPOT = "FishingSpot";
     public const string BUILD_OBJECT = "BuildObject";
     public const string POPUP = "Popup";
@@ -50,6 +51,7 @@ public class World : MonoBehaviour {
     public const string WHEAT = "Wheat";
     public const string EGGS = "Eggs";
     public const string FISH = "Fish";
+    public const string BEER = "Beer";
     public const string LUMBER = "Lumber";
 
     private PopulationAndCurrency populationAndCurrency;

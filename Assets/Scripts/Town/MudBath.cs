@@ -77,7 +77,7 @@ public class MudBath : MonoBehaviour
                 }
             }
         }
-        //If it is not alraedy wet or the number of workers is not at its max, we need to keep track of refilling
+        //If it is not already wet or the number of workers is not at its max, we need to keep track of refilling
         else if (hasWaterAccess && (currentCondition == Condition.DRY || employment.getNumHealthyWorkers() != employment.getWorkerCap()))
         {
             if (!hadPriorWorkers)

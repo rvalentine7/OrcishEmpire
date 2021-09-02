@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * A Gladiator is used to move gladiators from a GladiatorPit to an Arena in order to perform
- * fights for entertainment.
- */
+/// <summary>
+/// A Gladiator is used to move gladiators from a GladiatorPit to an Arena in order to perform
+/// fights for entertainment.
+/// </summary>
 public class Gladiator : Animated {
     private int numGladiators;
     private bool returnHome;
@@ -25,9 +25,9 @@ public class Gladiator : Animated {
     public float stepSize;
     private Animator animator;
 
-    /**
-     * Initializes the deliver class
-     */
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Awake()
     {
         numGladiators = 0;
@@ -42,11 +42,12 @@ public class Gladiator : Animated {
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
+        currentCharacterAnimation = characterAnimation.Idle;
     }
 
-    /**
-     * Attempts to find a path to the arena
-     */
+    /// <summary>
+    /// Attempts to find a path to the arena
+    /// </summary>
     void Start()
     {
         //TODO: if there is nowhere to go, wait some time before trying again?
@@ -56,24 +57,27 @@ public class Gladiator : Animated {
         }));
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Gladiator logic
+    /// </summary>
     void Update () {
         //if the place of employment is destroyed, this gameobject should be as well
         if (!placeOfEmployment)
         {
-            //Need to let the arena these gladiators are no longer coming
+            //Need to let the arena know these gladiators are no longer coming
             goalObject.GetComponent<Arena>().removeIncomingGladiators(numGladiators);
             Destroy(gameObject);
         }
-        if (runningAStar == false)
+        if (!runningAStar)
         {
             StartCoroutine(runGoToArena());
         }
     }
 
-    /**
-     * Plans out the movement of the gladiator
-     */
+    /// <summary>
+    /// Plans out the movement of the gladiator
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator runGoToArena()
     {
         //if the place of employment is destroyed, this gameobject should be as well
@@ -113,9 +117,7 @@ public class Gladiator : Animated {
                 }
                 //if there are no storage locations, and the orc isn't at its place of employment,
                 // send it back to its place of employment
-                float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
-                    * (originalLocation.x - gameObject.transform.position.x) + (originalLocation.y - gameObject.transform.position.y)
-                    * (originalLocation.y - gameObject.transform.position.y));
+                float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, originalLocation);;
                 if (path != null && path.Count == 0 && distanceBetweenPoints > 0.5f)
                 {
                     yield return StartCoroutine(findPathHome(returnPath =>
@@ -161,7 +163,7 @@ public class Gladiator : Animated {
             Vector2 nextLocation = path[0];
             //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
             if ((goalObject != null || headingHome || returnHome) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                && (network[(int)nextLocation.x, (int)nextLocation.y].tag != "Building"
+                && (!network[(int)nextLocation.x, (int)nextLocation.y].tag.Equals(World.BUILDING)
                 || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
             {
                 //take a step towards the nextLocation
@@ -265,10 +267,11 @@ public class Gladiator : Animated {
         yield return null;
     }
 
-    /**
-     * Creates a path to the arena.  TODO: clean up the method (can probably be just like findPathHome and just use one method instead of 2)
-     * @parameter returnPath a callback returning the path to the arena
-     */
+    /// <summary>
+    /// Creates a path to the arena.  TODO: clean up the method (can probably be just like findPathHome and just use one method instead of 2)
+    /// </summary>
+    /// <param name="returnPath">a callback returning the path to the arena</param>
+    /// <returns>A time delay to split the method execution over multiple frames</returns>
     private IEnumerator findPathToArena(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -282,7 +285,7 @@ public class Gladiator : Animated {
                 }
                 //gladiators should not travel over houses during their trip.  as such,
                 // houses are not included in the network
-                else if (structureArr[i, j].tag != "House")
+                else if (!structureArr[i, j].tag.Equals(World.HOUSE))
                 {
                     network[i, j] = structureArr[i, j];
                 }
@@ -325,10 +328,11 @@ public class Gladiator : Animated {
         yield return null;
     }
 
-    /**
-     * Finds a way back to the building that spawned the gladiator.
-     * @parameter returnPath a callback returning the path to the original location
-     */
+    /// <summary>
+    /// Finds a way back to the building that spawned the gladiator.
+    /// </summary>
+    /// <param name="returnPath">a callback returning the path to the original location</param>
+    /// <returns>A time to return to method execution</returns>
     private IEnumerator findPathHome(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -340,7 +344,7 @@ public class Gladiator : Animated {
                 {
                     network[i, j] = terrainArr[i, j];
                 }
-                else if (structureArr[i, j].tag != "House")
+                else if (!structureArr[i, j].tag.Equals(World.HOUSE))
                 {
                     network[i, j] = structureArr[i, j];
                 }
@@ -363,30 +367,30 @@ public class Gladiator : Animated {
         yield return new WaitForSeconds(0.05f);
     }
 
-    /**
-     * Sets the arena the gladiator should be going to
-     * @param arena the arena this gladiator should be going to
-     * @param numGladiators the number of gladiators in this gameObject going to the arena
-     */
+    /// <summary>
+    /// Sets the arena the gladiator should be going to
+    /// </summary>
+    /// <param name="arena">the arena this gladiator should be going to</param>
+    /// <param name="numGladiators">the number of gladiators in this gameObject going to the arena</param>
     public void setArena(GameObject arena, int numGladiators)
     {
         this.numGladiators = numGladiators;
         goalObject = arena;
     }
 
-    /**
-     * Sets the place the deliver orc starts at.
-     * @param position is the position the delivery orc spawned in at
-     */
+    /// <summary>
+    /// Sets the place the deliver orc starts at.
+    /// </summary>
+    /// <param name="position">the position the delivery orc spawned in at</param>
     public void setOriginalLocation(Vector2 position)
     {
         originalLocation = position;
     }
 
-    /**
-     * Sets the place of employment this delivery orc works for.
-     * @param employment the place of employment
-     */
+    /// <summary>
+    /// Sets the place of employment this delivery orc works for.
+    /// </summary>
+    /// <param name="employment">the place of employment</param>
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;

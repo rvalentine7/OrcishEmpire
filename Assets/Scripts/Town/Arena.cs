@@ -2,18 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Provides entertainment to nearby houses
+/// </summary>
 public class Arena : MonoBehaviour {
     private bool active;
     private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
+    private Employment employment;
     private bool ongoingFight;
     private bool findingGladiators;
     private int numGladiators;
     private int numIncomingGladiators;
     private float fightEndTime;
-    private int setupProgress;
-    private float checkTime;
+    private float setupProgress;
+    private float prevUpdateTime;
     /*The places from which the gladiators are coming.
      If the building no longer needs them and numIncomingGladiators > 0,
      will need to have them use this dictionary to return to their origin.*/
@@ -21,32 +25,38 @@ public class Arena : MonoBehaviour {
     
     public int fightDuration;
     public float timeInterval;
+    public float timeToSetup;
     public int numGladiatorsRequired;
     public int gladiatorSearchRadius;
     public int housingSearchRadius;
 
 
-	// Use this for initialization
+	/// <summary>
+    /// Initializes the arena
+    /// </summary>
 	void Start () {
         active = true;
         world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
+        employment = gameObject.GetComponent<Employment>();
         ongoingFight = false;
         numGladiators = 0;
         numIncomingGladiators = 0;
         fightEndTime = 0.0f;
-        setupProgress = 0;
-        checkTime = 0.0f;
+        setupProgress = 0.0f;
+        prevUpdateTime = 0.0f;
         gladiatorPitsAndNumbers = new Dictionary<GameObject, int>();
 	}
 	
-	// Update is called once per frame
+	/// <summary>
+    /// Logic for the arena
+    /// </summary>
 	void Update () {
         if (active)
         {
-            Employment employment = gameObject.GetComponent<Employment>();
-            if (employment.getNumHealthyWorkers() == 0)
+            int numHealthyWorkers = employment.getNumHealthyWorkers();
+            if (numHealthyWorkers == 0)
             {
                 if (ongoingFight)
                 {
@@ -58,18 +68,19 @@ public class Arena : MonoBehaviour {
             else
             {
                 //Make progress towards setting up a fight
-                if (setupProgress < 100 && !ongoingFight && Time.time > checkTime)
+                if (setupProgress < 100 && !ongoingFight)
                 {
-                    setupProgress += employment.getNumHealthyWorkers() * employment.getWorkerValue();
-                    if (setupProgress > 100)
+                    float progressedTime = Time.unscaledTime - prevUpdateTime;
+                    float effectiveTimeToFinish = timeToSetup / (employment.getNumWorkers() / numHealthyWorkers);
+                    setupProgress += progressedTime / effectiveTimeToFinish * 100;
+                    if (setupProgress >= 100)
                     {
                         setupProgress = 100;
                     }
-                    checkTime = Time.time + timeInterval;
                 }
 
                 //If we have all the required gladiators, the arena is set up, and a fight hasn't started, start the fight
-                if (numGladiators == numGladiatorsRequired && !ongoingFight && setupProgress == 100)
+                if (numGladiators == numGladiatorsRequired && !ongoingFight && setupProgress >= 100)
                 {
                     ongoingFight = true;
                     fightEndTime = Time.time + fightDuration;
@@ -100,7 +111,7 @@ public class Arena : MonoBehaviour {
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
                                 Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j] != null
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
-                                Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j].tag == World.BUILDING
+                                Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j].tag.Equals(World.BUILDING)
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - gladiatorSearchRadius + i,
                                 Mathf.RoundToInt(gameObject.transform.position.y) - gladiatorSearchRadius + j].GetComponent<GladiatorPit>() != null)
                             {
@@ -137,7 +148,7 @@ public class Arena : MonoBehaviour {
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
                                 Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j] != null
                                 && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
-                                Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j].tag == World.HOUSE)
+                                Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j].tag.Equals(World.HOUSE))
                             {
                                 GameObject house = structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
                                     Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j];
@@ -146,25 +157,25 @@ public class Arena : MonoBehaviour {
                         }
                     }
                 }
-                
-                
             }
         }
-	}
 
-    /**
-     * Toggles whether the building is active
-     */
+        prevUpdateTime = Time.unscaledTime;
+    }
+
+    /// <summary>
+    /// Toggles whether the building is active
+    /// </summary>
     public void toggleActive()
     {
         active = !active;
     }
 
-    /**
-     * Used by gladiators when they arrive at this building
-     * @param location the location from which the gladiator arrived
-     * @param num how many gladiators are a part of this gladiator gameObject which arrived
-     */
+    /// <summary>
+    /// Used by gladiators when they arrive at this building
+    /// </summary>
+    /// <param name="location">the location from which the gladiator arrived</param>
+    /// <param name="num">how many gladiators are a part of this gladiator gameObject which arrived</param>
     public void gladiatorArrived(GameObject location, int num)
     {
         //TODO: don't think I need the dictionary gladiatorPitsAndNumbers anymore... having gladiators check if this location still has employees instead
@@ -185,42 +196,46 @@ public class Arena : MonoBehaviour {
         }
     }
 
-    /**
-     * Removes a number of gladiators that were coming to the arena
-     * @param num the number of incoming gladiators to remove
-     */
+    /// <summary>
+    /// Removes a number of gladiators that were coming to the arena
+    /// </summary>
+    /// <param name="num">the number of incoming gladiators to remove</param>
     public void removeIncomingGladiators(int num)
     {
         numIncomingGladiators -= num;
     }
 
-    /**
-     * Gets the number of gladiators at the arena
-     */
+    /// <summary>
+    /// Gets the number of gladiators at the arena
+    /// </summary>
+    /// <returns>The number of gladiators at the arena</returns>
     public int getNumGladiators()
     {
         return numGladiators;
     }
 
-    /**
-     * Gets the number of gladiators required for a fight to begin
-     */
+    /// <summary>
+    /// Gets the number of gladiators required for a fight to begin
+    /// </summary>
+    /// <returns>The number of gladiators required for a fight to begin</returns>
     public int getNumGladiatorsRequired()
     {
         return numGladiatorsRequired;
     }
 
-    /**
-     * Gets the current progress in setting up the arena for a fight
-     */
-    public float getSetupProgress()
+    /// <summary>
+    /// Gets the current progress in setting up the arena for a fight
+    /// </summary>
+    /// <returns>The current progress in setting up the arena for a fight</returns>
+    public int getSetupProgress()
     {
-        return setupProgress;
+        return Mathf.FloorToInt(setupProgress);
     }
 
-    /**
-     * Gets the current time left in the fight
-     */
+    /// <summary>
+    /// Gets the current time left in the fight
+    /// </summary>
+    /// <returns>The current time left in the fight</returns>
     public float getRemainingFightTime()
     {
         return fightEndTime - Time.time;

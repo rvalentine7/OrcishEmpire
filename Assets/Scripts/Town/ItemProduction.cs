@@ -3,51 +3,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-/**
- * Item productions creates goods from a production type building using raw resources (weaponsmith, furniture workshop, etc.) and then
- * creates a delivery worker to deliver the goods upon completion of the goods.
- */
+/// <summary>
+/// Item productions creates goods from a production type building using raw resources (weaponsmith, furniture workshop, etc.) and then
+/// creates a delivery worker to deliver the goods upon completion of the goods.
+/// </summary>
 public class ItemProduction : MonoBehaviour
 {
     public GameObject collectorOrc;
     public int collectorCarryCapacity;
     public GameObject deliveryOrc;
-    public float timeInterval;
+    public float timeToProduce;
     public string requiredResourceName;
     public string resourceName;
     public int resourceProduced;
-    private int progress;
-    private float checkTime;
+    private float progress;
+    private float prevUpdateTime;
     private int numWorkers;
-    private int workerValue;
     private Employment employment;
     private Storage storage;
     private int requiredResourcesInUse;
     private bool orcMovingGoods;
 
-    /**
-     * Initializes the production site.
-     */
+    /// <summary>
+    /// Initializes the production site.
+    /// </summary>
     void Start()
     {
         employment = gameObject.GetComponent<Employment>();
         storage = gameObject.GetComponent<Storage>();
         progress = 0;
-        checkTime = 0.0f;
+        prevUpdateTime = 0.0f;
         numWorkers = employment.getNumHealthyWorkers();
-        workerValue = employment.getWorkerValue();
         requiredResourcesInUse = 0;
         orcMovingGoods = false;
     }
 
-    /**
-     * Updates progress on the production and sends out a worker to deliver
-     *  the goods upon progress completion.
-     */
+    /// <summary>
+    /// Updates progress on the production and sends out a worker to deliver
+    /// the goods upon progress completion.
+    /// </summary>
     void Update()
     {
         orcMovingGoods = employment.getWorkerDeliveringGoods();
-        numWorkers = employment.getNumHealthyWorkers();
+        numWorkers = employment.getNumWorkers();
+        int numHealthyWorkers = employment.getNumHealthyWorkers();
         //Deliver Goods
         if (progress == 100 && orcMovingGoods == false)
         {
@@ -57,7 +56,7 @@ public class ItemProduction : MonoBehaviour
             createDeliveryOrc();
         }
         //Collect goods
-        if (numWorkers > 0 && storage.getResourceCount(requiredResourceName) < storage.getStorageMax() && orcMovingGoods == false)
+        if (numHealthyWorkers > 0 && storage.getResourceCount(requiredResourceName) < storage.getStorageMax() && orcMovingGoods == false)
         {
             employment.setWorkerDeliveringGoods(true);
             createCollectionOrc();
@@ -69,28 +68,28 @@ public class ItemProduction : MonoBehaviour
             storage.removeResource(requiredResourceName, collectorCarryCapacity);
         }
         //Work on producing goods
-        if (numWorkers > 0 && Time.time > checkTime && requiredResourcesInUse == collectorCarryCapacity)
+        if (numHealthyWorkers > 0 && requiredResourcesInUse == collectorCarryCapacity)
         {
-            checkTime = Time.time + timeInterval;
             if (progress < 100)
             {
-                if (progress + numWorkers * workerValue > 100)
+                float progressedTime = Time.unscaledTime - prevUpdateTime;
+                float effectiveTimeToFinish = timeToProduce / (numWorkers / numHealthyWorkers);
+                progress += progressedTime / effectiveTimeToFinish * 100;
+                if (progress >= 100)
                 {
                     progress = 100;
                 }
-                else
-                {
-                    progress += numWorkers * workerValue;
-                }
             }
         }
+
+        prevUpdateTime = Time.unscaledTime;
     }
 
-    /**
-     * Creates an orc to carry resources from the production site to a storage location.
-     * This building favors placing an orc at the first available road segment
-     *  it finds in the order of: bottom, top, left, right
-     */
+    /// <summary>
+    /// Creates an orc to carry resources from the production site to a storage location.
+    /// This building favors placing an orc at the first available road segment
+    /// it finds in the order of: bottom, top, left, right
+    /// </summary>
     private void createDeliveryOrc()
     {
         GameObject world = GameObject.Find(World.WORLD_INFORMATION);
@@ -160,9 +159,9 @@ public class ItemProduction : MonoBehaviour
         deliver.setOrcEmployment(gameObject);
     }
 
-    /**
-     * Creates an orc to collect resources for the marketplace to distribute.
-     */
+    /// <summary>
+    /// Creates an orc to collect resources for the marketplace to distribute.
+    /// </summary>
     public void createCollectionOrc()
     {
         GameObject world = GameObject.Find(World.WORLD_INFORMATION);
@@ -234,22 +233,22 @@ public class ItemProduction : MonoBehaviour
         // workers at this employment
     }
 
-    /**
-     * Sets the boolean status of whether or not the delivery worker
-     * is out for delivery or at the production site.
-     * @param status is whether or not the orc is out for delivery
-     */
+    /// <summary>
+    /// Sets the boolean status of whether or not the delivery worker
+    /// is out for delivery or at the production site.
+    /// </summary>
+    /// <param name="status">whether or not the orc is out for delivery</param>
     public void setOrcTransportStatus(bool status)
     {
         orcMovingGoods = status;
     }
 
-    /**
-     * Gets the progress towards completion out of 100.
-     * @return progress how far the production is to completion
-     */
+    /// <summary>
+    /// Gets the progress towards completion out of 100.
+    /// </summary>
+    /// <returns>how close the production is to completion</returns>
     public int getProgressNum()
     {
-        return progress;
+        return Mathf.FloorToInt(progress);
     }
 }

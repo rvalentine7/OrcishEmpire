@@ -38,7 +38,7 @@ public class FishingWharf : BoatRequester
     /// <summary>
     /// Logic for what action the building should take at any given point in time
     /// </summary>
-    void Update()
+    void Update()//TODO: enable/disable
     {
         if (employment.getNumHealthyWorkers() > 0)
         {

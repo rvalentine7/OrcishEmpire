@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Provides entertainment to nearby houses through the use of beer!
+/// </summary>
 public class Pub : MonoBehaviour {
     private bool active;
     private GameObject world;
@@ -22,7 +25,9 @@ public class Pub : MonoBehaviour {
     // that even if I am only lacking 1 employee, there will be times where entertainment does not reach houses
     // before decaying
 
-    // Use this for initialization
+    /// <summary>
+    /// Initializes the pub
+    /// </summary>
     void Start () {
         active = true;
         world = GameObject.Find(World.WORLD_INFORMATION);
@@ -33,9 +38,11 @@ public class Pub : MonoBehaviour {
         checkTime = 0.0f;
         consumingBeer = false;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    /// <summary>
+    /// Logic for the pub
+    /// </summary>
+    void Update () {
 		if (active)
         {
             Employment employment = gameObject.GetComponent<Employment>();
@@ -60,7 +67,7 @@ public class Pub : MonoBehaviour {
                     }
                     if (Time.time > checkTime && consumingBeer)
                     {
-                        myStorage.removeResource("Beer", beerConsumedEachTick);
+                        myStorage.removeResource(World.BEER, beerConsumedEachTick);
                         checkTime = Time.time + beerConsumptionTime + (employment.getWorkerCap() - employment.getNumHealthyWorkers()) * lowEmployeePenaltyNum;
 
                         //supply entertainment
@@ -75,7 +82,7 @@ public class Pub : MonoBehaviour {
                                     && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
                                     Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j] != null
                                     && structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
-                                    Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j].tag == World.HOUSE)
+                                    Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j].tag.Equals(World.HOUSE))
                                 {
                                     GameObject house = structureArr[Mathf.RoundToInt(gameObject.transform.position.x) - housingSearchRadius + i,
                                         Mathf.RoundToInt(gameObject.transform.position.y) - housingSearchRadius + j];
@@ -93,14 +100,12 @@ public class Pub : MonoBehaviour {
         }
 	}
 
-    /**
-     * Creates an orc to collect resources for the marketplace to distribute.
-     */
+    /// <summary>
+    /// Creates an orc to collect resources for the marketplace to distribute.
+    /// </summary>
     public void createCollectionOrc()
     {
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        World myWorld = world.GetComponent<World>();
-        GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
+        structureArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
         //checking areas around the farm to place an orc on a road
@@ -111,20 +116,20 @@ public class Pub : MonoBehaviour {
         while (!foundSpawn && i < width)
         {
             //checking the row below the gameObject
-            if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+            if (!foundSpawn && structureArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)] != null
-                && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
-                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)].tag == World.ROAD)
+                && structureArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)].tag.Equals(World.ROAD))
             {
                 spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1));
                 foundSpawn = true;
             }
             //checking the row above the gameObject
-            else if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+            else if (!foundSpawn && structureArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
                 (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)] != null
-                && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
-                (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)].tag == World.ROAD)
+                && structureArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
+                (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)].tag.Equals(World.ROAD))
             {
                 spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
                 (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1));
@@ -136,20 +141,20 @@ public class Pub : MonoBehaviour {
         while (!foundSpawn && j < height)
         {
             //checking the column to the left of the gameObject
-            if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+            if (!foundSpawn && structureArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)] != null
-                && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
-                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag == World.ROAD)
+                && structureArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag.Equals(World.ROAD))
             {
                 spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j));
                 foundSpawn = true;
             }
             //checking the column to the right of the gameObject
-            else if (!foundSpawn && structArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 1) + 1),
+            else if (!foundSpawn && structureArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 1) + 1),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)] != null
-                && structArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 1) + 1),
-                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag == World.ROAD)
+                && structureArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 1) + 1),
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag.Equals(World.ROAD))
             {
                 spawnPosition = new Vector2((Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 1) + 1),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j));
@@ -167,28 +172,28 @@ public class Pub : MonoBehaviour {
         // workers at this employment
     }
 
-    /**
-     * Sets the boolean status of whether or not the delivery worker
-     * is out for delivery or at the production site.
-     * @param status is whether or not the orc is out for delivery
-     */
+    /// <summary>
+    /// Sets the boolean status of whether or not the delivery worker
+    /// is out for delivery or at the production site.
+    /// </summary>
+    /// <param name="status">whether or not the orc is out for delivery</param>
     public void setOrcTransportStatus(bool status)
     {
         orcMovingGoods = status;
     }
 
-    /**
-     * Gets the time remaining on the current drinks before a "beer" resource is consumed
-     * @return the time remaining on the current drinks
-     */
+    /// <summary>
+    /// Gets the time remaining on the current drinks before a "beer" resource is consumed
+    /// </summary>
+    /// <returns>the time remaining on the current drinks</returns>
     public int getTimeLeftOnCurrentDrinks()
     {
         return Mathf.RoundToInt(checkTime - Time.time);
     }
 
-    /**
-     * Toggles whether the building is active
-     */
+    /// <summary>
+    /// Toggles whether the building is active
+    /// </summary>
     public void toggleActive()
     {
         active = !active;
