@@ -31,8 +31,7 @@ public class Employment : MonoBehaviour {
         openForBusiness = false;
         workerDeliveringGoods = false;
         numWaterSources = 0;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         //Check if tiles already have water, update numWaterSources if so
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;

@@ -2,9 +2,9 @@
 using UnityEngine.EventSystems;
 using System.Collections;
 
-/**
- * Lets the player place buildings in the world.
- */
+/// <summary>
+/// Lets the player place buildings in the world.
+/// </summary>
 public class BuildingPlacement : MonoBehaviour {
     public int width;
     public int height;
@@ -15,22 +15,20 @@ public class BuildingPlacement : MonoBehaviour {
     public GameObject building;
     public int buildingCost;
     private bool validPlacement;
-    private GameObject world;
     private World myWorld;
 
-    /**
-     * Initializes the BuildingPlacement class
-     */
+    /// <summary>
+    /// Initializes the BuildingPlacement class
+    /// </summary>
     void Start () {
         //validPlacement = true;
-        world = GameObject.Find("WorldInformation");
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
     }
-	
-	/**
-     * Allows the player to place a building in a viable location.
-     */
-	void Update () {
+
+    /// <summary>
+    /// Allows the player to place a building in a viable location.
+    /// </summary>
+    void Update () {
         if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Escape))
         {
             //exits out of construction mode if the right mouse button or escape is clicked
@@ -81,29 +79,6 @@ public class BuildingPlacement : MonoBehaviour {
             || mousePos.y - Mathf.FloorToInt(height / 2) < 1 || mousePos.y + Mathf.FloorToInt(height / 2) >= myWorld.mapSize - 1))
         {
             validPlacement = false;
-        }
-        //houses can only be built within a distance of 2 from a road in horizontal and vertical directions
-        if (validPlacement && gameObject.name.Equals("BuildHouse(Clone)"))
-        {
-            if ((mousePos.x >= myWorld.mapSize - 1 || (mousePos.x + 1 > 0 && mousePos.x + 1 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
-                && (structureArr[(int)mousePos.x + 1, (int)mousePos.y] == null || structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag != "Road")))
-                && (mousePos.x >= myWorld.mapSize - 2 || (mousePos.x + 2 > 0 && mousePos.x + 2 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
-                && (structureArr[(int)mousePos.x + 2, (int)mousePos.y] == null || structureArr[(int)mousePos.x + 2, (int)mousePos.y].tag != "Road")))
-                && (mousePos.x <= 1 || (mousePos.x - 1 > 0 && mousePos.x - 1 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
-                && (structureArr[(int)mousePos.x - 1, (int)mousePos.y] == null || structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag != "Road")))
-                && (mousePos.x <= 2 || (mousePos.x - 2 > 0 && mousePos.x - 2 < myWorld.mapSize && mousePos.y > 0 && mousePos.y < myWorld.mapSize
-                && (structureArr[(int)mousePos.x - 2, (int)mousePos.y] == null || structureArr[(int)mousePos.x - 2, (int)mousePos.y].tag != "Road")))
-                && (mousePos.y >= myWorld.mapSize - 1 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y + 1 > 0 && mousePos.y + 1 < myWorld.mapSize
-                && (structureArr[(int)mousePos.x, (int)mousePos.y + 1] == null || structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag != "Road")))
-                && (mousePos.y >= myWorld.mapSize - 2 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y + 2 > 0 && mousePos.y + 2 < myWorld.mapSize
-                && (structureArr[(int)mousePos.x, (int)mousePos.y + 2] == null || structureArr[(int)mousePos.x, (int)mousePos.y + 2].tag != "Road")))
-                && (mousePos.y <= 1 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y - 1 > 0 && mousePos.y - 1 < myWorld.mapSize
-                && (structureArr[(int)mousePos.x, (int)mousePos.y - 1] == null || structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag != "Road")))
-                && (mousePos.y <= 2 || (mousePos.x > 0 && mousePos.x < myWorld.mapSize && mousePos.y - 2 > 0 && mousePos.y - 2 < myWorld.mapSize
-                && (structureArr[(int)mousePos.x, (int)mousePos.y - 2] == null || structureArr[(int)mousePos.x, (int)mousePos.y - 2].tag != "Road"))))
-            {
-                validPlacement = false;
-            }
         }
         //iron mines need to be next to "Rocks" terrain
         if (validPlacement && gameObject.name.Equals("BuildIronMine(Clone)"))
@@ -244,8 +219,8 @@ public class BuildingPlacement : MonoBehaviour {
             }
         }
 
-        //Place the object in the world upon left mouse click
-        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0) && validPlacement)
+        //Place the object in the world upon left mouse release
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonUp(0) && validPlacement)
         {
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
             {
@@ -294,13 +269,13 @@ public class BuildingPlacement : MonoBehaviour {
         }
     }
 
-    /**
-     * Checks the areas around a building for if a raw resource is next to it
-     * @param tagName the name of the resource to check for
-     * @param mousePos the position of the mouse
-     * @param terrainArr the array of terrain elements
-     * @return nextToResources whether the building has any of the raw resource next to it
-     */
+    /// <summary>
+    /// Checks the areas around a building for if a raw resource is next to it
+    /// </summary>
+    /// <param name="tagName">the name of the resource to check for</param>
+    /// <param name="mousePos">the position of the mouse</param>
+    /// <param name="terrainArr">the array of terrain elements</param>
+    /// <returns>whether the building has any of the raw resource next to it</returns>
     private bool checkForRawResources(string tagName, Vector2 mousePos, GameObject[,] terrainArr)
     {
         bool nextToResource = false;

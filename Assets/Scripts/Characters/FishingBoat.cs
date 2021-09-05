@@ -10,7 +10,6 @@ public class FishingBoat : Animated
     private GameObject fishingWharfBuilding;
     private FishingWharf fishingWharf;
     private GameObject[,] network;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
@@ -36,8 +35,7 @@ public class FishingBoat : Animated
     /// </summary>
     void Start()
     {
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         runningAStar = false;
@@ -64,7 +62,11 @@ public class FishingBoat : Animated
             Destroy(gameObject);
         }
 
-        if (startedFishing && !finishedFishing)
+        if (employment.getNumHealthyWorkers() == 0 && !finishedFishing)
+        {
+            finishedFishing = true;
+        }
+        else if (startedFishing && !finishedFishing)
         {
             float progressedTime = Time.unscaledTime - prevFishingTime;
             prevFishingTime = Time.unscaledTime;
@@ -188,16 +190,22 @@ public class FishingBoat : Animated
                     changePath = true;
                 }
             }
-            if (!finishedFishing && path.Count == 0)
+            
+            if (finishedFishing && goal == fishingWharfBuilding && path.Count == 1)
+            {
+                //Reached fishing wharf
+                bool returnedWithFish = true;
+                if (employment.getNumHealthyWorkers() == 0 || effectiveProgress < 100)
+                {
+                    returnedWithFish = false;
+                }
+                fishingWharf.fishingBoatReturned(returnedWithFish);
+            }
+            else if (!finishedFishing && path.Count == 0)
             {
                 //Reached fishing spot
                 startedFishing = true;
                 prevFishingTime = Time.unscaledTime;
-            }
-            else if (finishedFishing && path.Count == 1)
-            {
-                //Reached fishing wharf
-                fishingWharf.fishingBoatReturnedWithFish();
             }
         }
         yield return null;

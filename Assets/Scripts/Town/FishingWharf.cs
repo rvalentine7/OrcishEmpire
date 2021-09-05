@@ -38,7 +38,7 @@ public class FishingWharf : BoatRequester
     /// <summary>
     /// Logic for what action the building should take at any given point in time
     /// </summary>
-    void Update()//TODO: enable/disable
+    void Update()
     {
         if (employment.getNumHealthyWorkers() > 0)
         {
@@ -78,11 +78,20 @@ public class FishingWharf : BoatRequester
     }
 
     /// <summary>
-    /// The fishing boat returned with fish.  This updates numbers associated with the fishing boat successfully returning from a fishing trip
+    /// The fishing boat returned.  This updates numbers associated with the fishing boat returning from a fishing trip
     /// </summary>
-    public void fishingBoatReturnedWithFish()
+    /// <param name="returnedWithFish">Whether the boat returned with fish</param>
+    public void fishingBoatReturned(bool returnedWithFish)
     {
-        fishingBoatWaiting = true;
+        if (returnedWithFish)
+        {
+            fishingBoatWaiting = true;
+        }
+        else
+        {
+            fishingBoat.destroyFishingBoat();
+            fishingBoat = null;
+        }
     }
 
     /// <summary>
@@ -207,7 +216,7 @@ public class FishingWharf : BoatRequester
     /// <returns>Whether this building already has a boat</returns>
     public override bool canReceiveBoat()
     {
-        return !hasBoat;
+        return !hasBoat && employment.getNumHealthyWorkers() > 0;
     }
 
     /// <summary>

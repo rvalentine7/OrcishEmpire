@@ -10,10 +10,8 @@ using System.Collections;
  */
 public class RoadPlacement : MonoBehaviour {
     private bool validPlacement;
-    private GameObject world;
     private World myWorld;
     GameObject[,] terrainArr;
-    //private GameObject aqueduct;
     public Sprite possibleSprite;
     public Sprite possibleXRoadSprite;
     public Sprite possibleTRoadSprite;
@@ -28,10 +26,8 @@ public class RoadPlacement : MonoBehaviour {
      */
     void Start() {
         validPlacement = true;
-        world = GameObject.Find("WorldInformation");
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
-        //aqueduct = null;
     }
 
     /**

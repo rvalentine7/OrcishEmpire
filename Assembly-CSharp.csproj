@@ -66,6 +66,7 @@
     <Compile Include="Assets\Scripts\Building\BuildingPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\Clear.cs" />
     <Compile Include="Assets\Scripts\Building\CreateObject.cs" />
+    <Compile Include="Assets\Scripts\Building\HousingPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\PreConstructedRoads.cs" />
     <Compile Include="Assets\Scripts\Building\ReservoirPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\RoadPlacement.cs" />
@@ -176,6 +177,7 @@
     <Compile Include="Assets\Scripts\World\TreeRemoval.cs" />
     <Compile Include="Assets\Scripts\World\WaterTile.cs" />
     <Compile Include="Assets\Scripts\World\World.cs" />
+    <Compile Include="Assets\Scripts\World\WorldObject.cs" />
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>D:/GitHub/OrcishEmpire/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
     </Reference>

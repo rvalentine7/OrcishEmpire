@@ -8,7 +8,7 @@ using UnityEngine;
 /// In the future, this class will be useful for maintenance, fire safety (making sure the building has water), and overlays (displaying what this building has access to)
 /// TODO: this should implement a WorldObject which implements MonoBehaviour.  WorldObject would be used for clicking on objects in the game world and maybe some other stuff?
 /// </summary>
-public class Building : MonoBehaviour
+public class Building : WorldObject
 {
     // Start is called before the first frame update
     void Start()

@@ -21,7 +21,7 @@ MonoBehaviour:
   m_ShowMode: 4
   m_Title: 
   m_RootView: {fileID: 2}
-  m_MinSize: {x: 950, y: 300}
+  m_MinSize: {x: 950, y: 398}
   m_MaxSize: {x: 10000, y: 10000}
 --- !u!114 &2
 MonoBehaviour:
@@ -240,8 +240,8 @@ MonoBehaviour:
     y: 645
     width: 1360
     height: 342
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 102, y: 124}
+  m_MaxSize: {x: 4002, y: 4024}
   m_ActualView: {fileID: 19}
   m_Panes:
   - {fileID: 18}
@@ -303,7 +303,7 @@ MonoBehaviour:
   m_PersistentViewDataDictionary: {fileID: 0}
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: 233304
+  m_LastSelectedObjectID: 81650
 --- !u!114 &13
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -793,9 +793,9 @@ MonoBehaviour:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 0c0c0000
-    m_LastClickedID: 3084
-    m_ExpandedIDs: 000000006a0b00000a0c00000c0c0000fe0e00007a0f0000ca0f000000110000561200006014000006150000d2160000b41700002418000048930000
+    m_SelectedIDs: 160c0000
+    m_LastClickedID: 3094
+    m_ExpandedIDs: 00000000740b0000140c0000160c00000c0f0000880f0000d80f00000e1100006e14000014150000e0160000c2170000321800007018000062930000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -823,7 +823,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000006a0b00000a0c00000c0c0000fe0e00007a0f0000ca0f000000110000561200006014000006150000d2160000b41700002418000048930000
+    m_ExpandedIDs: 00000000740b0000140c0000160c00000c0f0000880f0000d80f00000e1100006e14000014150000e0160000c2170000321800007018000062930000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -848,10 +848,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 96e20300
-    m_LastClickedInstanceID: 254614
+    m_SelectedInstanceIDs: d4060000
+    m_LastClickedInstanceID: 1748
     m_HadKeyboardFocusLastEvent: 1
-    m_ExpandedInstanceIDs: 3e05000042060000f22c00009c2c00004a1d00002a3b0000b81d0000de040000e4040000e6040000f82d0000022400000e240000102400007e240000320b0000000000005211000080010100
+    m_ExpandedInstanceIDs: 3e05000042060000f22c00009c2c00004a1d00002a3b0000b81d0000de040000e4040000e6040000f82d0000022400000e240000102400007e240000320b00000000000052110000800101000c100000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -875,7 +875,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 55.5}
+    m_ScrollPosition: {x: 0, y: 0}
     m_GridSize: 96
   m_DirectoriesAreaWidth: 227
 --- !u!114 &19

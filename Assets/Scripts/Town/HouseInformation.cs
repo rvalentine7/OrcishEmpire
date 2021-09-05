@@ -61,9 +61,9 @@ public class HouseInformation : MonoBehaviour {
     private List<OrcInhabitant> inhabitantsWithoutBarbers;
     private Vector2 housePosition;
     private GameObject[,] constructArr;
+    private SpriteRenderer spriteRender;
 
     //add future resources here (weapons/furniture/currency)
-    private GameObject world;
     private World myWorld;
 
     private void Awake()
@@ -109,11 +109,12 @@ public class HouseInformation : MonoBehaviour {
         minSickRecoveryWait = 2;
         maxSickRecoveryWait = 5;
         sickRecoveryChance = 33;
-
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         constructArr = myWorld.constructNetwork.getConstructArr();
+        spriteRender = gameObject.GetComponent<SpriteRenderer>();
+
         nextPaymentTime = myWorld.getPaymentTime();
         //Check if tile already has water, update numWaterSources if so
         if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasWater())
@@ -312,6 +313,10 @@ public class HouseInformation : MonoBehaviour {
             {
                 numFoodTypes++;
             }
+            if (storage.getFishCount() > 0)
+            {
+                numFoodTypes++;
+            }
             if (numFoodTypes > 1)
             {
                 multipleFoodTypes = true;
@@ -329,12 +334,17 @@ public class HouseInformation : MonoBehaviour {
             {
                 storage.removeResource(World.EGGS, orcInhabitants.Count * inhabitantFoodConsumption * (storage.getEggCount() / storage.getFoodCount()));
             }
+            if (storage.getFoodCount() > 0)
+            {
+                storage.removeResource(World.FISH, orcInhabitants.Count * inhabitantFoodConsumption * (storage.getFishCount() / storage.getFoodCount()));
+            }
         }
         else if (storage.getFoodCount() > 0)
         {
             storage.removeResource(World.MEAT, storage.getMeatCount());
             storage.removeResource(World.WHEAT, storage.getWheatCount());
             storage.removeResource(World.EGGS, storage.getEggCount());
+            storage.removeResource(World.FISH, storage.getFishCount());
         }
     }
 
@@ -472,8 +482,6 @@ public class HouseInformation : MonoBehaviour {
         if (numEmployedInhabitants < orcInhabitants.Count - sickInhabitants.Count)
         {
             Vector2 housePosition = gameObject.transform.position;
-            GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-            World myWorld = world.GetComponent<World>();
             GameObject[,] constructArr = myWorld.constructNetwork.getConstructArr();
             int i = 0;
             while (i <= jobSearchRadius * 2 && numEmployedInhabitants < orcInhabitants.Count)
@@ -484,7 +492,7 @@ public class HouseInformation : MonoBehaviour {
                     if (housePosition.x - jobSearchRadius + i >= 0 && housePosition.y - jobSearchRadius + j >= 0
                         && housePosition.x - jobSearchRadius + i <= myWorld.mapSize - 1 && housePosition.y - jobSearchRadius + j <= myWorld.mapSize - 1
                         && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j] != null
-                        && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].tag == World.BUILDING)
+                        && constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j].tag.Equals(World.BUILDING))
                     {
                         GameObject possibleEmployment = constructArr[(int)housePosition.x - jobSearchRadius + i, (int)housePosition.y - jobSearchRadius + j];
                         Employment employment = possibleEmployment.GetComponent<Employment>();
@@ -561,7 +569,6 @@ public class HouseInformation : MonoBehaviour {
      */
     public void updateHouseSprite()
     {
-        SpriteRenderer spriteRender = gameObject.GetComponent<SpriteRenderer>();
         if (houseLevel == 1)
         {
             spriteRender.sprite = firstLevelHouse;

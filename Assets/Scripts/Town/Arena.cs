@@ -7,7 +7,6 @@ using UnityEngine;
 /// </summary>
 public class Arena : MonoBehaviour {
     private bool active;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private Employment employment;
@@ -36,8 +35,7 @@ public class Arena : MonoBehaviour {
     /// </summary>
 	void Start () {
         active = true;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         employment = gameObject.GetComponent<Employment>();
         ongoingFight = false;

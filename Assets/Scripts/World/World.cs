@@ -9,6 +9,10 @@ public class World : MonoBehaviour {
     private int populationCount;
     private float paymentTime;
 
+    //A queue to spread out how quickly immigrants can move in
+    private Queue<AvailableHome> homesToMoveInTo = new Queue<AvailableHome>();
+    private float nextEarliestMoveInTime = 0.0f;
+
     //Contains lists of each of the water sections in the map
     private List<List<WaterTile>> waterSections = new List<List<WaterTile>>();
     private int lowestEmptyWaterSection = 0;
@@ -87,6 +91,15 @@ public class World : MonoBehaviour {
         {
             paymentTime = Time.time + paymentInterval;
         }
+
+        //Spreads out how often immigrants are moving in to houses
+        if (homesToMoveInTo.Count > 0 && Time.time > nextEarliestMoveInTime)
+        {
+            //0.5f, 0.0f, and 1.0f are all random times I've chosen to spread out how quickly a new immigrant can be created
+            nextEarliestMoveInTime = Time.time + 0.5f + Random.Range(0.0f, 1.0f);
+            AvailableHome homeThatCanBeMovedInTo = homesToMoveInTo.Dequeue();
+            homeThatCanBeMovedInTo.spawnImmigrant();
+        }
     }
 
     /// <summary>
@@ -143,6 +156,15 @@ public class World : MonoBehaviour {
     public float getTaxPercentage()
     {
         return taxPercentage;
+    }
+
+    /// <summary>
+    /// Adds a home that immigrants are trying to move in to
+    /// </summary>
+    /// <param name="availableHome">The home immigrants are trying to move in to</param>
+    public void addHomeToMoveInTo(AvailableHome availableHome)
+    {
+        homesToMoveInTo.Enqueue(availableHome);
     }
 
     /// <summary>

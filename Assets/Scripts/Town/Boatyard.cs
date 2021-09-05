@@ -45,54 +45,58 @@ public class Boatyard : MonoBehaviour
     /// <summary>
     /// Collects lumber, creates boats, and delivers boats to any buildings waiting on them
     /// </summary>
-    void Update()//TODO: enable/disable
+    void Update()
     {
-        orcMovingGoods = employment.getWorkerDeliveringGoods();
         int numHealthyWorkers = employment.getNumHealthyWorkers();
-        //Collect goods
-        if (numHealthyWorkers > 0 && storage.getResourceCount(requiredResourceName) < storage.getStorageMax() && orcMovingGoods == false)
+        if (numHealthyWorkers > 0)
         {
-            employment.setWorkerDeliveringGoods(true);
-            createCollectionOrc();
-        }
-        //A boat has been made. Deliver it if there is someone waiting on it
-        if (progress == 100 && boatRequesters.Count > 0)
-        {
-            bool deliveredBoat = false;
-            int i = 0;
-            while (!deliveredBoat && i < boatRequesters.Count)
-            {
-                List<int> waterSectionNumbers = boatRequesters[i].getNearbyWaterSections();
-                Vector2 connectionLocation = findBoatSpawnLocation(waterSectionNumbers);
-                //If the requester is still looking for a boat, deliver this one
-                if (connectionLocation.x != -1 && boatRequesters[i].canReceiveBoat())
-                {
-                    spawnBoat(boatRequesters[i], connectionLocation);
-                    deliveredBoat = true;
-                    progress = 0;
-                    boatRequesters.RemoveAt(i);
-                }
-                i++;
-            }
+            orcMovingGoods = employment.getWorkerDeliveringGoods();
 
-        }
-        //Starts using the required raw resource
-        if (requiredResourcesInUse == 0 && storage.getResourceCount(requiredResourceName) == storage.getStorageMax())
-        {
-            requiredResourcesInUse = storage.getStorageMax();
-            storage.removeResource(requiredResourceName, collectorCarryCapacity);
-        }
-        //Work on producing goods
-        if (numHealthyWorkers > 0 && requiredResourcesInUse == collectorCarryCapacity)
-        {
-            if (progress < 100)
+            //Collect goods
+            if (storage.getResourceCount(requiredResourceName) < storage.getStorageMax() && orcMovingGoods == false)
             {
-                float progressedTime = Time.unscaledTime - prevUpdateTime;
-                float effectiveTimeToFinish = timeToProduce / (employment.getNumWorkers() / numHealthyWorkers);
-                progress += progressedTime / effectiveTimeToFinish * 100;
-                if (progress >= 100)
+                employment.setWorkerDeliveringGoods(true);
+                createCollectionOrc();
+            }
+            //A boat has been made. Deliver it if there is someone waiting on it
+            if (progress == 100 && boatRequesters.Count > 0)
+            {
+                bool deliveredBoat = false;
+                int i = 0;
+                while (!deliveredBoat && i < boatRequesters.Count)
                 {
-                    progress = 100;
+                    List<int> waterSectionNumbers = boatRequesters[i].getNearbyWaterSections();
+                    Vector2 connectionLocation = findBoatSpawnLocation(waterSectionNumbers);
+                    //If the requester is still looking for a boat, deliver this one
+                    if (connectionLocation.x != -1 && boatRequesters[i].canReceiveBoat())
+                    {
+                        spawnBoat(boatRequesters[i], connectionLocation);
+                        deliveredBoat = true;
+                        progress = 0;
+                        boatRequesters.RemoveAt(i);
+                    }
+                    i++;
+                }
+
+            }
+            //Starts using the required raw resource
+            if (requiredResourcesInUse == 0 && storage.getResourceCount(requiredResourceName) == storage.getStorageMax())
+            {
+                requiredResourcesInUse = storage.getStorageMax();
+                storage.removeResource(requiredResourceName, collectorCarryCapacity);
+            }
+            //Work on producing goods
+            if (requiredResourcesInUse == collectorCarryCapacity)
+            {
+                if (progress < 100)
+                {
+                    float progressedTime = Time.unscaledTime - prevUpdateTime;
+                    float effectiveTimeToFinish = timeToProduce / (employment.getNumWorkers() / numHealthyWorkers);
+                    progress += progressedTime / effectiveTimeToFinish * 100;
+                    if (progress >= 100)
+                    {
+                        progress = 100;
+                    }
                 }
             }
         }
@@ -204,6 +208,7 @@ public class Boatyard : MonoBehaviour
     /// <param name="boatSpawnLocation">The location to spawn the boat</param>
     private void spawnBoat(BoatRequester boatRequester, Vector2 boatSpawnLocation)
     {
+        requiredResourcesInUse = 0;
         GameObject newBoat = Instantiate(boat, new Vector2(boatSpawnLocation.x, boatSpawnLocation.y + 0.4f), Quaternion.identity);
         StandardBoat newStandardBoat = newBoat.GetComponent<StandardBoat>();
         newStandardBoat.initialize(boatRequester.getGameObject());
