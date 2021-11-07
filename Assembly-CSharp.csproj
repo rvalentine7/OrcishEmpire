@@ -64,6 +64,7 @@
     <Compile Include="Assets\Scripts\Building\AqueductPlacement.cs" />
     <Compile Include="Assets\Scripts\Building\BridgePlacement.cs" />
     <Compile Include="Assets\Scripts\Building\BuildingPlacement.cs" />
+    <Compile Include="Assets\Scripts\Building\BuildMode.cs" />
     <Compile Include="Assets\Scripts\Building\Clear.cs" />
     <Compile Include="Assets\Scripts\Building\CreateObject.cs" />
     <Compile Include="Assets\Scripts\Building\HousingPlacement.cs" />

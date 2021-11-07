@@ -6,17 +6,14 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// Places houses in the world
 /// </summary>
-public class HousingPlacement : MonoBehaviour
+public class HousingPlacement : BuildMode
 {
-    public int width;
-    public int height;
     public Sprite possibleSprite;
     public Sprite impossibleSprite;
     public GameObject validTempHouse;
     public GameObject invalidTempHouse;
     public GameObject house;
     public int buildingCost;
-    private World myWorld;
     private SpriteRenderer spriteRenderer;
     private bool startingPositionChosen;
     private Vector2 startingPosition;
@@ -29,7 +26,6 @@ public class HousingPlacement : MonoBehaviour
     void Start()
     {
         //validPlacement = true;
-        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         startingPositionChosen = false;
         startingPosition = new Vector2(-1, -1);
@@ -54,9 +50,7 @@ public class HousingPlacement : MonoBehaviour
             Destroy(gameObject);
         }
 
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.x = Mathf.RoundToInt(mousePos.x);
-        mousePos.y = Mathf.RoundToInt(mousePos.y);
+        updateBuildMode();
 
         if (!startingPositionChosen && !EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0))
         {
@@ -79,7 +73,7 @@ public class HousingPlacement : MonoBehaviour
             }
 
             if (mousePos.x - Mathf.FloorToInt(width / 2) + 1 > 0 && mousePos.x + Mathf.FloorToInt(width / 2) - 1 < myWorld.mapSize - 1
-            && mousePos.y - Mathf.FloorToInt(height / 2) + 1 > 0 && mousePos.y + Mathf.FloorToInt(height / 2) - 1 < myWorld.mapSize - 1)
+                && mousePos.y - Mathf.FloorToInt(height / 2) + 1 > 0 && mousePos.y + Mathf.FloorToInt(height / 2) - 1 < myWorld.mapSize - 1)
             {
                 float adjustedX = 0f;
                 float adjustedY = 0f;
@@ -99,7 +93,6 @@ public class HousingPlacement : MonoBehaviour
         {
             int xCount = Mathf.Abs((int)mousePos.x - (int)startingPosition.x) + 1;
             int yCount = Mathf.Abs((int)mousePos.y - (int)startingPosition.y) + 1;
-            int totalPossibleSpots = xCount * yCount;
 
             //Modifiers for determining which way the houses are being placed
             int xModifier = 1;

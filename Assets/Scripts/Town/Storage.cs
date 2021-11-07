@@ -90,7 +90,7 @@ public class Storage : MonoBehaviour {
     public bool acceptsResource(string name, int num)
     {
         bool accepts = false;
-        if (storageType.Equals("Market") || storageType.Equals("Warehouse") || storageType.Equals(World.HOUSE))
+        if (storageType.Equals("Market") || storageType.Equals(World.WAREHOUSE) || storageType.Equals(World.HOUSE))
         {
             //foods
             if (name.Equals(World.MEAT) && num <= storageMax - getCurrentAmountStored())
@@ -136,7 +136,7 @@ public class Storage : MonoBehaviour {
                 accepts = true;
             }
         }
-        if (storageType.Equals("Warehouse"))
+        if (storageType.Equals(World.WAREHOUSE))
         {
             //crafting resources
             if (name.Equals(World.LUMBER) && num <= storageMax - getCurrentAmountStored())
@@ -208,7 +208,7 @@ public class Storage : MonoBehaviour {
      * @param name the name of the resource to add
      * @param num the amount of the resource to add
      */
-    public void addResource(string name, int num)
+    public virtual void addResource(string name, int num)
     {
         if (name.Equals(World.MEAT))
         {
@@ -280,7 +280,7 @@ public class Storage : MonoBehaviour {
      * @param name the name of the resource to remove
      * @param num the amount of the resource to remove
      */
-    public void removeResource(string name, int num)
+    public virtual void removeResource(string name, int num)
     {
         if (name.Equals(World.MEAT))
         {

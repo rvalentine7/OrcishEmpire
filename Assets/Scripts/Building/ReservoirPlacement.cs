@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ReservoirPlacement : MonoBehaviour {
-    public int width;
-    public int height;
-
+/// <summary>
+/// Allows the user to place a reservoir in the world
+/// </summary>
+public class ReservoirPlacement : BuildMode {
     public Sprite impossibleEmptySprite;
     public Sprite impossibleFilledSprite;
     public Sprite possibleEmptySprite;
@@ -45,24 +45,20 @@ public class ReservoirPlacement : MonoBehaviour {
     public GameObject building;
     public int buildingCost;
     private bool validPlacement;
-    private GameObject world;
-    private World myWorld;
     private SpriteRenderer spriteRenderer;
 
-    /**
-     * Initializes the BuildingPlacement class
-     */
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start()
     {
         //validPlacement = true;
-        world = GameObject.Find("WorldInformation");
-        myWorld = world.GetComponent<World>();
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
     }
 
-    /**
-     * Allows the player to place a building in a viable location.
-     */
+    /// <summary>
+    /// Allows the player to place a reservoir in a viable location.
+    /// </summary>
     void Update()
     {
         if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Escape))
@@ -71,10 +67,7 @@ public class ReservoirPlacement : MonoBehaviour {
             Destroy(gameObject);
         }
 
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.x = Mathf.RoundToInt(mousePos.x);
-        mousePos.y = Mathf.RoundToInt(mousePos.y);
-        mousePos.z = 0;
+        updateBuildMode();
 
         //Need enough currency to build the reservoir
         if (myWorld.getCurrency() < buildingCost)
@@ -150,10 +143,10 @@ public class ReservoirPlacement : MonoBehaviour {
         }
 
         //make sure sprite is correct based on if the location is possible or not to build on
-        updateAppearance(mousePos, terrainArr, validPlacement);
+        updateAppearance(terrainArr, validPlacement);
 
-        //Place the object in the world upon left mouse click
-        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButton(0) && validPlacement)
+        //Place the object in the world upon left mouse release
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonUp(0) && validPlacement)
         {
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
             {
@@ -202,16 +195,15 @@ public class ReservoirPlacement : MonoBehaviour {
         }
     }
 
-    /**
-     * Updates the appearance of the reservoir based on its surroundings
-     * @param mousePos the current position of the mouse
-     * @param terrainArr the array holding terrain information from World
-     * @param validPlacement whether the placement is possible
-     */
-    private void updateAppearance(Vector2 mousePos, GameObject[,] terrainArr, bool validPlacement)
+    /// <summary>
+    /// Updates the appearance of the reservoir based on its surroundings
+    /// </summary>
+    /// <param name="terrainArr">the array holding terrain information from World</param>
+    /// <param name="validPlacement">whether the placement is possible</param>
+    private void updateAppearance(GameObject[,] terrainArr, bool validPlacement)
     {
         //reservoirs appear filled when next to water
-        bool nextToWater = checkForRawResources("Water", mousePos, terrainArr);
+        bool nextToWater = checkForRawResources(World.WATER, terrainArr);
 
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         Vector2 reservoirCenter = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x), Mathf.RoundToInt(gameObject.transform.position.y));
@@ -219,8 +211,8 @@ public class ReservoirPlacement : MonoBehaviour {
         bool southConnection = false;
         bool westConnection = false;
         bool eastConnection = false;
-        if ((int)reservoirCenter.y + 2 < myWorld.mapSize && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2] != null
-            && ((structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].tag == "Road"
+        if ((int)reservoirCenter.x < myWorld.mapSize && (int)reservoirCenter.x > 0 && (int)reservoirCenter.y + 2 < myWorld.mapSize && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2] != null
+            && ((structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].tag.Equals(World.ROAD)
                 && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].GetComponent<RoadInformation>().getAqueduct() != null)
             || structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].GetComponent<Aqueduct>() != null
             || (structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y + 2].GetComponent<Reservoir>() != null
@@ -228,8 +220,8 @@ public class ReservoirPlacement : MonoBehaviour {
         {
             northConnection = true;
         }
-        if ((int)reservoirCenter.y - 2 > 0 && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2] != null
-            && ((structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].tag == "Road"
+        if ((int)reservoirCenter.x < myWorld.mapSize && (int)reservoirCenter.x > 0 && (int)reservoirCenter.y - 2 > 0 && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2] != null
+            && ((structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].tag.Equals(World.ROAD)
                 && structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].GetComponent<RoadInformation>().getAqueduct() != null)
             || structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].GetComponent<Aqueduct>() != null
             || (structureArr[(int)reservoirCenter.x, (int)reservoirCenter.y - 2].GetComponent<Reservoir>() != null
@@ -237,8 +229,8 @@ public class ReservoirPlacement : MonoBehaviour {
         {
             southConnection = true;
         }
-        if ((int)reservoirCenter.x - 2 > 0 && structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y] != null
-            && ((structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].tag == "Road"
+        if ((int)reservoirCenter.y < myWorld.mapSize && (int)reservoirCenter.y > 0 && (int)reservoirCenter.x - 2 > 0 && structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y] != null
+            && ((structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].tag.Equals(World.ROAD)
                 && structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].GetComponent<RoadInformation>().getAqueduct() != null)
             || structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].GetComponent<Aqueduct>() != null
             || (structureArr[(int)reservoirCenter.x - 2, (int)reservoirCenter.y].GetComponent<Reservoir>() != null
@@ -246,8 +238,8 @@ public class ReservoirPlacement : MonoBehaviour {
         {
             westConnection = true;
         }
-        if ((int)reservoirCenter.x + 2 < myWorld.mapSize && structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y] != null
-            && ((structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].tag == "Road"
+        if ((int)reservoirCenter.y < myWorld.mapSize && (int)reservoirCenter.y > 0 && (int)reservoirCenter.x + 2 < myWorld.mapSize && structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y] != null
+            && ((structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].tag.Equals(World.ROAD)
                 && structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].GetComponent<RoadInformation>().getAqueduct() != null)
             || structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].GetComponent<Aqueduct>() != null
             || (structureArr[(int)reservoirCenter.x + 2, (int)reservoirCenter.y].GetComponent<Reservoir>() != null
@@ -445,14 +437,13 @@ public class ReservoirPlacement : MonoBehaviour {
         }
     }
 
-    /**
-     * Checks the areas around a building for if a raw resource is next to it
-     * @param tagName the name of the resource to check for
-     * @param mousePos the position of the mouse
-     * @param terrainArr the array of terrain elements
-     * @return nextToResources whether the building has any of the raw resource next to it
-     */
-    private bool checkForRawResources(string tagName, Vector2 mousePos, GameObject[,] terrainArr)
+    /// <summary>
+    /// Checks the areas around a building for if a raw resource is next to it
+    /// </summary>
+    /// <param name="tagName">the name of the resource to check for</param>
+    /// <param name="terrainArr">the array of terrain elements</param>
+    /// <returns>whether the building has any of the raw resource next to it</returns>
+    private bool checkForRawResources(string tagName, GameObject[,] terrainArr)
     {
         bool nextToResource = false;
         for (int i = 0; i < width; i++)
@@ -463,7 +454,7 @@ public class ReservoirPlacement : MonoBehaviour {
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i < myWorld.mapSize - 1
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i > 0
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }
@@ -472,7 +463,7 @@ public class ReservoirPlacement : MonoBehaviour {
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i < myWorld.mapSize - 1
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i > 0
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }
@@ -481,7 +472,7 @@ public class ReservoirPlacement : MonoBehaviour {
                 && (int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i > 0
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height < myWorld.mapSize - 1
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) + height].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }
@@ -490,7 +481,7 @@ public class ReservoirPlacement : MonoBehaviour {
                 && (int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i > 0
                 && (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1 > 0
                 && terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1] != null
-                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1].tag == tagName))
+                && (terrainArr[(int)mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) - 1].tag.Equals(tagName)))
             {
                 nextToResource = true;
             }

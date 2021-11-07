@@ -5,9 +5,9 @@ using System.Collections;
 /// <summary>
 /// Lets the player place buildings in the world.
 /// </summary>
-public class BuildingPlacement : MonoBehaviour {
-    public int width;
-    public int height;
+public class BuildingPlacement : BuildMode {
+    //public int width;
+    //public int height;
     public Sprite possibleSprite;
     public Sprite possibleSprite2;
     public Sprite impossibleSprite;
@@ -15,14 +15,14 @@ public class BuildingPlacement : MonoBehaviour {
     public GameObject building;
     public int buildingCost;
     private bool validPlacement;
-    private World myWorld;
+    //private World myWorld;
 
     /// <summary>
     /// Initializes the BuildingPlacement class
     /// </summary>
     void Start () {
         //validPlacement = true;
-        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
+        //myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
     }
 
     /// <summary>
@@ -34,11 +34,8 @@ public class BuildingPlacement : MonoBehaviour {
             //exits out of construction mode if the right mouse button or escape is clicked
             Destroy(gameObject);
         }
-        
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.x = Mathf.RoundToInt(mousePos.x);
-        mousePos.y = Mathf.RoundToInt(mousePos.y);
-        mousePos.z = 0;
+
+        updateBuildMode();
 
         //Need enough currency to build the building
         if (myWorld.getCurrency() < buildingCost)

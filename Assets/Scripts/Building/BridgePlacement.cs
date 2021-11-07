@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// Used to place bridges in the world
 /// </summary>
-public class BridgePlacement : MonoBehaviour {
+public class BridgePlacement : BuildMode {
     public GameObject bridgeObject;
     public int bridgeSegmentCost;
     public GameObject tempBridgeObject;
@@ -25,19 +25,17 @@ public class BridgePlacement : MonoBehaviour {
 
     private SpriteRenderer spriteRenderer;
     private bool validPlacement;
-    private GameObject world;
-    private World myWorld;
     private bool placedStartingLocation;
     private Dictionary<Vector2, GameObject> tempBridgeSegments;//The key is the position
     private Vector2 startingPosition;
     private Vector2 endingPosition;
 
-    // Use this for initialization
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start () {
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
         validPlacement = true;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
         placedStartingLocation = false;
         tempBridgeSegments = new Dictionary<Vector2, GameObject>();
         startingPosition = new Vector2(0, 0);
@@ -74,10 +72,7 @@ public class BridgePlacement : MonoBehaviour {
             }
         }
 
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.x = Mathf.RoundToInt(mousePos.x);
-        mousePos.y = Mathf.RoundToInt(mousePos.y);
-        mousePos.z = 0;
+        updateBuildMode();
 
         validPlacement = false;
         bool valid = true;
@@ -234,10 +229,10 @@ public class BridgePlacement : MonoBehaviour {
 
         validPlacement = valid && segmentsInValidPositions && (structureArr[(int)mousePos.x, (int)mousePos.y] == null);
         //Update the preview (this will show segments inbetween the two endpoints and show possible/impossible sprites)
-        updateBridgePreview(mousePos);
+        updateBridgePreview();
 
         //If the bridge is in a valid location and the left mouse is clicked, place an object
-        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonUp(0) && validPlacement)
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0) && validPlacement && !placedStartingLocation)
         {
             //when mouse down, can place a bridge object
             if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
@@ -254,8 +249,16 @@ public class BridgePlacement : MonoBehaviour {
                     spriteRenderer.enabled = false;
                     tempBridgeSegments.Add(mousePos, startingBridgeSegment);
                 }
+            }
+        }
+        else if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonUp(0) && validPlacement && placedStartingLocation)
+        {
+            //when mouse down, can place a bridge object
+            if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
+            {
+                transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
                 //Second click.  Place the end point
-                else if (new Vector2(mousePos.x, mousePos.y) != startingPosition)
+                if (new Vector2(mousePos.x, mousePos.y) != startingPosition)
                 {
                     //Update the city's currency for building the bridge
                     myWorld.updateCurrency(-(bridgeSegmentCost * tempBridgeSegments.Count));
@@ -359,18 +362,28 @@ public class BridgePlacement : MonoBehaviour {
                 }
             }
         }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            //Start over from square one because the bridge was placed incorrectly
+            foreach(GameObject tempBridgeSegment in tempBridgeSegments.Values)
+            {
+                Destroy(tempBridgeSegment);
+            }
+            placedStartingLocation = false;
+            tempBridgeSegments = new Dictionary<Vector2, GameObject>();
+            spriteRenderer.enabled = true;
+        }
         if (!placedStartingLocation && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
         {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
         }
     }
 
-    /**
-     * Displays all of the segments of a bridge and shows whether it is possible
-     * to create the bridge.
-     * @param mousePos the position of the mouse
-     */
-    private void updateBridgePreview(Vector3 mousePos)
+    /// <summary>
+    /// Displays all of the segments of a bridge and shows whether it is possible
+    /// to create the bridge.
+    /// </summary>
+    private void updateBridgePreview()
     {
         //If there is only one sprite to worry about (the starting sprite)
         if (!placedStartingLocation)
