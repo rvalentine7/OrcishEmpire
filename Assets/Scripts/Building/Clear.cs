@@ -2,52 +2,67 @@
 using System.Collections;
 using System.Collections.Generic;
 
-/**
- * Used by the ClearLand button in the game UI to clear out obstacles
- * and player-constructed objects in the map.
- */
+/// <summary>
+/// Used by the ClearLand button in the game UI to clear out obstacles
+/// and player-constructed objects in the map.
+/// </summary>
 public class Clear : MonoBehaviour {
     public Sprite clearSection;
     public GameObject straightRoad;
-    public GameObject cornerRoad;
-    public GameObject tRoad;
-    public GameObject crossRoad;
-    private Dictionary<GameObject, float> delayDeletion;
+    public GameObject tempClearObject;
 
-    // Use this for initialization
+    private World myWorld;
+    private Vector2 startClearPosition;
+    private Color color = Color.red;
+    private LineRenderer lineRenderer;
+    private SpriteRenderer spriteRenderer;
+    private Dictionary<Vector2, GameObject> clearObjects;
+
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start() {
-        delayDeletion = new Dictionary<GameObject, float>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
+        startClearPosition = new Vector2(-1, -1);
+
+        lineRenderer = gameObject.GetComponent<LineRenderer>();
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.sortingLayerName = "CreationGrid";
+        lineRenderer.widthMultiplier = 0.03f;
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
+        lineRenderer.enabled = false;
+
+        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        clearObjects = new Dictionary<Vector2, GameObject>();
     }
 
-    /**
-     * Updates the visual location of the "DestroySection" sprite and deletes what is at the location
-     * if the left mouse button is pressed.
-     */
+    /// <summary>
+    /// Updates the visual location of the "DestroySection" sprite and deletes what is at the location
+    /// if the left mouse button is pressed.
+    /// </summary>
     void Update() {
-        if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Escape))
+        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
         {
-            //exits out of destroy mode if the right mouse button or escape is clicked
-            Destroy(gameObject);
-        }
-        //Stops me from deleting a road immediately with an aqueduct
-        if (delayDeletion.Count > 0)
-        {
-            List<GameObject> keysToRemove = new List<GameObject>();
-            foreach (KeyValuePair<GameObject, float> kvp in delayDeletion)
+            if (startClearPosition.x != -1 && startClearPosition.y != -1)
             {
-                if (kvp.Value < Time.time)
+                startClearPosition.x = -1;
+                startClearPosition.y = -1;
+                lineRenderer.enabled = false;
+                spriteRenderer.enabled = true;
+                foreach (GameObject clearObject in clearObjects.Values)
                 {
-                    keysToRemove.Add(kvp.Key);
+                    Destroy(clearObject);
                 }
+                clearObjects = new Dictionary<Vector2, GameObject>();
             }
-            foreach (GameObject key in keysToRemove)
+            else
             {
-                delayDeletion.Remove(key);
+                //exits out of destroy mode if the right mouse button or escape is clicked
+                Destroy(gameObject);
             }
         }
-
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        World myWorld = world.GetComponent<World>();
+        
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
@@ -59,24 +74,121 @@ public class Clear : MonoBehaviour {
         if (mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1)
         {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
+
+            if (Input.GetMouseButtonDown(0) && startClearPosition.x == -1 && startClearPosition.y == -1)
+            {
+                startClearPosition = mousePos;
+                spriteRenderer.enabled = false;
+            }
         }
 
-        if (Input.GetMouseButton(0)
-            && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1
-            && structureArr[(int)mousePos.x, (int)mousePos.y] != null
-            && (structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.ROAD
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.BUILDING
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HOUSE
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HIGH_BRIDGE
-            || structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.LOW_BRIDGE))
+        int xSpaces = Mathf.RoundToInt(mousePos.x - startClearPosition.x);
+        int ySpaces = Mathf.RoundToInt(mousePos.y - startClearPosition.y);
+        //Draw the area in which stuff will be destroyed
+        if (startClearPosition.x != -1 && startClearPosition.y != -1)
         {
-            GameObject structureToClear = structureArr[(int)mousePos.x, (int)mousePos.y];
-            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.HOUSE)
+            float xStartAdjustment = xSpaces >= 0 ? -0.5f : 0.5f;
+            float yStartAdjustment = ySpaces >= 0 ? -0.5f : 0.5f;
+            //Start
+            lineRenderer.SetPosition(0, new Vector3(startClearPosition.x + xStartAdjustment, startClearPosition.y + yStartAdjustment, 0));
+            //Bottom right
+            lineRenderer.SetPosition(1, new Vector3(mousePos.x - xStartAdjustment, startClearPosition.y + yStartAdjustment, 0));
+            //Mouse Position
+            lineRenderer.SetPosition(2, new Vector3(mousePos.x - xStartAdjustment, mousePos.y - yStartAdjustment, 0));
+            //Top Left
+            lineRenderer.SetPosition(3, new Vector3(startClearPosition.x + xStartAdjustment, mousePos.y - yStartAdjustment, 0));
+            //Return to start
+            lineRenderer.SetPosition(4, new Vector3(startClearPosition.x + xStartAdjustment, startClearPosition.y + yStartAdjustment, 0));
+            lineRenderer.enabled = true;
+
+            //Go through all the locations in the selected area to display if something in it is being cleared
+            List<Vector2> clearLocationsToRemove = new List<Vector2>(clearObjects.Keys);
+            int xAbsSpaces = Mathf.Abs(xSpaces);
+            int yAbsSpaces = Mathf.Abs(ySpaces);
+            //Go through all the structure and terrain locations in the dragged area
+            for (int i = 0; i <= xAbsSpaces; i++)
+            {
+                int xSign = xSpaces == 0 ? 1 : xSpaces / xAbsSpaces;
+                for (int j = 0; j <= yAbsSpaces; j++)
+                {
+                    int ySign = ySpaces == 0 ? 1 : ySpaces / yAbsSpaces;
+                    //Check if there is a structure or tree in the location
+                    Vector2 tempClearObjPosition = new Vector2((int)startClearPosition.x + i * xSign, (int)startClearPosition.y + j * ySign);
+                    if (structureArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y] != null
+                        || (terrainArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y] != null
+                        && terrainArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y].tag.Equals(World.TREES)))
+                    {
+                        if (clearLocationsToRemove.Contains(tempClearObjPosition))
+                        {
+                            clearLocationsToRemove.Remove(tempClearObjPosition);
+                        }
+                        else
+                        {
+                            GameObject tempClearObj = Instantiate(tempClearObject, tempClearObjPosition, Quaternion.identity) as GameObject;
+                            clearObjects.Add(tempClearObjPosition, tempClearObj);
+                        }
+                    }
+                }
+            }
+            //Remove locations that are no longer being considered
+            foreach (Vector2 clearLocationToRemove in clearLocationsToRemove)
+            {
+                Destroy(clearObjects[clearLocationToRemove]);
+                clearObjects.Remove(clearLocationToRemove);
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0) && startClearPosition.x != -1)
+        {
+            int xAbsSpaces = Mathf.Abs(xSpaces);
+            int yAbsSpaces = Mathf.Abs(ySpaces);
+            //Go through all the structure and terrain locations in the dragged area
+            for (int i = 0; i <= xAbsSpaces; i++)
+            {
+                int xSign = xSpaces == 0 ? 1 : xSpaces / xAbsSpaces;
+                for (int j = 0; j <= yAbsSpaces; j++)
+                {
+                    int ySign = ySpaces == 0 ? 1 : ySpaces / yAbsSpaces;
+                    //If the user is clearing a section of space, this will clear every possible thing in that section.  If it's one grid space, it will clear the top item
+                    attemptClearOnPosition(new Vector2(startClearPosition.x + i * xSign, startClearPosition.y + j * ySign), structureArr, terrainArr, xAbsSpaces > 0 || yAbsSpaces > 0);
+                }
+            }
+            foreach (GameObject clearObject in clearObjects.Values)
+            {
+                Destroy(clearObject);
+            }
+            clearObjects = new Dictionary<Vector2, GameObject>();
+            startClearPosition.x = -1;
+            startClearPosition.y = -1;
+            lineRenderer.enabled = false;
+            spriteRenderer.enabled = true;
+        }
+    }
+
+    /// <summary>
+    /// Attempts to clear a grid space on the map
+    /// </summary>
+    /// <param name="locationToClear">The grid space to clear</param>
+    /// <param name="structureArr">The structure array to update</param>
+    /// <param name="terrainArr">The terrain array to update</param>
+    /// <param name="clearRoadAndAqueduct">Whether to clear both road and aqueduct if they're in the same grid space</param>
+    private void attemptClearOnPosition(Vector2 locationToClear, GameObject[,] structureArr, GameObject[,] terrainArr, bool clearRoadAndAqueduct)
+    {
+        if (locationToClear.x > 0 && locationToClear.x < myWorld.mapSize - 1 && locationToClear.y > 0 && locationToClear.y < myWorld.mapSize - 1
+            && structureArr[(int)locationToClear.x, (int)locationToClear.y] != null
+            && (structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.ROAD)
+            || structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.BUILDING)
+            || structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.HOUSE)
+            || structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.HIGH_BRIDGE)
+            || structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.LOW_BRIDGE)))
+        {
+            GameObject structureToClear = structureArr[(int)locationToClear.x, (int)locationToClear.y];
+            if (structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.HOUSE))
             {
                 HouseInformation houseInfo = structureToClear.GetComponent<HouseInformation>();
                 houseInfo.destroyHouse();
             }
-            if (structureArr[(int)mousePos.x, (int)mousePos.y].tag == World.BUILDING)
+            if (structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.BUILDING))
             {
                 bool clearingAnAqueduct = false;
                 bool clearingAReservoir = false;
@@ -115,11 +227,11 @@ public class Clear : MonoBehaviour {
                 employment.destroyEmployment();
 
                 //Clearing the array in that position because even though the object should be removed, it doesn't seem to update properly
-                if (structureArr[(int)mousePos.x, (int)mousePos.y] != null)
+                if (structureArr[(int)locationToClear.x, (int)locationToClear.y] != null)
                 {
-                    if (structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>() == null)
+                    if (structureArr[(int)locationToClear.x, (int)locationToClear.y].GetComponent<RoadInformation>() == null)
                     {
-                        structureArr[(int)mousePos.x, (int)mousePos.y] = null;
+                        structureArr[(int)locationToClear.x, (int)locationToClear.y] = null;
                     }
                 }
 
@@ -130,49 +242,20 @@ public class Clear : MonoBehaviour {
                 }
             }
             //Deleting bridges
-            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag.Equals(World.HIGH_BRIDGE)
-                || structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag.Equals(World.LOW_BRIDGE))
+            if (structureArr[(int)locationToClear.x, (int)locationToClear.y] != null && structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.HIGH_BRIDGE)
+                || structureArr[(int)locationToClear.x, (int)locationToClear.y] != null && structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.LOW_BRIDGE))
             {
-                structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Bridge>().destroyBridge();
+                structureArr[(int)locationToClear.x, (int)locationToClear.y].GetComponent<Bridge>().destroyBridge();
             }
             //If the deleted object is a road, the surrounding roads need to be updated to reflect
             // the fact there is no longer a road where the deleted one was
-            if (structureArr[(int)mousePos.x, (int)mousePos.y] != null && structureArr[(int)mousePos.x, (int)mousePos.y].tag.Equals(World.ROAD))
+            if (structureArr[(int)locationToClear.x, (int)locationToClear.y] != null && structureArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.ROAD))
             {
-                if (structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().getAqueduct() == null
-                    && !delayDeletion.ContainsKey(structureArr[(int)mousePos.x, (int)mousePos.y]))
+                if (structureArr[(int)locationToClear.x, (int)locationToClear.y].GetComponent<RoadInformation>().getAqueduct() == null)
                 {
-                    structureArr[(int)mousePos.x, (int)mousePos.y] = null;
-                    //updateRoadConnection(mousePos, structureArr);
-                    //go through roads attached to the deleted road to update them visibly
-                    //do not update the roads outside building limits
-                    if ((int)mousePos.y + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x, (int)mousePos.y + 1] != null
-                       && structureArr[(int)mousePos.x, (int)mousePos.y + 1].tag.Equals(World.ROAD))
-                    {
-                        //update road above the one you are trying to build
-                        structureArr[(int)mousePos.x, (int)mousePos.y + 1].GetComponent<RoadInformation>().updateRoadConnection();
-                    }
-                    if ((int)mousePos.y - 1 > 0 && structureArr[(int)mousePos.x, (int)mousePos.y - 1] != null
-                        && structureArr[(int)mousePos.x, (int)mousePos.y - 1].tag.Equals(World.ROAD))
-                    {
-                        //update road below the one you are trying to build
-                        structureArr[(int)mousePos.x, (int)mousePos.y - 1].GetComponent<RoadInformation>().updateRoadConnection(); ;
-                    }
-                    if ((int)mousePos.x - 1 > 0 && structureArr[(int)mousePos.x - 1, (int)mousePos.y] != null
-                        && structureArr[(int)mousePos.x - 1, (int)mousePos.y].tag.Equals(World.ROAD))
-                    {
-                        //update road to the left of the one you are trying to build
-                        structureArr[(int)mousePos.x - 1, (int)mousePos.y].GetComponent<RoadInformation>().updateRoadConnection();
-                    }
-                    if ((int)mousePos.x + 1 < myWorld.mapSize - 1 && structureArr[(int)mousePos.x + 1, (int)mousePos.y] != null
-                        && structureArr[(int)mousePos.x + 1, (int)mousePos.y].tag.Equals(World.ROAD))
-                    {
-                        //update road to the right of the one you are trying to build
-                        structureArr[(int)mousePos.x + 1, (int)mousePos.y].GetComponent<RoadInformation>().updateRoadConnection();
-                    }
-                    Destroy(structureToClear);
+                    clearRoad(structureToClear, locationToClear, structureArr);
                 }
-                else if (!delayDeletion.ContainsKey(structureArr[(int)mousePos.x, (int)mousePos.y]))
+                else
                 {
                     bool clearingAnAqueduct = false;
                     List<GameObject> aqueductConnections = new List<GameObject>();
@@ -182,60 +265,80 @@ public class Clear : MonoBehaviour {
                         //get a list of the current connections
                         aqueductConnections = structureToClear.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().getConnections();
                     }
-                    
-                    structureArr[(int)mousePos.x, (int)mousePos.y].GetComponent<RoadInformation>().destroyRoad();
-                    GameObject roadWithDestroyedAqueduct = structureArr[(int)mousePos.x, (int)mousePos.y];
-                    structureArr[(int)mousePos.x, (int)mousePos.y] = null;//connections won't update right away unless I explicity set this to null
+
+                    structureArr[(int)locationToClear.x, (int)locationToClear.y].GetComponent<RoadInformation>().destroyRoad();
+                    GameObject roadWithDestroyedAqueduct = structureArr[(int)locationToClear.x, (int)locationToClear.y];
+                    structureArr[(int)locationToClear.x, (int)locationToClear.y] = null;//connections won't update right away unless I explicity set this to null
 
                     if (clearingAnAqueduct)
                     {
-                        //call update connections on each item in the list of the aqueduct's old connections
-                        foreach (GameObject connection in aqueductConnections)
-                        {
-                            if (connection != null)
-                            {
-                                if (connection.GetComponent<Aqueduct>() != null)
-                                {
-                                    connection.GetComponent<Aqueduct>().updateConnections();
-                                }
-                                else if (connection.GetComponent<Reservoir>() != null)
-                                {
-                                    connection.GetComponent<Reservoir>().updateConnections();
-                                }
-                                else if (connection.GetComponent<RoadInformation>() != null)
-                                {
-                                    connection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>().updateConnections();
-                                }
-                            }
-                        }
+                        updateWaterConnections(aqueductConnections);
                     }
-                    //roadWithDestroyedAqueduct.GetComponent<RoadInformation>().setAqueduct(null);
-                    structureArr[(int)mousePos.x, (int)mousePos.y] = roadWithDestroyedAqueduct;
-
-                    //0.3f is an arbitrarily chosen number I feel is long enough to avoid losing the road from a click
-                    delayDeletion.Add(structureArr[(int)mousePos.x, (int)mousePos.y], Time.time + 0.3f);
+                    if (clearRoadAndAqueduct)
+                    {
+                        clearRoad(structureToClear, locationToClear, structureArr);
+                    }
+                    else
+                    {
+                        structureArr[(int)locationToClear.x, (int)locationToClear.y] = roadWithDestroyedAqueduct;
+                    }
                 }
             }
-
-            //myControls.buildArr.removeFromBuildArr((int)mousePos.y, (int)mousePos.x);
-            //Destroy(structureToClear);
         }
         //allow the user to destroy trees
-        if (Input.GetMouseButton(0)
-            && mousePos.x > 0 && mousePos.x < myWorld.mapSize - 1 && mousePos.y > 0 && mousePos.y < myWorld.mapSize - 1
-            && terrainArr[(int)mousePos.x, (int)mousePos.y] != null
-            && (terrainArr[(int)mousePos.x, (int)mousePos.y].tag.Equals("Trees")))
+        if (locationToClear.x > 0 && locationToClear.x < myWorld.mapSize - 1 && locationToClear.y > 0 && locationToClear.y < myWorld.mapSize - 1
+            && terrainArr[(int)locationToClear.x, (int)locationToClear.y] != null
+            && (terrainArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.TREES)))
         {
-            GameObject terrainToClear = terrainArr[(int)mousePos.x, (int)mousePos.y];
+            GameObject terrainToClear = terrainArr[(int)locationToClear.x, (int)locationToClear.y];
             TreeRemoval treeToClear = terrainToClear.GetComponent<TreeRemoval>();
             treeToClear.removeTree();
         }
     }
 
-    /**
-     * Updates the connections of a reservoir or aqueduct that is being deleted
-     * @param waterConnections the connections to update
-     */
+    /// <summary>
+    /// Destroys a road segment
+    /// </summary>
+    /// <param name="roadToClear">The road to clear</param>
+    /// <param name="locationToClear">The grid space to clear the road from</param>
+    /// <param name="structureArr">The world's structure array</param>
+    private void clearRoad(GameObject roadToClear, Vector2 locationToClear, GameObject[,] structureArr)
+    {
+        structureArr[(int)locationToClear.x, (int)locationToClear.y] = null;
+        //updateRoadConnection(mousePos, structureArr);
+        //go through roads attached to the deleted road to update them visibly
+        //do not update the roads outside building limits
+        if ((int)locationToClear.y + 1 < myWorld.mapSize - 1 && structureArr[(int)locationToClear.x, (int)locationToClear.y + 1] != null
+           && structureArr[(int)locationToClear.x, (int)locationToClear.y + 1].tag.Equals(World.ROAD))
+        {
+            //update road above the one you are trying to build
+            structureArr[(int)locationToClear.x, (int)locationToClear.y + 1].GetComponent<RoadInformation>().updateRoadConnection();
+        }
+        if ((int)locationToClear.y - 1 > 0 && structureArr[(int)locationToClear.x, (int)locationToClear.y - 1] != null
+            && structureArr[(int)locationToClear.x, (int)locationToClear.y - 1].tag.Equals(World.ROAD))
+        {
+            //update road below the one you are trying to build
+            structureArr[(int)locationToClear.x, (int)locationToClear.y - 1].GetComponent<RoadInformation>().updateRoadConnection(); ;
+        }
+        if ((int)locationToClear.x - 1 > 0 && structureArr[(int)locationToClear.x - 1, (int)locationToClear.y] != null
+            && structureArr[(int)locationToClear.x - 1, (int)locationToClear.y].tag.Equals(World.ROAD))
+        {
+            //update road to the left of the one you are trying to build
+            structureArr[(int)locationToClear.x - 1, (int)locationToClear.y].GetComponent<RoadInformation>().updateRoadConnection();
+        }
+        if ((int)locationToClear.x + 1 < myWorld.mapSize - 1 && structureArr[(int)locationToClear.x + 1, (int)locationToClear.y] != null
+            && structureArr[(int)locationToClear.x + 1, (int)locationToClear.y].tag.Equals(World.ROAD))
+        {
+            //update road to the right of the one you are trying to build
+            structureArr[(int)locationToClear.x + 1, (int)locationToClear.y].GetComponent<RoadInformation>().updateRoadConnection();
+        }
+        Destroy(roadToClear);
+    }
+
+    /// <summary>
+    /// Updates the connections of a reservoir or aqueduct that is being deleted
+    /// </summary>
+    /// <param name="waterConnections">the connections to update</param>
     private void updateWaterConnections(List<GameObject> waterConnections)
     {
         //call update connections on each item in the list of the aqueduct's old connections

@@ -242,27 +242,27 @@ public class RoadInformation : MonoBehaviour {
         }
     }
 
-    /**
-     * Sets the aqueduct that is over this road object
-     * @param the aqueduct to go over this road
-     */
+    /// <summary>
+    /// Sets the aqueduct that is over this road object
+    /// </summary>
+    /// <param name="aqueduct">the aqueduct to go over this road</param>
     public void setAqueduct(GameObject aqueduct)
     {
         this.aqueduct = aqueduct;
     }
 
-    /**
-     * Gets the aqueduct over this road object
-     * @return the aqueduct over this road object if there is one, null otherwise
-     */
+    /// <summary>
+    /// Gets the aqueduct over this road object
+    /// </summary>
+    /// <returns>the aqueduct over this road object if there is one, null otherwise</returns>
     public GameObject getAqueduct()
     {
         return this.aqueduct;
     }
 
-    /**
-     * Destroys the aqueduct if there is one on top of the road, otherwise destroy the road
-     */
+    /// <summary>
+    /// Destroys the aqueduct if there is one on top of the road, otherwise destroy the road
+    /// </summary>
     public void destroyRoad()
     {
         if (this.aqueduct != null)

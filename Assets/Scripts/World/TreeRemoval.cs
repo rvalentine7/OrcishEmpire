@@ -2,20 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Removes the tree and replaces itself with a patch of land
+/// </summary>
 public class TreeRemoval : MonoBehaviour {
     public GameObject ground;
     private GameObject world;
     private World myWorld;
 
-    // Use this for initialization
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start () {
         world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
     }
 
-    /**
-     * Removes the trees gameobject this script is attached to and replaces it with a ground tile
-     */
+    /// <summary>
+    /// Removes the trees gameobject this script is attached to and replaces it with a ground tile
+    /// </summary>
     public void removeTree()
     {
         Vector2 treeLocation = gameObject.transform.position;

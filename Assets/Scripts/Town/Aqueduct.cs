@@ -235,12 +235,12 @@ public class Aqueduct : MonoBehaviour {
         }
 
         bool overRoad = false;
-        if (structureArr[(int)aqueductPos.x, (int)aqueductPos.y].tag.Equals(World.ROAD))
+        if (structureArr[(int)aqueductPos.x, (int)aqueductPos.y] != null && structureArr[(int)aqueductPos.x, (int)aqueductPos.y].tag.Equals(World.ROAD))
         {
             overRoad = true;
         }
 
-        //TODO: update the 4 and 3 connections to account for when an arch is going north/south or east/west and an aqueduct is placed on the east/west or north/south respectively
+        //TODO: update the 4 and 3 connections to account for when an arch is going north/south or east/west and an aqueduct is placed on the east/west or north/south respectively. still todo?
         //Update sprite and add the connections.  Need to check if any are arches to see if I need to update based on those... currently adding sprites
         //Four connections
         if (north && south && west && east)
