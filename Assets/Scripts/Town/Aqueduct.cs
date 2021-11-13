@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+/// <summary>
+/// An aqueduct is used to transfer water from a filled reservoir
+/// </summary>
 public class Aqueduct : MonoBehaviour {
     public float timeInterval;//for checking if it should be filled with water
     public float waterDelay;
@@ -30,8 +33,7 @@ public class Aqueduct : MonoBehaviour {
     public Sprite filled3NWE;
     public Sprite filled3SWE;
     public Sprite filled4;
-
-    private GameObject world;
+    
     private World myWorld;
     private GameObject topConnection = null;
     private GameObject botConnection = null;
@@ -50,10 +52,12 @@ public class Aqueduct : MonoBehaviour {
     private bool nextToClearedWaterStructure;
     private bool initialCreation;
 
+    /// <summary>
+    /// Initialization
+    /// </summary>
     private void Awake()
     {
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         topConnection = null;
         botConnection = null;
         leftConnection = null;
@@ -72,21 +76,45 @@ public class Aqueduct : MonoBehaviour {
         initialCreation = true;
     }
 
-    // Use this for initialization
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start () {
         updateConnections();
         updateNeighbors();
     }
 	
-	// Update is called once per frame
+	/// <summary>
+    /// Updates the aqueduct
+    /// </summary>
 	void Update () {
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         Vector2 aqueductPos = gameObject.transform.position;
         if (structureArr[(int)aqueductPos.x, (int)aqueductPos.y] != null
-            && structureArr[(int)aqueductPos.x, (int)aqueductPos.y].tag == "Road"
-            && topConnection == null && botConnection == null && leftConnection == null && rightConnection == null)
+            && structureArr[(int)aqueductPos.x, (int)aqueductPos.y].tag.Equals(World.ROAD))
         {
-            Destroy(gameObject);
+            int connectionCount = 0;
+            if (topConnection)
+            {
+                connectionCount++;
+            }
+            if (botConnection)
+            {
+                connectionCount++;
+            }
+            if (leftConnection)
+            {
+                connectionCount++;
+            }
+            if (rightConnection)
+            {
+                connectionCount++;
+            }
+            if (connectionCount != 2)
+            {
+                notifyConnectionsOfDeletion();
+                Destroy(gameObject);
+            }
         }
         if (!checkingWaterSources && preparingToUpdateWaterSources && Time.time > timeToUpdateWaterSources)
         {
@@ -110,9 +138,9 @@ public class Aqueduct : MonoBehaviour {
         }
     }
 
-    /**
-     * Updates the visuals and connections of the aqueduct being placed
-     */
+    /// <summary>
+    /// Updates the visuals and connections of the aqueduct being placed
+    /// </summary>
     public void updateConnections()
     {
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
@@ -153,7 +181,7 @@ public class Aqueduct : MonoBehaviour {
         int nearbyArchCount = 0;
         bool topArch = false;
         if ((int)aqueductPos.y + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1] != null
-            && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].tag == "Road"
+            && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].tag.Equals(World.ROAD)
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>() != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1].GetComponent<RoadInformation>().getAqueduct() != null)
         {
@@ -163,7 +191,7 @@ public class Aqueduct : MonoBehaviour {
         }
         bool botArch = false;
         if ((int)aqueductPos.y - 1 > 0 && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1] != null
-            && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].tag == "Road"
+            && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].tag.Equals(World.ROAD)
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>() != null
             && structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1].GetComponent<RoadInformation>().getAqueduct() != null)
         {
@@ -173,7 +201,7 @@ public class Aqueduct : MonoBehaviour {
         }
         bool leftArch = false;
         if ((int)aqueductPos.x - 1 > 0 && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y] != null
-            && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].tag == "Road"
+            && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].tag.Equals(World.ROAD)
             && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>() != null
             && structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct() != null)
         {
@@ -183,7 +211,7 @@ public class Aqueduct : MonoBehaviour {
         }
         bool rightArch = false;
         if ((int)aqueductPos.x + 1 < myWorld.mapSize && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y] != null
-            && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].tag == "Road"
+            && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].tag.Equals(World.ROAD)
             && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>() != null
             && structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y].GetComponent<RoadInformation>().getAqueduct() != null)
         {
@@ -245,7 +273,7 @@ public class Aqueduct : MonoBehaviour {
         //Four connections
         if (north && south && west && east)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
@@ -363,7 +391,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (northConnectionValid && westConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2NW;
@@ -408,7 +436,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (westConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -422,7 +450,7 @@ public class Aqueduct : MonoBehaviour {
         //Three connections
         else if (north && south && west)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
@@ -486,7 +514,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (northConnectionValid && westConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2NW;
@@ -531,7 +559,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (westConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -544,7 +572,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (north && south && east)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             bool eastArchConnectionValid = false;
@@ -608,7 +636,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (northConnectionValid && eastConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2NE;
@@ -653,7 +681,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (eastConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -666,7 +694,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (north && west && east)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
             bool northArchConnectionValid = false;
             bool westArchConnectionValid = false;
             bool eastArchConnectionValid = false;
@@ -752,7 +780,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (northConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
@@ -787,7 +815,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (south && west && east)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
             bool eastArchConnectionValid = false;
@@ -862,7 +890,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (westConnectionValid && eastConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -885,7 +913,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (westConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -897,7 +925,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (eastConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -911,7 +939,7 @@ public class Aqueduct : MonoBehaviour {
         //Two connections
         else if (north && south)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             bool northArchConnectionValid = false;
             bool southArchConnectionValid = false;
             if (nearbyArchCount > 0)
@@ -991,7 +1019,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (north && west)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
             bool northArchConnectionValid = false;
             bool westArchConnectionValid = false;
             if (nearbyArchCount > 0)
@@ -1036,7 +1064,7 @@ public class Aqueduct : MonoBehaviour {
                 }
                 else if (northConnectionValid)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
@@ -1060,7 +1088,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (overRoad && northConnectionValid && !westConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
@@ -1074,7 +1102,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (north && east)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
             bool northArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
@@ -1119,7 +1147,7 @@ public class Aqueduct : MonoBehaviour {
                 }
                 else if (northConnectionValid)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
@@ -1143,7 +1171,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (overRoad && northConnectionValid && !eastConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2NS;
@@ -1156,7 +1184,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (south && west)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             bool southArchConnectionValid = false;
             bool westArchConnectionValid = false;
             if (nearbyArchCount > 0)
@@ -1212,7 +1240,7 @@ public class Aqueduct : MonoBehaviour {
                 }
                 else if (westConnectionValid)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -1237,7 +1265,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (south && east)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             bool southArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
@@ -1293,7 +1321,7 @@ public class Aqueduct : MonoBehaviour {
                 }
                 else if (eastConnectionValid)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -1318,7 +1346,7 @@ public class Aqueduct : MonoBehaviour {
         }
         else if (west && east)
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
             bool westArchConnectionValid = false;
             bool eastArchConnectionValid = false;
             if (nearbyArchCount > 0)
@@ -1352,12 +1380,12 @@ public class Aqueduct : MonoBehaviour {
             {
                 if (westConnectionValid && eastConnectionValid)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         if (overRoad)
                         {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                             gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
                         }
                         else
@@ -1369,7 +1397,7 @@ public class Aqueduct : MonoBehaviour {
                     {
                         if (overRoad)
                         {
-                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                             gameObject.GetComponent<SpriteRenderer>().sprite = empty2WEArch;
                         }
                         else
@@ -1380,7 +1408,7 @@ public class Aqueduct : MonoBehaviour {
                 }
                 else if (westConnectionValid)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDING;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -1392,7 +1420,7 @@ public class Aqueduct : MonoBehaviour {
                 }
                 else if (eastConnectionValid)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WE;
@@ -1405,7 +1433,7 @@ public class Aqueduct : MonoBehaviour {
             }
             else if (overRoad && westConnectionValid && eastConnectionValid)
             {
-                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                 if (waterSourcesCount > 0)
                 {
                     gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
@@ -1423,7 +1451,7 @@ public class Aqueduct : MonoBehaviour {
             botConnection = null;
             leftConnection = null;
             rightConnection = null;
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             if (nearbyReservoirCount > 0)
             {
                 topConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y + 1];
@@ -1508,7 +1536,7 @@ public class Aqueduct : MonoBehaviour {
             botConnection = null;
             leftConnection = null;
             rightConnection = null;
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
             if (nearbyReservoirCount > 0)
             {
                 botConnection = structureArr[(int)aqueductPos.x, (int)aqueductPos.y - 1];
@@ -1591,13 +1619,13 @@ public class Aqueduct : MonoBehaviour {
             botConnection = null;
             leftConnection = null;
             rightConnection = null;
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
             if (nearbyReservoirCount > 0)
             {
                 leftConnection = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
@@ -1650,7 +1678,7 @@ public class Aqueduct : MonoBehaviour {
                 leftConnection = structureArr[(int)aqueductPos.x - 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
@@ -1679,13 +1707,13 @@ public class Aqueduct : MonoBehaviour {
             botConnection = null;
             leftConnection = null;
             rightConnection = null;
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
             if (nearbyReservoirCount > 0)
             {
                 rightConnection = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
@@ -1738,7 +1766,7 @@ public class Aqueduct : MonoBehaviour {
                 rightConnection = structureArr[(int)aqueductPos.x + 1, (int)aqueductPos.y];
                 if (overRoad)
                 {
-                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "TallBuildings";
+                    gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.TALL_BUILDINGS;
                     if (waterSourcesCount > 0)
                     {
                         gameObject.GetComponent<SpriteRenderer>().sprite = filled2WEArch;
@@ -1763,77 +1791,76 @@ public class Aqueduct : MonoBehaviour {
         }
         else
         {
-            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = "Buildings";
+            gameObject.GetComponent<SpriteRenderer>().sortingLayerName = World.BUILDINGS;
             gameObject.GetComponent<SpriteRenderer>().sprite = empty2WE;
         }
         initialPlacement = false;
-        if (overRoad && topConnection == null && botConnection == null && leftConnection == null && rightConnection == null)
+        if (overRoad)
         {
-            Destroy(gameObject);
+            int connectionCount = 0;
+            if (topConnection)
+            {
+                connectionCount++;
+            }
+            if (botConnection)
+            {
+                connectionCount++;
+            }
+            if (leftConnection)
+            {
+                connectionCount++;
+            }
+            if (rightConnection)
+            {
+                connectionCount++;
+            }
+            if (connectionCount != 2)
+            {
+                notifyConnectionsOfDeletion();
+                Destroy(gameObject);
+            }
         }
-
-        //TODO: at the end, I should call a fill method that checks connected aqueducts/reservoirs if they have access to nearWater reservoirs
-
-        //TODO: when deleting an aqueduct, update the surrounding aqueducts, if the surrounding aqueducts got water from the deleted aqueduct, update them so they don't get it from that direction
     }
 
-
-    //maybe not use these?
-    public void setTopConnection(GameObject aqueduct)
-    {
-        topConnection = aqueduct;
-    }
-
-    public void setBotConnection(GameObject aqueduct)
-    {
-        botConnection = aqueduct;
-    }
-
-    public void setLeftConnection(GameObject aqueduct)
-    {
-        leftConnection = aqueduct;
-    }
-
-    public void setRightConnection(GameObject aqueduct)
-    {
-        rightConnection = aqueduct;
-    }
-
-    /**
-     * Gets the connected aqueduct to the north/top of this one
-     */
+    /// <summary>
+    /// Gets the connected aqueduct to the north/top of this one
+    /// </summary>
+    /// <returns>The connected aqueduct to the north/top of this one</returns>
     public GameObject getTopConnection()
     {
         return topConnection;
     }
 
-    /*
-     * Gets the connected aqueduct to the south/bot of this one
-     */
+    /// <summary>
+    /// Gets the connected aqueduct to the south/bot of this one
+    /// </summary>
+    /// <returns>The connected aqueduct to the south/bottom of this one</returns>
     public GameObject getBotConnection()
     {
         return botConnection;
     }
 
-    /**
-     * Gets the connected aqueduct to the west/left of this one
-     */
+    /// <summary>
+    /// Gets the connected aqueduct to the west/left of this one
+    /// </summary>
+    /// <returns>The connected aqueduct to the west/lefto f this one</returns>
     public GameObject getLeftConnection()
     {
         return leftConnection;
     }
 
-    /**
-     * Gets the connected aqueduct to the east/right of this one
-     */
+    /// <summary>
+    /// Gets the connected aqueduct to the east/right of this one
+    /// </summary>
+    /// <returns>The connected aqueduct to the east/right of this one</returns>
     public GameObject getRightConnection()
     {
         return rightConnection;
     }
 
-    /**
-     * Updates the connecting neighbors of this aqueduct to also connect to this aqueduct
-     */
+    /// <summary>
+    /// Updates the connecting neighbors of this aqueduct to also connect to this aqueduct
+    /// </summary>
     public void updateNeighbors()
     {
         if (topConnection != null)
@@ -1902,9 +1929,10 @@ public class Aqueduct : MonoBehaviour {
         }
     }
 
-    /**
-     * Gets the aqueducts/reservoirs connected to this aqueduct
-     */
+    /// <summary>
+    /// Gets the aqueducts/reservoirs connected to this aqueduct
+    /// </summary>
+    /// <returns>The aqueducts and reservoirs connected to this aqueduct</returns>
     public List<GameObject> getConnections()
     {
         List<GameObject> connections = new List<GameObject>();
@@ -1927,9 +1955,9 @@ public class Aqueduct : MonoBehaviour {
         return connections;
     }
 
-    /**
-     * 
-     */
+    /// <summary>
+    /// Fills the neighbors with water
+    /// </summary>
     public void fillNeighbors()
     {
         //Get references to how the water sources are before they are updated to see if they need to update neighbors
@@ -1952,7 +1980,7 @@ public class Aqueduct : MonoBehaviour {
             initialCreation = false;
             if (topConnection != null)
             {
-                if (topConnection.tag == "Road")
+                if (topConnection.tag.Equals(World.ROAD))
                 {
                     if (topConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                     {
@@ -1970,7 +1998,7 @@ public class Aqueduct : MonoBehaviour {
             }
             if (botConnection != null)
             {
-                if (botConnection.tag == "Road")
+                if (botConnection.tag.Equals(World.ROAD))
                 {
                     if (botConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                     {
@@ -1988,7 +2016,7 @@ public class Aqueduct : MonoBehaviour {
             }
             if (leftConnection != null)
             {
-                if (leftConnection.tag == "Road")
+                if (leftConnection.tag.Equals(World.ROAD))
                 {
                     if (leftConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                     {
@@ -2006,7 +2034,7 @@ public class Aqueduct : MonoBehaviour {
             }
             if (rightConnection != null)
             {
-                if (rightConnection.tag == "Road")
+                if (rightConnection.tag.Equals(World.ROAD))
                 {
                     if (rightConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                     {
@@ -2027,9 +2055,9 @@ public class Aqueduct : MonoBehaviour {
         filling = true;
     }
 
-    /**
-     * Sets the water sources this aqueduct receives from its neighboring connections
-     */
+    /// <summary>
+    /// Sets the water sources this aqueduct receives from its neighboring connections
+    /// </summary>
     public void setWaterSources()
     {
         waterSourcesFromTop = new List<GameObject>();
@@ -2039,7 +2067,7 @@ public class Aqueduct : MonoBehaviour {
         //Sets the water source lists (the 4 directions and the overall)
         if (topConnection != null)
         {
-            if (topConnection.tag == "Road")
+            if (topConnection.tag.Equals(World.ROAD))
             {
                 if (topConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                 {
@@ -2057,7 +2085,7 @@ public class Aqueduct : MonoBehaviour {
         }
         if (botConnection != null)
         {
-            if (botConnection.tag == "Road")
+            if (botConnection.tag.Equals(World.ROAD))
             {
                 if (botConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                 {
@@ -2075,7 +2103,7 @@ public class Aqueduct : MonoBehaviour {
         }
         if (leftConnection != null)
         {
-            if (leftConnection.tag == "Road")
+            if (leftConnection.tag.Equals(World.ROAD))
             {
                 if (leftConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                 {
@@ -2093,7 +2121,7 @@ public class Aqueduct : MonoBehaviour {
         }
         if (rightConnection != null)
         {
-            if (rightConnection.tag == "Road")
+            if (rightConnection.tag.Equals(World.ROAD))
             {
                 if (rightConnection.GetComponent<RoadInformation>().getAqueduct() != null)
                 {
@@ -2140,10 +2168,10 @@ public class Aqueduct : MonoBehaviour {
         }
     }
 
-    /**
-     * Updates the structures with correct water amount and appearance following a clear
-     * @param connectedWaterStructures the structures to update
-     */
+    /// <summary>
+    /// Updates the structures with correct water amount and appearance following a clear
+    /// </summary>
+    /// <param name="connectedWaterStructures">the structures to update</param>
     public void updateConnectedStructuresAfterClear(List<GameObject> connectedWaterStructures)
     {
         //Update everything in the list to remove any water sources they no longer have connection to (can check water sources from this object and make a list of what needs to be removed)
@@ -2160,7 +2188,7 @@ public class Aqueduct : MonoBehaviour {
         {
             if (connectedWaterStructures[i] != null)
             {
-                if (connectedWaterStructures[i].tag == "Road" && connectedWaterStructures[i].GetComponent<RoadInformation>().getAqueduct() != null)
+                if (connectedWaterStructures[i].tag.Equals(World.ROAD) && connectedWaterStructures[i].GetComponent<RoadInformation>().getAqueduct() != null)
                 {
                     foreach (GameObject waterSourceToRemove in waterSourcesToRemove)
                     {
@@ -2188,11 +2216,12 @@ public class Aqueduct : MonoBehaviour {
         fillNeighbors();
     }
 
-    /**
-     * Gets a list of every water structure from this aqueduct in order to check if water sources are in the list
-     * TODO: this method and the idential one in Reservoir should be updated to be standalone so there is one method they both use instead of 2 identical ones
-     * @param waterStructures is a callback of all the connected water structures to this aqueduct
-     */
+    /// <summary>
+    /// Gets a list of every water structure from this aqueduct in order to check if water sources are in the list
+    /// TODO: this method and the idential one in Reservoir should be updated to be standalone so there is one method they both use instead of 2 identical ones
+    /// </summary>
+    /// <param name="waterStructures">a callback of all the connected water structures to this aqueduct</param>
+    /// <returns>A time delay to split method execution over multiple frames</returns>
     private IEnumerator checkForWaterSources(System.Action<List<GameObject>> waterStructures)
     {
         List<GameObject> connectedStructures = getConnections();
@@ -2200,7 +2229,6 @@ public class Aqueduct : MonoBehaviour {
         bool addingStructures = true;
         while (addingStructures)
         {
-            //Debug.Log("updating");
             addingStructures = false;
             List<GameObject> tempConnections = new List<GameObject>();
             //Go through each new connection and get its connections
@@ -2209,7 +2237,7 @@ public class Aqueduct : MonoBehaviour {
                 if (connection != null)
                 {
                     List<GameObject> connectionsOfConnection = new List<GameObject>();
-                    if (connection.tag == "Road")
+                    if (connection.tag.Equals(World.ROAD))
                     {
                         if (connection.GetComponent<RoadInformation>().getAqueduct() != null)
                         {
@@ -2248,23 +2276,23 @@ public class Aqueduct : MonoBehaviour {
             }
             tempConnections = new List<GameObject>();
         }
-        //Debug.Log("finishing");
         waterStructures(connectedStructures);
         yield break;
     }
 
-    /**
-     * Gets the sources filling this aqueduct
-     */
+    /// <summary>
+    /// Gets the sources filling this aqueduct
+    /// </summary>
+    /// <returns></returns>
     public List<GameObject> getWaterSources()
     {
         return waterSources;
     }
 
-    /**
-     * Removes the given water source from the lists of water sources
-     * @param waterSource the water source to remove
-     */
+    /// <summary>
+    /// Removes the given water source from the lists of water sources
+    /// </summary>
+    /// <param name="waterSource">the water source to remove</param>
     public void removeWaterSource(GameObject waterSource)
     {
         waterSourcesFromTop.Remove(waterSource);
@@ -2274,10 +2302,10 @@ public class Aqueduct : MonoBehaviour {
         waterSources.Remove(waterSource);
     }
 
-    /**
-     * Sets the time at which the aqueduct should update its water sources
-     * @param filling whether the aqueduct is going to be filling after the time is up
-     */
+    /// <summary>
+    /// Sets the time at which the aqueduct should update its water sources
+    /// </summary>
+    /// <param name="filling">whether the aqueduct is going to be filling after the time is up</param>
     public void setTimeToUpdateWaterSources(bool filling)
     {
         this.filling = filling;
@@ -2285,18 +2313,67 @@ public class Aqueduct : MonoBehaviour {
         preparingToUpdateWaterSources = true;
     }
 
-    /**
-     * Sets whether the gameObject is next to a water structure that was just cleared
-     * @param nextToClearedWaterStructure whether the gameObject is next to a water structure that was just cleared
-     */
+    /// <summary>
+    /// Sets whether the gameObject is next to a water structure that was just cleared
+    /// </summary>
+    /// <param name="nextToClearedWaterStructure">whether the gameObject is next to a water structure that was just cleared</param>
     public void setNextToClearedWaterStructure(bool nextToClearedWaterStructure)
     {
         this.nextToClearedWaterStructure = nextToClearedWaterStructure;
     }
 
-    /**
-     * Destroys the aqueduct
-     */
+    /// <summary>
+    /// Updates the connections of a reservoir or aqueduct that is being deleted
+    /// </summary>
+    /// <param name="waterConnections">the connections to update</param>
+    private void notifyConnectionsOfDeletion()
+    {
+        //call update connections on each item in the list of the aqueduct's old connections
+        foreach (GameObject connection in this.getConnections())
+        {
+            if (connection != null)
+            {
+                if (connection.GetComponent<Aqueduct>() != null)
+                {
+                    Aqueduct aqueduct = connection.GetComponent<Aqueduct>();
+                    aqueduct.updateConnections();
+                    aqueduct.setTimeToUpdateWaterSources(false);
+                    aqueduct.setNextToClearedWaterStructure(true);
+                }
+                else if (connection.GetComponent<Reservoir>() != null)
+                {
+                    Reservoir reservoir = connection.GetComponent<Reservoir>();
+                    reservoir.updateConnections();
+                    reservoir.setTimeToUpdateWaterSources(false);
+                    reservoir.setNextToClearedWaterStructure(true);
+                }
+                else if (connection.GetComponent<RoadInformation>() != null)
+                {
+                    if (connection.GetComponent<RoadInformation>().getAqueduct() != null)
+                    {
+                        //If an arch loses its connections, it should also be destroyed
+                        Aqueduct connectingAqueductArch = connection.GetComponent<RoadInformation>().getAqueduct().GetComponent<Aqueduct>();
+                        if (connectingAqueductArch.getTopConnection() != null || connectingAqueductArch.getBotConnection() != null
+                            || connectingAqueductArch.getLeftConnection() != null || connectingAqueductArch.getRightConnection() != null)
+                        {
+                            connectingAqueductArch.updateConnections();
+                            connectingAqueductArch.setTimeToUpdateWaterSources(false);
+                            connectingAqueductArch.setNextToClearedWaterStructure(true);
+                        }
+                        else if (connectingAqueductArch.getTopConnection() == null && connectingAqueductArch.getBotConnection() == null
+                            && connectingAqueductArch.getLeftConnection() == null && connectingAqueductArch.getRightConnection() == null)
+                        {
+                            connection.GetComponent<RoadInformation>().destroyRoad();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Destroys the aqueduct
+    /// </summary>
     public void destroyAqueduct()
     {
         Destroy(gameObject);

@@ -41,6 +41,8 @@ public class World : MonoBehaviour {
     public const string TAX = "Tax";
     public const string HOUSE = "House";
     public const string BUILDING = "Building";
+    public const string BUILDINGS = "Buildings";
+    public const string TALL_BUILDINGS = "TallBuildings";
     public const string WAREHOUSE = "Warehouse";
     public const string ROAD = "Road";
     public const string STAIRS = "Stairs";
