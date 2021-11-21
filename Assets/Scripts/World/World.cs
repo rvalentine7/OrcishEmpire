@@ -10,7 +10,7 @@ public class World : MonoBehaviour {
     private float paymentTime;
 
     //A queue to spread out how quickly immigrants can move in
-    private Queue<AvailableHome> homesToMoveInTo = new Queue<AvailableHome>();
+    private Queue<GameObject> homesToMoveInTo = new Queue<GameObject>();
     private float nextEarliestMoveInTime = 0.0f;
 
     //Contains lists of each of the water sections in the map
@@ -100,8 +100,11 @@ public class World : MonoBehaviour {
         {
             //0.5f, 0.0f, and 1.0f are all random times I've chosen to spread out how quickly a new immigrant can be created
             nextEarliestMoveInTime = Time.time + 0.5f + Random.Range(0.0f, 1.0f);
-            AvailableHome homeThatCanBeMovedInTo = homesToMoveInTo.Dequeue();
-            homeThatCanBeMovedInTo.spawnImmigrant();
+            GameObject homeThatCanBeMovedInTo = homesToMoveInTo.Dequeue();
+            if (homeThatCanBeMovedInTo)
+            {
+                homeThatCanBeMovedInTo.GetComponent<AvailableHome>().spawnImmigrant();
+            }
         }
     }
 
@@ -165,7 +168,7 @@ public class World : MonoBehaviour {
     /// Adds a home that immigrants are trying to move in to
     /// </summary>
     /// <param name="availableHome">The home immigrants are trying to move in to</param>
-    public void addHomeToMoveInTo(AvailableHome availableHome)
+    public void addHomeToMoveInTo(GameObject availableHome)
     {
         homesToMoveInTo.Enqueue(availableHome);
     }

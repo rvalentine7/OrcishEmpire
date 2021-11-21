@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
  *  
  *  TODO: OrcInhabitants should be handling more of the starting/quitting jobs instead of HouseInformation
  */
-public class HouseInformation : MonoBehaviour {
+public class HouseInformation : Building {
     public float timeInterval;
     public float timeBeforeEntertainmentDecay;
     public int upkeep;
@@ -18,7 +18,7 @@ public class HouseInformation : MonoBehaviour {
     public int inhabitantWaterConsumption;
     public int inhabitantFoodConsumption;
     public int jobSearchRadius;
-    public GameObject housePopupObject;
+    //public GameObject housePopupObject;
     public Sprite sign;
     public Sprite firstLevelHouse;
     public Sprite secondLevelHouse;
@@ -266,28 +266,15 @@ public class HouseInformation : MonoBehaviour {
 
             addBarbersForInhabitants();
             updateHealth();
-        }
 
-        findJobs();
+            findJobs();
+        }
 
         //Upkeep
         if (myWorld.getPaymentTime() > 0.0f && Mathf.Abs(myWorld.getPaymentTime() - nextPaymentTime) > 0.1f)
         {
             nextPaymentTime = myWorld.getPaymentTime();
             myWorld.updateCurrency(-upkeep);
-        }
-    }
-
-    /**
-     * Click the object to see information about it
-     */
-    void OnMouseDown()
-    {
-        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag(World.BUILD_OBJECT) == null)
-        {
-            GameObject popup = Instantiate(housePopupObject) as GameObject;
-            HousePopup housePopup = popup.GetComponent<HousePopup>();
-            housePopup.setHouse(gameObject);
         }
     }
 
@@ -600,7 +587,10 @@ public class HouseInformation : MonoBehaviour {
             inhabitantsWithoutBarbers.Add(orcInhabitant);
             unemployedInhabitants.Add(orcInhabitant);
         }
-        //populationChange = true;
+        if (orcInhabitants.Count >= houseSize && gameObject.GetComponent<AvailableHome>() != null)
+        {
+            Destroy(gameObject.GetComponent<AvailableHome>());
+        }
         this.myWorld.updatePopulation(num);
     }
 
@@ -629,10 +619,11 @@ public class HouseInformation : MonoBehaviour {
     public void removeInhabitants(int num)//TODO: remove an OrcInhabitant
     {
         //Updating lists and other game objects relying on the orc inhabitants that are being removed
+        List<OrcInhabitant> inhabitantsToRemove = new List<OrcInhabitant>();
         for (int i = 0; i < num; i++)
         {
             OrcInhabitant orcInhabitant = orcInhabitants[orcInhabitants.Count - 1 - i];//treating like a stack in case I want to add something for orcs that live in a house longer
-            orcInhabitants.Remove(orcInhabitant);
+            inhabitantsToRemove.Add(orcInhabitant);
             if (inhabitantsWithoutBarbers.Contains(orcInhabitant))
             {
                 inhabitantsWithoutBarbers.Remove(orcInhabitant);
@@ -647,12 +638,18 @@ public class HouseInformation : MonoBehaviour {
             {
                 Employment employment = orcInhabitant.getWorkLocation().GetComponent<Employment>();
                 employment.removeWorkers(1, gameObject);
+                numEmployedInhabitants -= 1;
                 inhabWorkLocations[orcInhabitant.getWorkLocation()].Remove(orcInhabitant);
             }
             if (unemployedInhabitants.Contains(orcInhabitant))
             {
                 unemployedInhabitants.Remove(orcInhabitant);
             }
+        }
+        //Removing the inhabitants that got selected for eviction
+        foreach (OrcInhabitant inhabitantToRemove in inhabitantsToRemove)
+        {
+            orcInhabitants.Remove(inhabitantToRemove);
         }
         //populationChange = true;
         if (orcInhabitants.Count > 0)

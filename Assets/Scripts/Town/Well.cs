@@ -3,31 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-/**
- * Provides water to nearby houses.
- */
-public class Well : MonoBehaviour {
+/// <summary>
+/// Provides water to nearby houses.
+/// </summary>
+public class Well : Building {
     private GameObject[,] constructArr;
-    private GameObject world;
     private World myWorld;
     public float timeInterval;
     public int waterRadius;
     public int waterPerTick;
-    public GameObject wellPopupObject;
 
-    /**
-     * Initializes the Well.
-     */
+    /// <summary>
+    /// Initializes the Well.
+    /// </summary>
     void Start () {
-        world = GameObject.Find("WorldInformation");
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         updateWaterSupplying(true);
     }
-	
-	/**
-     * Gives water to nearby houses at a given time interval.
-     */
-	void Update () {
+
+    /// <summary>
+    /// Gives water to nearby houses at a given time interval.
+    /// </summary>
+    void Update () {
         /*if (Time.time > checkTime)
         {
             checkTime = Time.time + timeInterval;
@@ -56,12 +53,12 @@ public class Well : MonoBehaviour {
                 }
             }
         }*/
-	}
+    }
 
-    /**
-     * Updates whether this well is supplying water to nearby buildings
-     * @param supplying whether the well is supplying water to nearby buildings
-     */
+    /// <summary>
+    /// Updates whether this well is supplying water to nearby buildings
+    /// </summary>
+    /// <param name="supplying">whether the well is supplying water to nearby buildings</param>
     public void updateWaterSupplying(bool supplying)
     {
         constructArr = myWorld.constructNetwork.getConstructArr();
@@ -76,7 +73,7 @@ public class Well : MonoBehaviour {
                             && gameObject.transform.position.x != (int)wellPosition.x - waterRadius + i//avoid adding/removing water to/from itself
                             && gameObject.transform.position.y != (int)wellPosition.y - waterRadius + j
                             && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j] != null
-                            && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].tag == "Building"
+                            && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].tag.Equals(World.BUILDING)
                             && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].GetComponent<Fountain>() == null
                             && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].GetComponent<Reservoir>() == null)
                 {
@@ -94,7 +91,7 @@ public class Well : MonoBehaviour {
                 if (wellPosition.x - waterRadius + i >= 0 && wellPosition.y - waterRadius + j >= 0
                         && wellPosition.x - waterRadius + i <= 40 && wellPosition.y - waterRadius + j <= 40
                         && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j] != null
-                        && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].tag == "House")
+                        && constructArr[(int)wellPosition.x - waterRadius + i, (int)wellPosition.y - waterRadius + j].tag.Equals(World.HOUSE))
                 {
                     HouseInformation houseInformation = constructArr[(int)wellPosition.x - waterRadius + i,
                         (int)wellPosition.y - waterRadius + j].GetComponent<HouseInformation>();
@@ -122,22 +119,6 @@ public class Well : MonoBehaviour {
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Click the object to see information about it
-     */
-    void OnMouseDown()
-    {
-        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag(World.BUILD_OBJECT) == null)
-        {
-            GameObject popupObject = GameObject.FindWithTag(World.POPUP);
-            if (popupObject != null)
-            {
-                Destroy(popupObject);
-            }
-            Instantiate(wellPopupObject);
         }
     }
 }

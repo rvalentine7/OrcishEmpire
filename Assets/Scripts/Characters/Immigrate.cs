@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * Uses A* to form a path which the orc immigrant will then use to move in to a house.
- */
+/// <summary>
+/// Uses A* to form a path which the orc immigrant will then use to move in to a house.
+/// </summary>
 public class Immigrate : Animated {
     //TODO: If a part of its path is destroyed at any point in time, it should find a new path.
     private GameObject[,] network;
@@ -16,17 +16,18 @@ public class Immigrate : Animated {
     private bool changePath;
     private bool runningAStar;
     private Animator animator;
+    private bool exitingMap;
 
-    /**
-     * Instantiates the information necessary for the orc to find its way to its new house.
-     */
+    /// <summary>
+    /// Instantiates the information necessary for the orc to find its way to its new house.
+    /// </summary>
     void Start () {
         path = new List<Vector2>();
         changePath = false;
         runningAStar = false;
         animator = gameObject.GetComponent<Animator>();
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        exitingMap = false;
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -46,9 +47,9 @@ public class Immigrate : Animated {
         }
     }
 
-    /**
-     * Update has the orc immigrant seek out its house destination.
-     */
+    /// <summary>
+    /// Update has the orc immigrant seek out its house destination.
+    /// </summary>
     void Update () {
         if (goalObject != null && runningAStar == false)
         {
@@ -205,14 +206,21 @@ public class Immigrate : Animated {
         }
         else if (goalObject == null)//house was deleted, find a new place to go to
         {
-            //Debug.Log("goal object was deleted, making new goal object");
-            GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-            World myWorld = world.GetComponent<World>();
+            exitingMap = true;
             Vector2 goal = myWorld.exitLocation;
             GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
             goalObject = terrainArr[(int) goal.x, (int) goal.y];
             changePath = true;
             runningAStar = false;
         }
+    }
+
+    /// <summary>
+    /// Gets whether the immigrant is exiting the map
+    /// </summary>
+    /// <returns>Whether the immigrant is exiting the map</returns>
+    public bool getExitingMap()
+    {
+        return exitingMap;
     }
 }

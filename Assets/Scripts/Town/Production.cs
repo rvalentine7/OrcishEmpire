@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 /// Production creates goods from a raw resource production type building (farm, lumbermill, iron mine, etc.) and then
 /// creates a delivery worker to deliver the goods upon completion of the goods.
 /// </summary>
-public class Production : MonoBehaviour {
+public class Production : Building {
     public GameObject deliveryOrc;
     public float timeToProduce;
     public string resourceName;
@@ -45,7 +45,7 @@ public class Production : MonoBehaviour {
         if (active)
         {
             //Lumber mills need to be near trees in order to function
-            if (gameObject.GetComponent<LumberMillClick>() != null)
+            if (gameObject.name.Contains(World.LUMBER))
             {
                 //nearTrees = true;
 

@@ -71,7 +71,7 @@ public class RoadPlacement : BuildMode {
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
 
-        if (Input.GetMouseButtonDown(0) && buildStartLocation.x == -1 && buildStartLocation.y == -1)
+        if (!EventSystem.current.IsPointerOverGameObject() && Input.GetMouseButtonDown(0) && buildStartLocation.x == -1 && buildStartLocation.y == -1)
         {
             buildStartLocation = mousePos;
             spriteRenderer.enabled = false;

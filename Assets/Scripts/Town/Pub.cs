@@ -5,9 +5,8 @@ using UnityEngine;
 /// <summary>
 /// Provides entertainment to nearby houses through the use of beer!
 /// </summary>
-public class Pub : MonoBehaviour {
+public class Pub : Building {
     private bool active;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private Storage myStorage;
@@ -30,8 +29,7 @@ public class Pub : MonoBehaviour {
     /// </summary>
     void Start () {
         active = true;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         myStorage = gameObject.GetComponent<Storage>();
         orcMovingGoods = false;

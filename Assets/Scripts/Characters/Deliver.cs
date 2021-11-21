@@ -18,7 +18,6 @@ public class Deliver : Animated {
     private bool changePath;
     private bool runningAStar;
     private bool headingHome;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
@@ -38,8 +37,7 @@ public class Deliver : Animated {
         changePath = false;
         runningAStar = false;
         headingHome = false;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         hasGoods = true;
@@ -588,5 +586,14 @@ public class Deliver : Animated {
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;
+    }
+
+    /// <summary>
+    /// Gets whether the character is heading back to its place of employment
+    /// </summary>
+    /// <returns>Whether the character is heading back to its place of employment</returns>
+    public bool getHeadingHome()
+    {
+        return headingHome || reachedGoal;
     }
 }

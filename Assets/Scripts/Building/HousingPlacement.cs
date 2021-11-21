@@ -38,16 +38,24 @@ public class HousingPlacement : BuildMode
     /// </summary>
     void Update()
     {
-        if (Input.GetMouseButton(1) || Input.GetKey(KeyCode.Escape))
+        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
         {
-            //Destroy the temp houses because we will have to check them all over again
-            foreach (GameObject houseToCreate in tempHouses.Values)
+            if (tempHouses.Count > 0)
             {
-                Destroy(houseToCreate);
+                //Destroy the temp houses because we will have to check them all over again
+                foreach (GameObject houseToCreate in tempHouses.Values)
+                {
+                    Destroy(houseToCreate);
+                }
+                tempHouses = new Dictionary<Vector2, GameObject>();
+                startingPositionChosen = false;
+                startingPosition = new Vector2(-1, -1);
             }
-
-            //exits out of construction mode if the right mouse button or escape is clicked
-            Destroy(gameObject);
+            else
+            {
+                //exits out of construction mode if the right mouse button or escape is clicked
+                Destroy(gameObject);
+            }
         }
 
         updateBuildMode();

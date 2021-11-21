@@ -6,7 +6,7 @@ using UnityEngine;
 /**
  * Used to supply water to fountains and mud baths
  */
-public class Reservoir : MonoBehaviour {
+public class Reservoir : Building {
     public float timeDelay;
     public int waterRadius;
     public float waterDelay;
@@ -42,11 +42,9 @@ public class Reservoir : MonoBehaviour {
     public Sprite empty3NWE;
     public Sprite empty3SWE;
     public Sprite empty4;
-
-    private GameObject world;
+    
     private World myWorld;
     private SpriteRenderer spriteRenderer;
-    //private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
     private int width;
     private int height;
@@ -71,10 +69,8 @@ public class Reservoir : MonoBehaviour {
 
     private void Awake()
     {
-        world = GameObject.Find("WorldInformation");
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        //structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
@@ -108,28 +104,28 @@ public class Reservoir : MonoBehaviour {
             //Left side
             if ((int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) - 1 > 0
                 && terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
-                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == "Water"))
+                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) - 1, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag.Equals(World.WATER)))
             {
                 nextToWater = true;
             }
             //Right side
             else if ((int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + width < myWorld.mapSize - 1
                 && terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + i] != null
-                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag == "Water"))
+                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + width, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + i].tag.Equals(World.WATER)))
             {
                 nextToWater = true;
             }
             //Top side
             else if ((int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + height < myWorld.mapSize - 1
                 && terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + height] != null
-                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + height].tag == "Water"))
+                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) + height].tag.Equals(World.WATER)))
             {
                 nextToWater = true;
             }
             //Bottom side
             else if ((int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) - 1 > 0
                 && terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) - 1] != null
-                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) - 1].tag == "Water"))
+                && (terrainArr[(int)reservoirPosition.x - Mathf.CeilToInt(width / 2.0f - 1) + i, (int)reservoirPosition.y - Mathf.CeilToInt(height / 2.0f - 1) - 1].tag.Equals(World.WATER)))
             {
                 nextToWater = true;
             }
@@ -143,11 +139,9 @@ public class Reservoir : MonoBehaviour {
             waterSources.Add(gameObject);
             //Update all nearby tiles with water
             updatePipes(true);
-            //supplyingPipes = true;
         }
         updateConnections();//art and setting connections
         updateNeighbors();//updating neighbor connections
-        //fillNeighbors();
     }
 
     /**

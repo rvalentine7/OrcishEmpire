@@ -96,20 +96,20 @@ public class Warehouse : Storage {
     }
 
     /// <summary>
-    /// Returns information on what is stored at the warehouse.
+    /// Create a popup for the world object when clicked on
     /// </summary>
-    void OnMouseDown()
+    void OnMouseDown()//TODO: this should be removed once I make a "Storage" a child of "Building"
     {
         if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag(World.BUILD_OBJECT) == null)
         {
-            GameObject popupObject = GameObject.FindWithTag(World.POPUP);
-            if (popupObject != null)
+            GameObject otherPopupObject = GameObject.FindWithTag(World.POPUP);
+            if (otherPopupObject != null)
             {
-                Destroy(popupObject);
+                Destroy(otherPopupObject);
             }
-            GameObject popup = Instantiate(warehousePopupObject) as GameObject;
-            WarehousePopup warehousePopup = popup.GetComponent<WarehousePopup>();
-            warehousePopup.setWarehouse(gameObject);
+            GameObject instantiatedWorldObjectPopup = Instantiate(warehousePopupObject) as GameObject;
+            Popup popupOfWorldObject = instantiatedWorldObjectPopup.GetComponent<Popup>();
+            popupOfWorldObject.setGameObject(gameObject);
         }
     }
 }

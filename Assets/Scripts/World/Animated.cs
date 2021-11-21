@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// A class that contains animation information that is used across animated GameObjects
 /// </summary>
-public class Animated : MonoBehaviour
+public class Animated : WorldObject
 {
     public const string MOVING_SIDEWAYS = "movingSideways";
     public const string MOVING_UP = "movingUp";

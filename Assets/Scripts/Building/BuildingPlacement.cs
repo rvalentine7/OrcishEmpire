@@ -5,9 +5,8 @@ using System.Collections;
 /// <summary>
 /// Lets the player place buildings in the world.
 /// </summary>
-public class BuildingPlacement : BuildMode {
-    //public int width;
-    //public int height;
+public class BuildingPlacement : BuildMode
+{
     public Sprite possibleSprite;
     public Sprite possibleSprite2;
     public Sprite impossibleSprite;
@@ -15,7 +14,6 @@ public class BuildingPlacement : BuildMode {
     public GameObject building;
     public int buildingCost;
     private bool validPlacement;
-    //private World myWorld;
 
     /// <summary>
     /// Initializes the BuildingPlacement class
@@ -70,13 +68,14 @@ public class BuildingPlacement : BuildMode {
 
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+
         //distance to location just outside object? floor(width / 2 + 1) floor(height / 2 + 1)
-        
         if (validPlacement && (mousePos.x - Mathf.CeilToInt(width / 2.0f - 1) < 1 || mousePos.x + Mathf.FloorToInt(width / 2) >= myWorld.mapSize - 1
-            || mousePos.y - Mathf.FloorToInt(height / 2) < 1 || mousePos.y + Mathf.FloorToInt(height / 2) >= myWorld.mapSize - 1))
+            || mousePos.y - Mathf.CeilToInt(height / 2.0f - 1) < 1 || mousePos.y + Mathf.FloorToInt(height / 2) >= myWorld.mapSize - 1))
         {
             validPlacement = false;
         }
+
         //iron mines need to be next to "Rocks" terrain
         if (validPlacement && gameObject.name.Equals("BuildIronMine(Clone)"))
         {
@@ -140,12 +139,12 @@ public class BuildingPlacement : BuildMode {
         //lumberyards need to be built next to "Trees" terrain
         if (validPlacement && gameObject.name.Equals("BuildLumberMill(Clone)"))
         {
-            validPlacement = checkForRawResources("Trees", mousePos, terrainArr);
+            validPlacement = checkForRawResources(World.TREES, mousePos, terrainArr);
         }
         //buildings using boats must be built next to water
         if (validPlacement && (gameObject.name.Equals("BuildBoatyard(Clone)") || gameObject.name.Equals("BuildFishingWharf(Clone)")))
         {
-            validPlacement = checkForRawResources("Water", mousePos, terrainArr);
+            validPlacement = checkForRawResources(World.WATER, mousePos, terrainArr);
         }
 
         //can't place a building on other constructs or water
@@ -184,7 +183,7 @@ public class BuildingPlacement : BuildMode {
         bool useFirstSprites = true;
         if (gameObject.name.Equals("BuildReservoir(Clone)"))
         {
-            useFirstSprites = checkForRawResources("Water", mousePos, terrainArr);
+            useFirstSprites = checkForRawResources(World.WATER, mousePos, terrainArr);
         }
         if (gameObject.name.Equals("BuildFountain(Clone)")
             && !terrainArr[(int)mousePos.x, (int)mousePos.y].GetComponent<Tile>().hasPipes())

@@ -10,7 +10,6 @@ public class StandardBoat : Animated
     private BoatRequester boatRequester;
     private GameObject requestingBuilding;
     private GameObject[,] network;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
@@ -27,8 +26,7 @@ public class StandardBoat : Animated
     /// </summary>
     void Start()
     {
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         runningAStar = false;

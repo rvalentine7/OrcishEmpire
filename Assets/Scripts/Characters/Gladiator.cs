@@ -18,7 +18,6 @@ public class Gladiator : Animated {
     private bool changePath;
     private bool runningAStar;
     private bool headingHome;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
@@ -37,8 +36,7 @@ public class Gladiator : Animated {
         runningAStar = false;
         headingHome = false;
         animator = gameObject.GetComponent<Animator>();
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
@@ -60,7 +58,7 @@ public class Gladiator : Animated {
     /// <summary>
     /// Gladiator logic
     /// </summary>
-    void Update () {
+    void Update() {
         //if the place of employment is destroyed, this gameobject should be as well
         if (!placeOfEmployment)
         {
@@ -115,9 +113,9 @@ public class Gladiator : Animated {
                     goalObject.GetComponent<Arena>().removeIncomingGladiators(numGladiators);
                     Destroy(gameObject);
                 }
-                //if there are no storage locations, and the orc isn't at its place of employment,
+                //if there is no arena, and the orc isn't at its place of employment,
                 // send it back to its place of employment
-                float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, originalLocation);;
+                float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, originalLocation); ;
                 if (path != null && path.Count == 0 && distanceBetweenPoints > 0.5f)
                 {
                     yield return StartCoroutine(findPathHome(returnPath =>
@@ -232,7 +230,7 @@ public class Gladiator : Animated {
                     * (nextLocation.y - gameObject.transform.position.y));
                 bool nextIsGoal = false;
                 //path[1] is valid as next being the goal because arenas are 3x3.  If I add a larger entertainment building that uses gladiators, this will need an update
-                if (nextLocation == goalLocation || (network[(int) nextLocation.x, (int) nextLocation.y] != null
+                if (nextLocation == goalLocation || (network[(int)nextLocation.x, (int)nextLocation.y] != null
                     && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                 {
                     nextIsGoal = true;
@@ -311,7 +309,7 @@ public class Gladiator : Animated {
             goalObject.GetComponent<Arena>().removeIncomingGladiators(numGladiators);
             Destroy(gameObject);
         }
-        
+
         //check for other storage-type buildings if there are no available warehouses (market, grainery, etc)
         if (pathToArena.Count == 0)
         {
@@ -394,5 +392,14 @@ public class Gladiator : Animated {
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;
+    }
+
+    /// <summary>
+    /// Gets whether the gladiator is returning to the gladiator pit
+    /// </summary>
+    /// <returns>Whether the gladiator is returning to the gladiator pit</returns>
+    public bool getHeadingHome()
+    {
+        return headingHome || returnHome;
     }
 }

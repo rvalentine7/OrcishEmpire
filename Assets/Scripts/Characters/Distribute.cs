@@ -5,10 +5,11 @@ using UnityEngine;
 //TODO: Update the bit in awake that adds houses to visit so that houses with plenty of food already are not visited (prioritize houses with less food?)
 //TODO: Collect, Delivery, and Distribute need to be updated with regards to heading back to the original location of the orc
 //  (what happens when the original location is removed... need to find a different road segment)
-/**
- * Sends a worker from the marketplace to nearby houses to deliver goods.
- */
-public class Distribute : Animated {
+/// <summary>
+/// Sends a worker from the marketplace to nearby houses to deliver goods.
+/// </summary>
+public class Distribute : Animated
+{
     //private Dictionary<string, int> resources;
     private GameObject[,] network;
     private Vector2 originalLocation;
@@ -20,7 +21,6 @@ public class Distribute : Animated {
     private bool changePath;
     private bool runningAStar;
     private bool headingHome;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
@@ -31,9 +31,9 @@ public class Distribute : Animated {
     public int foodNumToDistribute;//the amount of food distributed based on potential inhabitant count
     public int waterNumToDistribute;
 
-    /**
-     * Initializes the distribute class
-     */
+    /// <summary>
+    /// Initializes the distribute class
+    /// </summary>
     void Awake()
     {
         //resources = new Dictionary<string, int>();
@@ -42,8 +42,7 @@ public class Distribute : Animated {
         changePath = false;
         runningAStar = false;
         headingHome = false;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         locationsToVisit = new Dictionary<GameObject, GameObject>();
@@ -108,20 +107,21 @@ public class Distribute : Animated {
             }
         }
     }
-	
-	/**
-     * Runs the distribution orc
-     */
-	void Update () {
+
+    /// <summary>
+    /// Runs the distribution orc
+    /// </summary>
+    void Update () {
         if (runningAStar == false)
         {
             StartCoroutine(runDistribute());
         }
     }
 
-    /**
-     * Sends the distribution orc to each house within its radius for as long as it has goods to distribute
-     */
+    /// <summary>
+    /// Sends the distribution orc to each house within its radius for as long as it has goods to distribute
+    /// </summary>
+    /// <returns>A time delay to split the method execution over multiple frames</returns>
     private IEnumerator runDistribute()
     {
         //if the place of employment is destroyed, this gameobject should be as well
@@ -381,9 +381,9 @@ public class Distribute : Animated {
         yield return null;
     }
 
-    /**
-     * Distributes goods to locations around the orc's current location
-     */
+    /// <summary>
+    /// Distributes goods to locations around the orc's current location
+    /// </summary>
     public void distributeGoods()
     {
         Vector2 currentLocation = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x), Mathf.RoundToInt(gameObject.transform.position.y));
@@ -424,40 +424,40 @@ public class Distribute : Animated {
             if (employmentStorage.getFoodCount() > 0)
             {
                 if (employmentStorage.getMeatCount() >= foodNumToDistribute * houseSize
-                    && houseStorage.acceptsResource("Meat", foodNumToDistribute * houseSize))
+                    && houseStorage.acceptsResource(World.MEAT, foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Meat", foodNumToDistribute * houseSize);
-                    employmentStorage.removeResource("Meat", foodNumToDistribute * houseSize);
+                    houseStorage.addResource(World.MEAT, foodNumToDistribute * houseSize);
+                    employmentStorage.removeResource(World.MEAT, foodNumToDistribute * houseSize);
                 }
                 else if (employmentStorage.getMeatCount() > 0
-                    && houseStorage.acceptsResource("Meat", foodNumToDistribute * houseSize))
+                    && houseStorage.acceptsResource(World.MEAT, foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Meat", employmentStorage.getMeatCount());
-                    employmentStorage.removeResource("Meat", employmentStorage.getMeatCount());
+                    houseStorage.addResource(World.MEAT, employmentStorage.getMeatCount());
+                    employmentStorage.removeResource(World.MEAT, employmentStorage.getMeatCount());
                 }
                 if (employmentStorage.getWheatCount() >= foodNumToDistribute * houseSize
-                    && houseStorage.acceptsResource("Wheat", foodNumToDistribute * houseSize))
+                    && houseStorage.acceptsResource(World.WHEAT, foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Wheat", foodNumToDistribute * houseSize);
-                    employmentStorage.removeResource("Wheat", foodNumToDistribute * houseSize);
+                    houseStorage.addResource(World.WHEAT, foodNumToDistribute * houseSize);
+                    employmentStorage.removeResource(World.WHEAT, foodNumToDistribute * houseSize);
                 }
                 else if (employmentStorage.getWheatCount() > 0
-                    && houseStorage.acceptsResource("Wheat", foodNumToDistribute * houseSize))
+                    && houseStorage.acceptsResource(World.WHEAT, foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Wheat", employmentStorage.getWheatCount());
-                    employmentStorage.removeResource("Wheat", employmentStorage.getWheatCount());
+                    houseStorage.addResource(World.WHEAT, employmentStorage.getWheatCount());
+                    employmentStorage.removeResource(World.WHEAT, employmentStorage.getWheatCount());
                 }
                 if (employmentStorage.getEggCount() >= foodNumToDistribute * houseSize
-                    && houseStorage.acceptsResource("Eggs", foodNumToDistribute * houseSize))
+                    && houseStorage.acceptsResource(World.EGGS, foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Eggs", foodNumToDistribute * houseSize);
-                    employmentStorage.removeResource("Eggs", foodNumToDistribute * houseSize);
+                    houseStorage.addResource(World.EGGS, foodNumToDistribute * houseSize);
+                    employmentStorage.removeResource(World.EGGS, foodNumToDistribute * houseSize);
                 }
                 else if (employmentStorage.getEggCount() > 0
-                    && houseStorage.acceptsResource("Eggs", foodNumToDistribute * houseSize))
+                    && houseStorage.acceptsResource(World.EGGS, foodNumToDistribute * houseSize))
                 {
-                    houseStorage.addResource("Eggs", employmentStorage.getEggCount());
-                    employmentStorage.removeResource("Eggs", employmentStorage.getEggCount());
+                    houseStorage.addResource(World.EGGS, employmentStorage.getEggCount());
+                    employmentStorage.removeResource(World.EGGS, employmentStorage.getEggCount());
                 }
                 if (employmentStorage.getFishCount() >= foodNumToDistribute * houseSize
                     && houseStorage.acceptsResource(World.FISH, foodNumToDistribute * houseSize))
@@ -491,12 +491,12 @@ public class Distribute : Animated {
         }
     }
 
-    /**
-     * Checks the distance between two points.
-     * @param point1 is the first point
-     * @param point2 is the second point
-     * @return the distance between the two points rounded to an int
-     */
+    /// <summary>
+    /// Checks the distance between two points.
+    /// </summary>
+    /// <param name="point1">the first point</param>
+    /// <param name="point2">the second point</param>
+    /// <returns>the distance between the two points rounded to an int</returns>
     int distance(Vector2 point1, Vector2 point2)
     {
         return Mathf.RoundToInt(Mathf.Sqrt((point2.x - point1.x)
@@ -504,21 +504,30 @@ public class Distribute : Animated {
             * (point2.y - point1.y)));
     }
 
-    /**
-     * Sets the place the distribution orc starts at.
-     * @param position is the position the distribution orc spawned in at
-     */
+    /// <summary>
+    /// Sets the place the distribution orc starts at.
+    /// </summary>
+    /// <param name="position">the position the distribution orc spawned in at</param>
     public void setOriginalLocation(Vector2 position)
     {
         originalLocation = position;
     }
 
-    /**
-     * Sets the place of employment this distribution orc works for.
-     * @param employment the place of employment
-     */
+    /// <summary>
+    /// Sets the place of employment this distribution orc works for.
+    /// </summary>
+    /// <param name="employment">the place of employment</param>
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;
+    }
+
+    /// <summary>
+    /// Gets whether the distribute orc is heading back to where it was spawned from
+    /// </summary>
+    /// <returns>Whether the distribute orc is heading back to where it was spawned from</returns>
+    public bool getHeadingHome()
+    {
+        return headingHome;
     }
 }

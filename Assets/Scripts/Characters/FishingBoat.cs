@@ -358,4 +358,22 @@ public class FishingBoat : Animated
     {
         return Mathf.FloorToInt(this.effectiveProgress);
     }
+
+    /// <summary>
+    /// Gets whether the boat has started fishing
+    /// </summary>
+    /// <returns>Whether the boat has started fishing</returns>
+    public bool getStartedFishing()
+    {
+        return startedFishing;
+    }
+
+    /// <summary>
+    /// Gets whether the boat has finished fishing
+    /// </summary>
+    /// <returns>Whether the boat has finished fishing</returns>
+    public bool getFinishedFishing()
+    {
+        return finishedFishing;
+    }
 }

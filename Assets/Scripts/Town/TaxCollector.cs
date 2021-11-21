@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class TaxCollector : MonoBehaviour {
+/// <summary>
+/// A building that creates a tax collector to go around collecting taxes for the city
+/// </summary>
+public class TaxCollector : Building {
     public GameObject taxCollectorOrc;
     public float taxBreakTime;
-
-    private GameObject world;
+    
     private World myWorld;
     private GameObject[,] constructArr;
     private bool orcOutForCollection;
@@ -16,22 +18,21 @@ public class TaxCollector : MonoBehaviour {
     private int taxesCollected;
     private float timeUntilNextTax;
 
-    /**
-     * Initializes the marketplace.
-     */
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start()
     {
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         employment = gameObject.GetComponent<Employment>();
         taxPercentage = myWorld.getTaxPercentage();
         taxesCollected = 0;
         timeUntilNextTax = 0.0f;
     }
 
-    /**
-     * Creates a worker for collecting taxes
-     */
+    /// <summary>
+    /// Creates a worker for collecting taxes
+    /// </summary>
     void Update ()
     {
         orcOutForCollection = employment.getWorkerDeliveringGoods();
@@ -44,9 +45,9 @@ public class TaxCollector : MonoBehaviour {
         }
     }
 
-    /**
-     * Creates an orc to collect resources for the marketplace to distribute.
-     */
+    /// <summary>
+    /// Creates an orc to collect resources for the marketplace to distribute.
+    /// </summary>
     public void createCollectionOrc()
     {
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
@@ -114,11 +115,11 @@ public class TaxCollector : MonoBehaviour {
         collectTaxes.setOrcEmployment(gameObject);
     }
 
-    /**
-     * Sets the boolean status of whether or not the collector worker
-     * is out for collection or at the market.
-     * @param status is whether or not the orc is out for collection
-     */
+    /// <summary>
+    /// Sets the boolean status of whether or not the collector worker
+    /// is out for collection or at the market.
+    /// </summary>
+    /// <param name="status">whether or not the orc is out for collection</param>
     public void setCollectorStatus(bool status)
     {
         if (status == false)
@@ -129,29 +130,29 @@ public class TaxCollector : MonoBehaviour {
         orcOutForCollection = status;
     }
 
-    /**
-     * Gets whether the orc is currently out collecting taxes
-     * @return orcOutForCollection whether the orc is currently out collecting taxes
-     */
+    /// <summary>
+    /// Gets whether the orc is currently out collecting taxes
+    /// </summary>
+    /// <returns>whether the orc is currently out collecting taxes</returns>
     public bool getCollectorStatus()
     {
         return orcOutForCollection;
     }
 
-    /**
-     * Updates the city's currency based on taxes received from the tax collector
-     * @param currencyFromTaxes the currency received from taxes to date
-     */
+    /// <summary>
+    /// Updates the city's currency based on taxes received from the tax collector
+    /// </summary>
+    /// <param name="currencyFromTaxes">the currency received from taxes to date</param>
     public void updateCityCurrencyFromTaxes(int currencyFromTaxes)
     {
         taxesCollected += currencyFromTaxes;
         myWorld.updateCurrency(currencyFromTaxes);
     }
 
-    /**
-     * Gets the amount of currency collected by this building
-     * @param taxesCollected the amount of currency collected by this building
-     */
+    /// <summary>
+    /// Gets the amount of currency collected by this building
+    /// </summary>
+    /// <returns>the amount of currency collected by this building</returns>
     public int getTaxesCollected()
     {
         return taxesCollected;

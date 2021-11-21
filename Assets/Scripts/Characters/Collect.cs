@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * Collect sends the orc to take a resource from another building and return it to the building the orc
- *  originated from.
- */
-public class Collect : Animated {
+/// <summary>
+/// Collect sends the orc to take a resource from another building and return it to the building the orc
+/// originated from.
+/// </summary>
+public class Collect : Animated
+{
     private Dictionary<string, int> resources;
     private string resourcesToCollect;
     //private int carryingCapacity;
@@ -21,7 +22,6 @@ public class Collect : Animated {
     private bool changePath;
     private bool runningAStar;
     private bool headingHome;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
@@ -29,9 +29,9 @@ public class Collect : Animated {
     public int searchRadius;
     private Animator animator;
 
-    /**
-     * Initializes the collector class
-     */
+    /// <summary>
+    /// Initializes the collector class
+    /// </summary>
     void Awake()
     {
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
@@ -43,17 +43,16 @@ public class Collect : Animated {
         reachedGoal = false;
         changePath = false;
         headingHome = false;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         animator = gameObject.GetComponent<Animator>();
         gameObject.GetComponent<SpriteRenderer>().sortingOrder = gameObject.GetHashCode();
     }
 
-    /**
-     * Attempts to find the first place to go to
-     */
+    /// <summary>
+    /// Attempts to find the first place to go to
+    /// </summary>
     void Start()
     {
         StartCoroutine(findPathToStorage(returnPath =>
@@ -62,9 +61,9 @@ public class Collect : Animated {
         }));
     }
 
-    /**
-     * Runs the collector orc
-     */
+    /// <summary>
+    /// Runs the collector orc
+    /// </summary>
     void Update () {
         if (runningAStar == false)
         {
@@ -72,9 +71,10 @@ public class Collect : Animated {
         }
     }
 
-    /**
-     * Plans out the movement and collection of resources for the collector orc
-     */
+    /// <summary>
+    /// Plans out the movement and collection of resources for the collector orc
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator runCollect()
     {
         //if the place of employment is destroyed, this gameobject should be as well
@@ -548,10 +548,11 @@ public class Collect : Animated {
         yield return null;
     }
 
-    /**
-     * Finds a place for the collector orc to go to and creates a path to it.
-     * @parameter returnPath a callback returning the path to the closest storage facility
-     */
+    /// <summary>
+    /// Finds a place for the collector orc to go to and creates a path to it.
+    /// </summary>
+    /// <param name="returnPath">a callback returning the path to the closest storage facility</param>
+    /// <returns>A time delay to break method execution over multiple frames</returns>
     private IEnumerator findPathToStorage(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -715,10 +716,11 @@ public class Collect : Animated {
         yield return null;
     }
 
-    /**
-     * Finds a way back to the building that spawned the delivery orc.
-     * @parameter returnPath a callback returning the path back to the original location
-     */
+    /// <summary>
+    /// Finds a way back to the building that spawned the delivery orc.
+    /// </summary>
+    /// <param name="returnPath">a callback returning the path back to the original location</param>
+    /// <returns>A time delay to break method execution over multiple frames</returns>
     private IEnumerator findPathHome(System.Action<List<Vector2>> returnPath)
     {
         network = new GameObject[myWorld.mapSize, myWorld.mapSize];
@@ -753,40 +755,48 @@ public class Collect : Animated {
         yield return new WaitForSeconds(0.05f);
     }
 
-    /**
-     * Sets the place the delivery orc starts at.
-     * @param position is the position the delivery orc spawned in at
-     */
+    /// <summary>
+    /// Sets the place the delivery orc starts at.
+    /// </summary>
+    /// <param name="position">the position the delivery orc spawned in at</param>
     public void setOriginalLocation(Vector2 position)
     {
         originalLocation = position;
     }
 
-    /**
-     * Sets the place of employment this delivery orc works for.
-     * @param employment the place of employment
-     */
+    /// <summary>
+    /// Sets the place of employment this delivery orc works for.
+    /// </summary>
+    /// <param name="employment">the place of employment</param>
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;
     }
 
-    /**
-     * Sets which resources the collector orc is to collect.
-     * @param resources is the type of resource to collect
-     */
+    /// <summary>
+    /// Sets which resources the collector orc is to collect.
+    /// </summary>
+    /// <param name="resources">the type of resource to collect</param>
     public void setResourcesToCollect(string resources)
     {
         resourcesToCollect = resources;
     }
 
-    /**
-     * Sets the amount of resources this collector can carry.
-     * @param num is the number of resources the collector can carry
-     */
+    /// <summary>
+    /// Sets the amount of resources this collector can carry.
+    /// </summary>
+    /// <param name="num">the number of resources the collector can carry</param>
     public void setCarryingCapacity(int num)
     {
-        //carryingCapacity = num;
         remainingCapacity = num;
+    }
+
+    /// <summary>
+    /// Gets whether the character is heading back to the building that spawned it
+    /// </summary>
+    /// <returns>Whether the character is heading back to the building that spawned it</returns>
+    public bool getHeadingHome()
+    {
+        return headingHome || reachedGoal;
     }
 }

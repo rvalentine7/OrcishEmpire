@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Creates boats from lumber and provides the boats to BoatRequesters
 /// </summary>
-public class Boatyard : MonoBehaviour
+public class Boatyard : Building
 {
     public GameObject collectorOrc;
     public GameObject boat;

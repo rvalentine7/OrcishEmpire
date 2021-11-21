@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * A hospital improves the rate at which orcs recover from being sick
- * and helps prevent the spread of sickness
- */
-public class Hospital : MonoBehaviour
+/// <summary>
+/// A hospital improves the rate at which orcs recover from being sick
+/// and helps prevent the spread of sickness
+/// </summary>
+public class Hospital : Building
 {
     public int numHospitalBeds;
 
@@ -15,12 +15,17 @@ public class Hospital : MonoBehaviour
     Employment employment;
     private int maxEmployeeNum;
 
+    /// <summary>
+    /// Initialization that must occur before anything else
+    /// </summary>
     private void Awake()
     {
         sickOrcs = new List<OrcInhabitant>();
     }
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start()
     {
         numAvailableBeds = 0;
@@ -49,7 +54,9 @@ public class Hospital : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Updates information for the hospital
+    /// </summary>
     void Update()
     {
         double numEmployees = employment.getNumHealthyWorkers();
@@ -62,11 +69,11 @@ public class Hospital : MonoBehaviour
         }
     }
 
-    /**
-     * Add a sick orc to this hospital if there are enough beds
-     * @param sickOrc the orc to be admitted to this hospital
-     * @return whether the orc was successfully admitted to the hospital
-     */
+    /// <summary>
+    /// Add a sick orc to this hospital if there are enough beds
+    /// </summary>
+    /// <param name="sickOrc">the orc to be admitted to this hospital</param>
+    /// <returns>whether the orc was successfully admitted to the hospital</returns>
     public bool addSickOrc(OrcInhabitant sickOrc)
     {
         if (numAvailableBeds - sickOrcs.Count > 0)
@@ -78,33 +85,39 @@ public class Hospital : MonoBehaviour
         return false;
     }
 
-    /**
-     * Remove an orc from the hospital.  This will either be due to a reduction in staff
-     * or due to the orc recovering from sickness.
-     * @param sickOrc the orc in question
-     */
+    /// <summary>
+    /// Remove an orc from the hospital.  This will either be due to a reduction in staff
+    /// or due to the orc recovering from sickness.
+    /// </summary>
+    /// <param name="sickOrc">the orc in question</param>
     public void removeSickOrc(OrcInhabitant sickOrc)
     {
         sickOrcs.Remove(sickOrc);
         sickOrc.removeHospital();
     }
 
+    /// <summary>
+    /// Removes an orc from the list of sick orcs
+    /// </summary>
+    /// <param name="sickOrc">The orc that is no longer at the hospital</param>
     public void sickOrcLeft(OrcInhabitant sickOrc)
     {
         sickOrcs.Remove(sickOrc);
     }
 
-    /**
-     * Gets the number of sick orcs recovering at this hospital
-     */
+    /// <summary>
+    /// Gets the number of sick orcs recovering at this hospital
+    /// </summary>
+    /// <returns>The number of sick orcs recovering at this hospital</returns>
     public int getNumPatients()
     {
         return sickOrcs.Count;
     }
 
-    /**
-     * Gets the number of beds this hospital currently has for patients
-     */
+    /// <summary>
+    /// Gets the number of beds this hospital currently has for patients
+    /// </summary>
+    /// <returns>The number of beds this hospital currently has for patients</returns>
     public int getNumAvailableBeds()
     {
         return numAvailableBeds;

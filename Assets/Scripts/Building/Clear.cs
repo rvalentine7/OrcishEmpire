@@ -291,7 +291,7 @@ public class Clear : MonoBehaviour {
             && (terrainArr[(int)locationToClear.x, (int)locationToClear.y].tag.Equals(World.TREES)))
         {
             GameObject terrainToClear = terrainArr[(int)locationToClear.x, (int)locationToClear.y];
-            TreeRemoval treeToClear = terrainToClear.GetComponent<TreeRemoval>();
+            TreeObject treeToClear = terrainToClear.GetComponent<TreeObject>();
             treeToClear.removeTree();
         }
     }

@@ -2,25 +2,31 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fountain : MonoBehaviour {
+/// <summary>
+/// A building that supplies water to nearby buildings as long as it is receiving water from a reservoir
+/// </summary>
+public class Fountain : Building {
     public int timeInterval;
     public int waterRadius;
     public int waterPerTick;
     public Sprite filledFountain;
     public Sprite emptyFountain;
-
-    private GameObject world;
+    
     private World myWorld;
     private GameObject[,] terrainArr;
     private bool filled;
 
+    /// <summary>
+    /// Initialization that must occur before anything else
+    /// </summary>
     private void Awake()
     {
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
     }
 
-    // Use this for initialization
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start () {
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         if (terrainArr[(int)gameObject.transform.position.x, (int)gameObject.transform.position.y].GetComponent<Tile>().hasPipes())
@@ -33,17 +39,12 @@ public class Fountain : MonoBehaviour {
             filled = false;
             gameObject.GetComponent<SpriteRenderer>().sprite = emptyFountain;
         }
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        
     }
 
-    /**
-     * Updates whether the fountain is filled
-     * @param filled whether the fountain is filled
-     */
+    /// <summary>
+    /// Updates whether the fountain is filled
+    /// </summary>
+    /// <param name="filled">whether the fountain is filled</param>
     public void updateFilled(bool filled)
     {
         this.filled = filled;
@@ -59,10 +60,10 @@ public class Fountain : MonoBehaviour {
         }
     }
 
-    /**
-     * Updates whether this fountain is supplying water to nearby buildings
-     * @param supplying whether the fountain is supplying water to nearby buildings
-     */
+    /// <summary>
+    /// Updates whether this fountain is supplying water to nearby buildings
+    /// </summary>
+    /// <param name="supplying">whether the fountain is supplying water to nearby buildings</param>
     public void updateWaterSupplying(bool supplying)
     {
         GameObject[,] constructArr = myWorld.constructNetwork.getConstructArr();
@@ -126,10 +127,10 @@ public class Fountain : MonoBehaviour {
         }
     }
 
-    /**
-     * Gets whether the fountain is filled
-     * @return filled whether the fountain is filled
-     */
+    /// <summary>
+    /// Gets whether the fountain is filled
+    /// </summary>
+    /// <returns>whether the fountain is filled</returns>
     public bool getFilled()
     {
         return filled;

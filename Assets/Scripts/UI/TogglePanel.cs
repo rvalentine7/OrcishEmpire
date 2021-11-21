@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * Toggles the active state of a game object.
- */
-public class TogglePanel : MonoBehaviour {
+/// <summary>
+/// Toggles the active state of a game object.
+/// </summary>
+public class TogglePanel : Highlightable
+{
     public GameObject panelToSetActive;
     //The other panels for making sure they are turned off when the new panel becomes active
     public GameObject offPanelA;//1
@@ -19,9 +20,9 @@ public class TogglePanel : MonoBehaviour {
     public GameObject offPanelI;//9
     public GameObject offPanelJ;//10
 
-    /**
-     * Toggle the passed-in game object on or off
-     */
+    /// <summary>
+    /// Toggle the passed-in game object on or off
+    /// </summary>
     public void togglePanel()
     {
         GameObject popupObject = GameObject.FindWithTag(World.POPUP);

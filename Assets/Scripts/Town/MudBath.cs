@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * Provides bathing services for the health of orcs
- * TODO: there should probably be a water-type employment class that this and fountain extend from (methods dealing with filling)
- */
-public class MudBath : MonoBehaviour
+/// <summary>
+/// Provides bathing services for the health of orcs
+/// TODO: there should probably be a water-type employment class that this and fountain extend from (methods dealing with filling)
+/// </summary>
+public class MudBath : Building
 {
     public Sprite dryBath;
     public Sprite wetBath;
     public int bathRadius;
     public int timeToKeepWet;
-
-    private GameObject world;
+    
     private World myWorld;
     private GameObject[,] terrainArr;
     private Employment employment;
@@ -27,13 +26,17 @@ public class MudBath : MonoBehaviour
     private float amountLeftToRefill;
     private float previousCheckTime;
 
+    /// <summary>
+    /// Initializes objects that must be initialized before anything else
+    /// </summary>
     private void Awake()
     {
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
     }
 
-    // Start is called before the first frame update
+    /// <summary>
+    /// Initialization
+    /// </summary>
     void Start()
     {
         currentCondition = Condition.DRY;
@@ -52,7 +55,9 @@ public class MudBath : MonoBehaviour
         }
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Updates information managed by the mud bath
+    /// </summary>
     void Update()
     {
         //If there are no workers, the bath should dry up
@@ -126,19 +131,19 @@ public class MudBath : MonoBehaviour
         }
     }
 
-    /**
-     * Updates whether the mud bath has water access
-     * @param filled whether the mud bath has water access
-     */
+    /// <summary>
+    /// Updates whether the mud bath has water access
+    /// </summary>
+    /// <param name="hasWaterAccess">whether the mud bath has water access</param>
     public void updateFilled(bool hasWaterAccess)
     {
         this.hasWaterAccess = hasWaterAccess;
     }
 
-    /**
-     * Lets households within the bath radius know whether this bath is providing services to them
-     * @param providing whether the bath is providing its services to nearby houses
-     */
+    /// <summary>
+    /// Lets households within the bath radius know whether this bath is providing services to them
+    /// </summary>
+    /// <param name="providing">whether the bath is providing its services to nearby houses</param>
     public void handleServices(bool providing)
     {
         GameObject[,] constructArr = myWorld.constructNetwork.getConstructArr();
@@ -168,39 +173,30 @@ public class MudBath : MonoBehaviour
         }
     }
 
-    /**
-     * Gets the time left to refill the mud bath to keep it wet
-     * @return the time left to refill the mud bath
-     */
+    /// <summary>
+    /// Gets the time left to refill the mud bath to keep it wet
+    /// </summary>
+    /// <returns>the time left to refill the mud bath</returns>
     public int getTimeLeftToRefill()
     {
         return Mathf.RoundToInt(timeLeftToRefill);
     }
 
-    /**
-     * Gets the time until this mud bath will dry up
-     * @return int the time until the mad bath dries up
-     */
+    /// <summary>
+    /// Gets the time until this mud bath will dry up
+    /// </summary>
+    /// <returns>the time until the mad bath dries up</returns>
     public int getTimeUntilDry()
     {
         return Mathf.RoundToInt(timeUntilDry);
     }
 
-    /**
-     * Gets whether the mud bath is currently wet
-     * @return whether the mud bath is currently wet
-     */
+    /// <summary>
+    /// Gets whether the mud bath is currently wet
+    /// </summary>
+    /// <returns>whether the mud bath is currently wet</returns>
     public bool getWet()
     {
         return currentCondition == Condition.WET;
     }
-
-    /**
-     * Gets whether the mud bath is filled
-     * @return filled whether the mud bath is filled
-     */
-    //public bool getFilled()
-    //{
-    //    return hasWaterAccess;//TODO: this needs to be changed? is this used for anything at all?
-    //}
 }

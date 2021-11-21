@@ -10,18 +10,6 @@ using UnityEngine;
 /// </summary>
 public class Building : WorldObject
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public GameObject getGameObject()
     {
         return this.gameObject;

@@ -40,7 +40,7 @@ public class AvailableHome : MonoBehaviour {
             {
                 spawningImmigrant = true;
 
-                myWorld.addHomeToMoveInTo(this);
+                myWorld.addHomeToMoveInTo(gameObject);
             }
         }
     }
@@ -51,13 +51,12 @@ public class AvailableHome : MonoBehaviour {
     public void spawnImmigrant()
     {
         spawningImmigrant = false;
-        
+
         int houseSize = houseInfo.getHouseSize();
         int numInhabitants = houseInfo.getNumInhabitants();
         int numIncomingOrcs = houseInfo.getNumOrcsMovingIn();
         if (immigrant == null)
         {
-            //immigrant = Instantiate(Resources.Load("Orc Immigrant")) as GameObject;
             immigrant = gameObject.GetComponent<ImmigrantPrefab>().getImmigrant();
         }
         GameObject newImmigrant = Instantiate(immigrant, myWorld.spawnLocation, Quaternion.identity);

@@ -19,8 +19,8 @@ public class Employment : MonoBehaviour {
     private bool openForBusiness;
     private bool workerDeliveringGoods;
     private int numWaterSources;
-    private GameObject world;
     private World myWorld;
+    private bool destroyed;
 
     /**
      * Initializes necessary variables
@@ -32,6 +32,7 @@ public class Employment : MonoBehaviour {
         workerDeliveringGoods = false;
         numWaterSources = 0;
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
+        destroyed = false;
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         //Check if tiles already have water, update numWaterSources if so
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
@@ -56,8 +57,6 @@ public class Employment : MonoBehaviour {
      */
     void Update()
     {
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
@@ -72,7 +71,7 @@ public class Employment : MonoBehaviour {
             if (structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)] != null
                 && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
-                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)].tag == "Road")
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) - 1)].tag.Equals(World.ROAD))
             {
                 openForBusiness = true;
             }
@@ -80,7 +79,7 @@ public class Employment : MonoBehaviour {
             else if (structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
                 (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)] != null
                 && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) + i),
-                (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)].tag == "Road")
+                (Mathf.CeilToInt(employmentPos.y) + Mathf.CeilToInt(height / 2.0f - 1) + 1)].tag.Equals(World.ROAD))
             {
                 openForBusiness = true;
             }
@@ -93,7 +92,7 @@ public class Employment : MonoBehaviour {
             if (structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)] != null
                 && structArr[(Mathf.FloorToInt(employmentPos.x) - Mathf.CeilToInt(width / 2.0f - 1) - 1),
-                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag == "Road")
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag.Equals(World.ROAD))
             {
                 openForBusiness = true;
             }
@@ -101,7 +100,7 @@ public class Employment : MonoBehaviour {
             else if (structArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 0.5f) + 1),
                 (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)] != null
                 && structArr[(Mathf.FloorToInt(employmentPos.x) + Mathf.CeilToInt(width / 2.0f - 0.5f) + 1),
-                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag == "Road")
+                (Mathf.FloorToInt(employmentPos.y) - Mathf.CeilToInt(height / 2.0f - 1) + j)].tag.Equals(World.ROAD))
             {
                 openForBusiness = true;
             }
@@ -214,33 +213,37 @@ public class Employment : MonoBehaviour {
      */
     public void destroyEmployment()
     {
-        //lets the houses of the workers know the inhabitants are now unemployed
-        if (numWorkers > 0)
+        if (!destroyed)
         {
-            foreach (KeyValuePair<GameObject, int> kvp in workerHouses)
+            //lets the houses of the workers know the inhabitants are now unemployed
+            if (numWorkers > 0)
             {
-                HouseInformation houseInfo = kvp.Key.GetComponent<HouseInformation>();
-                houseInfo.removeWorkLocation(gameObject);
+                foreach (KeyValuePair<GameObject, int> kvp in workerHouses)
+                {
+                    HouseInformation houseInfo = kvp.Key.GetComponent<HouseInformation>();
+                    houseInfo.removeWorkLocation(gameObject);
+                }
             }
+            //Water supplying sources need to stop supplying water
+            if (gameObject.GetComponent<Reservoir>() != null)
+            {
+                gameObject.GetComponent<Reservoir>().updatePipes(false);
+            }
+            else if (gameObject.GetComponent<Fountain>() != null)
+            {
+                gameObject.GetComponent<Fountain>().updateWaterSupplying(false);
+            }
+            else if (gameObject.GetComponent<Well>() != null)
+            {
+                gameObject.GetComponent<Well>().updateWaterSupplying(false);
+            }
+            else if (gameObject.GetComponent<MudBath>() != null)
+            {
+                gameObject.GetComponent<MudBath>().handleServices(false);
+            }
+            destroyed = true;
+            Destroy(gameObject);
         }
-        //Water supplying sources need to stop supplying water
-        if (gameObject.GetComponent<Reservoir>() != null)
-        {
-            gameObject.GetComponent<Reservoir>().updatePipes(false);
-        }
-        else if (gameObject.GetComponent<Fountain>() != null)
-        {
-            gameObject.GetComponent<Fountain>().updateWaterSupplying(false);
-        }
-        else if (gameObject.GetComponent<Well>() != null)
-        {
-            gameObject.GetComponent<Well>().updateWaterSupplying(false);
-        }
-        else if (gameObject.GetComponent<MudBath>() != null)
-        {
-            gameObject.GetComponent<MudBath>().handleServices(false);
-        }
-        Destroy(gameObject);
     }
 
     /**

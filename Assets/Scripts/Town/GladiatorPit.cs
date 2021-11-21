@@ -5,15 +5,14 @@ using UnityEngine;
 /// <summary>
 /// A gladiator pit trains gladiators to fight in an arena
 /// </summary>
-public class GladiatorPit : MonoBehaviour {
+public class GladiatorPit : Building {
     private World myWorld;
+    private Employment employment;
     private float trainingProgress;
     private float progressRequired;
     private float prevUpdateTime;
     private int numReadyGladiators;//the number of gladiators that have been trained and are ready to be sent out to perform
     private int gladiatorsGoingToFight;
-    private bool active;//will be used to activate/deactivate the building
-                        //private Dictionary<GameObject, GameObject> arenaAndGladiators; //was this for if the arena is destroyed?
 
     public GameObject gladiatorOrc;
     public int maxGladiators;//the number of gladiators that can be ready and waiting at any given time
@@ -24,13 +23,12 @@ public class GladiatorPit : MonoBehaviour {
     /// </summary>
 	void Start () {
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
+        employment = gameObject.GetComponent<Employment>();
         trainingProgress = 0.0f;
         progressRequired = 100.0f;
         prevUpdateTime = 0.0f;
         numReadyGladiators = 0;
         gladiatorsGoingToFight = 0;
-        active = true;
-        //arenaAndGladiators = new Dictionary<GameObject, GameObject>();
 	}
 	
 	/// <summary>
@@ -39,9 +37,8 @@ public class GladiatorPit : MonoBehaviour {
 	void Update () {
         //number of workers impact how quickly gladiators can be trained
         //when gladiators are trained, send them to arenas
-        if (numReadyGladiators < maxGladiators && active)
+        if (numReadyGladiators < maxGladiators)
         {
-            Employment employment = gameObject.GetComponent<Employment>();
             int numHealthyWorkers = employment.getNumHealthyWorkers();
             if (numHealthyWorkers > 0)
             {
@@ -78,14 +75,12 @@ public class GladiatorPit : MonoBehaviour {
         {
             if (numRequestedGladiators > numReadyGladiators - gladiatorsGoingToFight)
             {
-                //TODO?: Make sure to update arenaAndGladiators... was this from before I put more functionality in Gladiator itself?
                 createGladiator(numReadyGladiators - gladiatorsGoingToFight, destination);
                 gladiatorsGoingToFight += numReadyGladiators - gladiatorsGoingToFight;
                 return numReadyGladiators;
             }
             else
             {
-                //TODO?: Make sure to update arenaAndGladiators... was this from before I put more functionality in Gladiator itself?
                 createGladiator(numRequestedGladiators, destination);
                 gladiatorsGoingToFight += numRequestedGladiators;
                 return numRequestedGladiators;
@@ -212,13 +207,5 @@ public class GladiatorPit : MonoBehaviour {
     public int getTrainingProgress()
     {
         return Mathf.FloorToInt(trainingProgress);
-    }
-
-    /// <summary>
-    /// Toggles whether the building is active
-    /// </summary>
-    public void toggleActive()
-    {
-        active = !active;
     }
 }

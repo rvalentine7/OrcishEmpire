@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 /// Item productions creates goods from a production type building using raw resources (weaponsmith, furniture workshop, etc.) and then
 /// creates a delivery worker to deliver the goods upon completion of the goods.
 /// </summary>
-public class ItemProduction : MonoBehaviour
+public class ItemProduction : Building
 {
     public GameObject collectorOrc;
     public int collectorCarryCapacity;
@@ -92,8 +92,7 @@ public class ItemProduction : MonoBehaviour
     /// </summary>
     private void createDeliveryOrc()
     {
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        World myWorld = world.GetComponent<World>();
+        World myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;

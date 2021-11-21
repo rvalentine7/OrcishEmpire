@@ -1,19 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-/**
- * Marketplaces distribute food to the houses around it.
- * Sends out a worker to houses in circular area surrounding the marketplace.  Every time the worker
- * is sent out, it has a list of houses to travel to.  Upon reaching the house, it checks if they need food and then supplies them with
- * some before moving on to the next house.  The worker uses the supplies of the marketplace to give food to the houses.  If the marketplace
- * runs out of food, the worker returns.
- */
-public class Marketplace : MonoBehaviour {
+/// <summary>
+/// Marketplaces distribute food to the houses around it.
+/// Sends out a worker to houses in circular area surrounding the marketplace.Every time the worker
+/// is sent out, it has a list of houses to travel to.Upon reaching the house, it checks if they need food and then supplies them with
+/// some before moving on to the next house.The worker uses the supplies of the marketplace to give food to the houses.If the marketplace
+/// runs out of food, the worker returns.
+/// </summary>
+public class Marketplace : Building {
+    private World myWorld;
     private GameObject[,] constructArr;
-    //private int numWorkers;
-    //private int workerValue;
     private bool orcOutForCollection;
     private bool orcOutForDelivery;
     private Employment employment;
@@ -22,20 +20,19 @@ public class Marketplace : MonoBehaviour {
     public GameObject marketPopupObject;
     public int collectorCarryCapacity;
 
-    /**
-     * Initializes the marketplace.
-     */
+    /// <summary>
+    /// Initializes the market
+    /// </summary>
     void Start () {
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         employment = gameObject.GetComponent<Employment>();
-        //numWorkers = employment.getNumWorkers();
-        //workerValue = employment.getWorkerValue();
         orcOutForCollection = false;
     }
-	
-	/**
-     * Creates workers for collecting and distributing resources
-     */
-	void Update () {
+
+    /// <summary>
+    /// Creates workers for collecting and distributing resources
+    /// </summary>
+    void Update () {
         //TODO:  If only one worker, it should switch between gathering supplies and distributing them
         //  Alternatively, I might have worker count affect how much the workers are able to carry around with them
         //  and instead make it so the marketplace can either collect resources or distribute them, but not both at the same time
@@ -74,31 +71,11 @@ public class Marketplace : MonoBehaviour {
         }
     }
 
-    /**
-     * Returns information on what is stored at the marketplace.
-     */
-    void OnMouseDown()
-    {
-        if (!EventSystem.current.IsPointerOverGameObject() && GameObject.FindWithTag(World.BUILD_OBJECT) == null)
-        {
-            GameObject popupObject = GameObject.FindWithTag(World.POPUP);
-            if (popupObject != null)
-            {
-                Destroy(popupObject);
-            }
-            GameObject popup = Instantiate(marketPopupObject) as GameObject;
-            MarketPopup marketPopup = popup.GetComponent<MarketPopup>();
-            marketPopup.setMarketplace(gameObject);
-        }
-    }
-
-    /**
-     * Creates an orc to collect resources for the marketplace to distribute.
-     */
+    /// <summary>
+    /// Creates an orc to collect resources for the marketplace to distribute.
+    /// </summary>
     public void createCollectionOrc()
     {
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
@@ -166,23 +143,21 @@ public class Marketplace : MonoBehaviour {
         // workers at this employment
     }
 
-    /**
-     * Sets the boolean status of whether or not the collector worker
-     * is out for collection or at the market.
-     * @param status is whether or not the orc is out for collection
-     */
+    /// <summary>
+    /// Sets the boolean status of whether or not the collector worker
+    /// is out for collection or at the market.
+    /// </summary>
+    /// <param name="status">whether or not the orc is out for collection</param>
     public void setCollectorStatus(bool status)
     {
         orcOutForCollection = status;
     }
 
-    /**
-     * Creates an orc to distribute products from the marketplace to nearby houses
-     */
+    /// <summary>
+    /// Creates an orc to distribute products from the marketplace to nearby houses
+    /// </summary>
     public void createDistributionOrc()
     {
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        World myWorld = world.GetComponent<World>();
         GameObject[,] structArr = myWorld.constructNetwork.getConstructArr();
         int width = (int)gameObject.GetComponent<BoxCollider2D>().size.x;
         int height = (int)gameObject.GetComponent<BoxCollider2D>().size.y;
@@ -248,11 +223,11 @@ public class Marketplace : MonoBehaviour {
         distribute.setOrcEmployment(gameObject);
     }
 
-    /**
-     * Sets the boolean status of whether or not the distributor worker
-     * is out for distribution or at the market.
-     * @param status is whether or not the orc is out for distribution
-     */
+    /// <summary>
+    /// Sets the boolean status of whether or not the distributor worker
+    /// is out for distribution or at the market.
+    /// </summary>
+    /// <param name="status">whether or not the orc is out for distribution</param>
     public void setDistributorStatus(bool status)
     {
         orcOutForDelivery = status;

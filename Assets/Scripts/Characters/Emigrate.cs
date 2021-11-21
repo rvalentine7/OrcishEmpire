@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/**
- * Uses A* to form a path which the orc emigrant will then use to leave the city.
- */
-public class Emigrate : Animated {
+/// <summary>
+/// Uses A* to form a path which the orc emigrant will then use to leave the city.
+/// </summary>
+public class Emigrate : Animated
+{
     //TODO: If a part of its path is destroyed at any point in time, it should find a new path.
     private GameObject[,] network;
     private Vector2 exitLocation;
@@ -16,17 +17,16 @@ public class Emigrate : Animated {
     private bool runningAStar;
     private Animator animator;
 
-    /**
-     * Instantiates the information necessary for the orc to find its way to its new house.
-     */
+    /// <summary>
+    /// Instantiates the information necessary for the orc to find its way to its new house.
+    /// </summary>
     void Start()
     {
         path = new List<Vector2>();
         changePath = false;
         runningAStar = false;
         animator = gameObject.GetComponent<Animator>();
-        GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         exitLocation = myWorld.exitLocation;
         GameObject[,] structureArr = myWorld.constructNetwork.getConstructArr();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
@@ -53,7 +53,9 @@ public class Emigrate : Animated {
         }
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Updates the animation of the orc
+    /// </summary>
     void Update () {
         if (runningAStar == false)
         {

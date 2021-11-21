@@ -16,7 +16,6 @@ public class CollectTaxes : Animated {
     private bool changePath;
     private bool runningAStar;
     private bool headingHome;
-    private GameObject world;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
@@ -38,8 +37,7 @@ public class CollectTaxes : Animated {
         changePath = false;
         runningAStar = false;
         headingHome = false;
-        world = GameObject.Find(World.WORLD_INFORMATION);
-        myWorld = world.GetComponent<World>();
+        myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
         locationsToVisit = new Dictionary<GameObject, GameObject>();
@@ -462,5 +460,14 @@ public class CollectTaxes : Animated {
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;
+    }
+
+    /// <summary>
+    /// Gets whether the tax collector is returning to its place of employment
+    /// </summary>
+    /// <returns>Whether the tax collector is returning to its place of employment</returns>
+    public bool getHeadingHome()
+    {
+        return headingHome;
     }
 }

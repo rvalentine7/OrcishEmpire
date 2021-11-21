@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Provides entertainment to nearby houses
 /// </summary>
-public class Arena : MonoBehaviour {
+public class Arena : Building {
     private bool active;
     private World myWorld;
     private GameObject[,] structureArr;
