@@ -19,6 +19,8 @@ public class TogglePanel : Highlightable
     public GameObject offPanelH;//8
     public GameObject offPanelI;//9
     public GameObject offPanelJ;//10
+    public GameObject offPanelK;//11
+    public GameObject offPanelL;//12
 
     /// <summary>
     /// Toggle the passed-in game object on or off
@@ -29,6 +31,11 @@ public class TogglePanel : Highlightable
         if (popupObject != null)
         {
             Destroy(popupObject);
+        }
+        GameObject buildObject = GameObject.FindWithTag(World.BUILD_OBJECT);
+        if (buildObject != null)
+        {
+            Destroy(buildObject);
         }
         //Panel to toggle
         if (panelToSetActive != null && panelToSetActive.activeSelf == false)
@@ -79,6 +86,14 @@ public class TogglePanel : Highlightable
         if (offPanelJ != null)
         {
             offPanelJ.SetActive(false);
+        }
+        if (offPanelK != null)
+        {
+            offPanelK.SetActive(false);
+        }
+        if (offPanelL != null)
+        {
+            offPanelL.SetActive(false);
         }
     }
 }

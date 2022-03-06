@@ -109,8 +109,8 @@ public class Emigrate : Animated
                     Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
                     float length = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
                     Vector2 unitVector = new Vector2(vector.x / length, vector.y / length);
-                    Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
-                        + unitVector.y * stepSize);
+                    Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.timeScale, currentLocation.y
+                        + unitVector.y * stepSize * Time.timeScale);
                     gameObject.transform.position = newLocation;
 
                     //animation

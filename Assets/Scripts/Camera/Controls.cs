@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/**
- * Used to update the Camera position and distance from the ground.
- */
+/// <summary>
+/// Used to update the Camera position and distance from the ground.
+/// </summary>
 public class Controls : MonoBehaviour {
     public float scrollSpeed = 0.001f;
     private Camera myCamera;
@@ -11,45 +11,46 @@ public class Controls : MonoBehaviour {
     private GameObject world;
     private World myWorld;
     private int mapSize;
-    
-    /**
-     * Initializes variables used by the Controls class.
-     */
+
+    /// <summary>
+    /// Initializes variables used by the Controls class.
+    /// </summary>
     void Start () {
         myCamera = GetComponent<Camera>();
-        world = GameObject.Find("WorldInformation");
+        world = GameObject.Find(World.WORLD_INFORMATION);
         myWorld = world.GetComponent<World>();
         mapSize = myWorld.mapSize;
     }
-	
-    /**
-     * Updates the camera based on the player's inputs.
-     */
-	void Update () {
+
+    /// <summary>
+    /// Updates the camera based on the player's inputs.
+    /// </summary>
+    void Update () {
         //Moving the camera around the x and y directions by moving the mouse to the edges of the screen
         Vector3 currentPos = transform.position;
         float cameraSize = myCamera.orthographicSize / 5;
         float cameraAdjustment = 0.1f * (cameraSize / 1.3f);
         int borderAdjustment = 3;
+        float speedAdjustment = 0.015f;
         //Scrolling up
         if (Input.mousePosition.y >= Screen.height * 0.999 && currentPos.y < mapSize - myCamera.orthographicSize - 1 + cameraAdjustment + (borderAdjustment - 2))
         {
-            transform.position = new Vector3(currentPos.x, currentPos.y + scrollSpeed * Time.deltaTime * cameraSize, currentPos.z);
+            transform.position = new Vector3(currentPos.x, currentPos.y + scrollSpeed * speedAdjustment * cameraSize, currentPos.z);
         }
         //Scrolling down
         if (Input.mousePosition.y <= Screen.height * 0.001 && currentPos.y > myCamera.orthographicSize - cameraAdjustment - borderAdjustment)
         {
-            transform.position = new Vector3(currentPos.x, currentPos.y - scrollSpeed * Time.deltaTime * cameraSize, currentPos.z);
+            transform.position = new Vector3(currentPos.x, currentPos.y - scrollSpeed * speedAdjustment * cameraSize, currentPos.z);
         }
         //Scrolling right
         if (Input.mousePosition.x >= Screen.width * 0.999 && currentPos.x < mapSize - myCamera.aspect * myCamera.orthographicSize - 1 + cameraAdjustment + (borderAdjustment - 2))
         {
-            transform.position = new Vector3(currentPos.x + scrollSpeed * Time.deltaTime * cameraSize, currentPos.y, currentPos.z);
+            transform.position = new Vector3(currentPos.x + scrollSpeed * speedAdjustment * cameraSize, currentPos.y, currentPos.z);
         }
         //Scrolling left
         if (Input.mousePosition.x <= Screen.width * 0.001 && currentPos.x > myCamera.aspect * myCamera.orthographicSize - cameraAdjustment - (borderAdjustment + 2))
         {
-            transform.position = new Vector3(currentPos.x - scrollSpeed * Time.deltaTime * cameraSize, currentPos.y, currentPos.z);
+            transform.position = new Vector3(currentPos.x - scrollSpeed * speedAdjustment * cameraSize, currentPos.y, currentPos.z);
         }
 
         //Zooming in and out with the mouse scrollwheel

@@ -9,6 +9,7 @@ using UnityEngine.EventSystems;
 public class WorldObject : MonoBehaviour
 {
     public GameObject worldObjectPopup;
+    public AudioSource clickSound;
     private GameObject createdPopup;
     
     /// <summary>
@@ -23,10 +24,21 @@ public class WorldObject : MonoBehaviour
             {
                 Destroy(otherPopupObject);
             }
+            GameObject worldUIObject = GameObject.FindWithTag(World.WORLD_UI);
+            if (worldUIObject != null)
+            {
+                worldUIObject.SetActive(false);
+            }
             GameObject instantiatedWorldObjectPopup = Instantiate(worldObjectPopup) as GameObject;
             Popup popupOfWorldObject = instantiatedWorldObjectPopup.GetComponent<Popup>();
             popupOfWorldObject.setGameObject(gameObject);
             createdPopup = instantiatedWorldObjectPopup;
+
+            //sound
+            if (clickSound != null)
+            {
+                clickSound.Play();
+            }
         }
     }
 

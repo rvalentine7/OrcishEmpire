@@ -4,7 +4,7 @@ using System.Collections;
 /// <summary>
 /// Used by the building creation buttons in the UI to enter build mode for a particular structure
 /// </summary>
-public class CreateObject : MonoBehaviour
+public class CreateObject : Highlightable
 {
     public GameObject construct;
 

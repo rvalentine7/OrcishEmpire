@@ -26,7 +26,7 @@ public class Highlightable : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (Time.time > setActiveTime && displayTooltip)
+        if (displayTooltip && Time.time > setActiveTime)
         {
             tooltip.SetActive(true);
             displayTooltip = false;

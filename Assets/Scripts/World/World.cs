@@ -8,6 +8,7 @@ using UnityEngine;
 public class World : MonoBehaviour {
     private int populationCount;
     private float paymentTime;
+    private float manageTradeTime;
 
     //A queue to spread out how quickly immigrants can move in
     private Queue<GameObject> homesToMoveInTo = new Queue<GameObject>();
@@ -18,6 +19,7 @@ public class World : MonoBehaviour {
     private int lowestEmptyWaterSection = 0;
 
     public float paymentInterval;
+    public float manageTradeInterval;
     public float taxPercentage;
     public int currencyCount;
     public ConstructionNetwork constructNetwork;
@@ -25,12 +27,27 @@ public class World : MonoBehaviour {
     public int mapSize;
     public Vector2 spawnLocation;//location where immigrants will spawn in
     public Vector2 exitLocation;//locations where emmigrants will exit the world
+    public int wheatCost;
+    public int meatCost;
+    public int fishCost;
+    public int eggsCost;
+    public int hopsCost;
+    public int beerCost;
+    public int lumberCost;
+    public int furnitureCost;
+    public int ironCost;
+    public int weaponCost;
+    public int ochreCost;
+    public int warPaintCost;
     public List<string> walkableTerrain;
     public List<string> nonWalkableTerrain;
     public List<string> buildableTerrain;
     public List<string> aqueductTerrain;
     public List<string> mountainousTerrain;
     public List<string> wateryTerrain;
+
+    //Trade Management
+    private TradeManager tradeManager;
 
     //Value used by multiple different buildings
     public const int HEALTH_BUILDING_RADIUS = 15;
@@ -39,6 +56,7 @@ public class World : MonoBehaviour {
     public const string WORLD_INFORMATION = "WorldInformation";
     public const string JOB_PAYMENT = "Job Payment";
     public const string TAX = "Tax";
+    //Buildings
     public const string HOUSE = "House";
     public const string BUILDING = "Building";
     public const string BUILDINGS = "Buildings";
@@ -48,18 +66,28 @@ public class World : MonoBehaviour {
     public const string STAIRS = "Stairs";
     public const string LOW_BRIDGE = "LowBridge";
     public const string HIGH_BRIDGE = "HighBridge";
+    //Terrain
     public const string WATER = "Water";
     public const string TREES = "Trees";
     public const string FISHING_SPOT = "FishingSpot";
+    //UI
     public const string BUILD_OBJECT = "BuildObject";
     public const string POPUP = "Popup";
+    public const string WORLD_UI = "WorldUI";
     public const string BUILD_PANEL = "BuildPanel";
+    //Resources
     public const string MEAT = "Meat";
     public const string WHEAT = "Wheat";
     public const string EGGS = "Eggs";
     public const string FISH = "Fish";
+    public const string HOPS = "Hops";
     public const string BEER = "Beer";
     public const string LUMBER = "Lumber";
+    public const string FURNITURE = "Furniture";
+    public const string IRON = "Iron";
+    public const string WEAPON = "Weapon";
+    public const string OCHRE = "Ochre";
+    public const string WAR_PAINT = "WarPaint";
 
     private PopulationAndCurrency populationAndCurrency;
 
@@ -70,6 +98,7 @@ public class World : MonoBehaviour {
     {
         populationCount = 0;
         paymentTime = paymentInterval;
+        manageTradeTime = manageTradeInterval;
         //eventually change these to be general and passed in by a level
         // manager
         constructNetwork = new ConstructionNetwork();
@@ -80,6 +109,8 @@ public class World : MonoBehaviour {
 
         GameObject populationAndCurrencyUI = GameObject.Find("ResourcesPanel");
         populationAndCurrency = populationAndCurrencyUI.GetComponent<PopulationAndCurrency>();
+
+        tradeManager = new TradeManager(this);
     }
 
     // Use this for initialization
@@ -105,6 +136,13 @@ public class World : MonoBehaviour {
             {
                 homeThatCanBeMovedInTo.GetComponent<AvailableHome>().spawnImmigrant();
             }
+        }
+
+        //Manage Trade Routes
+        if (Time.time > manageTradeTime)
+        {
+            manageTradeTime = Time.time + manageTradeInterval;
+            tradeManager.manageTradeRoutes();
         }
     }
 
@@ -260,6 +298,75 @@ public class World : MonoBehaviour {
     /// <returns>The distance between two points</returns>
     public float getDistanceBetweenPoints(Vector2 firstLocation, Vector2 secondLocation) {
         return Mathf.Sqrt(Mathf.Pow(secondLocation.x - firstLocation.x, 2) + Mathf.Pow(secondLocation.y - firstLocation.y, 2));
+    }
+
+    /// <summary>
+    /// Gets the trade manager for this world
+    /// </summary>
+    /// <returns>The trade manager for this world</returns>
+    public TradeManager getTradeManager()
+    {
+        return this.tradeManager;
+    }
+
+    /// <summary>
+    /// Returns the cost of a particular goods item from its name
+    /// </summary>
+    /// <param name="goodsName">The name of the goods to return the cost of</param>
+    /// <returns>The cost of a particular goods item</returns>
+    public int getGoodsCost(string goodsName)
+    {
+        goodsName = goodsName.Replace(" ", "");
+
+        if (goodsName.Equals(WHEAT))
+        {
+            return wheatCost;
+        }
+        if (goodsName.Equals(MEAT))
+        {
+            return meatCost;
+        }
+        if (goodsName.Equals(FISH))
+        {
+            return fishCost;
+        }
+        if (goodsName.Equals(EGGS))
+        {
+            return eggsCost;
+        }
+        if (goodsName.Equals(HOPS))
+        {
+            return hopsCost;
+        }
+        if (goodsName.Equals(BEER))
+        {
+            return beerCost;
+        }
+        if (goodsName.Equals(LUMBER))
+        {
+            return lumberCost;
+        }
+        if (goodsName.Equals(FURNITURE))
+        {
+            return furnitureCost;
+        }
+        if (goodsName.Equals(IRON))
+        {
+            return ironCost;
+        }
+        if (goodsName.Equals(WEAPON))
+        {
+            return weaponCost;
+        }
+        if (goodsName.Equals(OCHRE))
+        {
+            return ochreCost;
+        }
+        if (goodsName.Equals(WAR_PAINT))
+        {
+            return warPaintCost;
+        }
+         return -1;
     }
 
     //with a level manager, I will need getters and setters for information such as "spawnLocation" so that

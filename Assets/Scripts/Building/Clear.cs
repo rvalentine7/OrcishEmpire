@@ -114,9 +114,11 @@ public class Clear : MonoBehaviour {
                     int ySign = ySpaces == 0 ? 1 : ySpaces / yAbsSpaces;
                     //Check if there is a structure or tree in the location
                     Vector2 tempClearObjPosition = new Vector2((int)startClearPosition.x + i * xSign, (int)startClearPosition.y + j * ySign);
-                    if (structureArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y] != null
+                    if (tempClearObjPosition.x > 0 && tempClearObjPosition.x < myWorld.mapSize
+                        && tempClearObjPosition.y > 0 && tempClearObjPosition.y < myWorld.mapSize
+                        && (structureArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y] != null
                         || (terrainArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y] != null
-                        && terrainArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y].tag.Equals(World.TREES)))
+                        && terrainArr[(int)tempClearObjPosition.x, (int)tempClearObjPosition.y].tag.Equals(World.TREES))))
                     {
                         if (clearLocationsToRemove.Contains(tempClearObjPosition))
                         {
