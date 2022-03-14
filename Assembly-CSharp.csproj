@@ -157,10 +157,11 @@
     <Compile Include="Assets\Scripts\UI\CharacterPopups\TaxCollectorOrcPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ClosePanel.cs" />
     <Compile Include="Assets\Scripts\UI\Highlightable.cs" />
-    <Compile Include="Assets\Scripts\UI\MyTradePanel.cs" />
     <Compile Include="Assets\Scripts\UI\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\UI\PopulationAndCurrency.cs" />
     <Compile Include="Assets\Scripts\UI\Popup.cs" />
+    <Compile Include="Assets\Scripts\UI\QuitGame.cs" />
+    <Compile Include="Assets\Scripts\UI\ResourceTradeInputs.cs" />
     <Compile Include="Assets\Scripts\UI\SpeedAdjustment.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\TradeCityObject.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Assets\Scripts\UI\WorldUI.cs" />
     <Compile Include="Assets\Scripts\World\Animated.cs" />
     <Compile Include="Assets\Scripts\World\ConstructNetwork.cs" />
+    <Compile Include="Assets\Scripts\World\ResourceTrading.cs" />
     <Compile Include="Assets\Scripts\World\TerrainNetwork.cs" />
     <Compile Include="Assets\Scripts\World\Tile.cs" />
     <Compile Include="Assets\Scripts\World\TradeManager.cs" />

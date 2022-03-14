@@ -216,6 +216,9 @@ public class AqueductPlacement : BuildMode {
                         Vector2 positionToBuild = tempAqueductToPlace.transform.position;
                         GameObject roadAqueductIsOn = roadsUnderTempAqueducts.ContainsKey(positionToBuild) ? roadsUnderTempAqueducts[positionToBuild] : null;
                         GameObject aqueductObj = Instantiate(building, positionToBuild, Quaternion.identity) as GameObject;
+                        AudioSource buildAudioSource = GameObject.Find(World.BUILD_AUDIO).GetComponent<AudioSource>();
+                        buildAudioSource.clip = buildAudioClip;
+                        buildAudioSource.Play();
                         myWorld.updateCurrency(-buildingCost);
                         if (roadAqueductIsOn != null)
                         {

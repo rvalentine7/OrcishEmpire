@@ -271,6 +271,9 @@ public class BridgePlacement : BuildMode {
                     {
                         Vector2 segmentPosition = segment.transform.position;
                         GameObject confirmedBridgeSegment = Instantiate(bridgeObject, segmentPosition, Quaternion.identity) as GameObject;
+                        AudioSource buildAudioSource = GameObject.Find(World.BUILD_AUDIO).GetComponent<AudioSource>();
+                        buildAudioSource.clip = buildAudioClip;
+                        buildAudioSource.Play();
                         confirmedBridgeSegments.Add(confirmedBridgeSegment);
                         structureArr[(int)segmentPosition.x, (int)segmentPosition.y] = confirmedBridgeSegment;
 

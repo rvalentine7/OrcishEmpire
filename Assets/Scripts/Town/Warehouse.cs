@@ -8,7 +8,7 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class Warehouse : Storage {
     public GameObject warehousePopupObject;
-
+    public AudioSource onMouseDownAudio;
     public Sprite emptyWarehouse;
     public Sprite firstRowWarehouse;
     public Sprite secondRowWarehouse;
@@ -110,6 +110,7 @@ public class Warehouse : Storage {
             GameObject instantiatedWorldObjectPopup = Instantiate(warehousePopupObject) as GameObject;
             Popup popupOfWorldObject = instantiatedWorldObjectPopup.GetComponent<Popup>();
             popupOfWorldObject.setGameObject(gameObject);
+            onMouseDownAudio.Play();
         }
     }
 }

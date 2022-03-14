@@ -19,8 +19,7 @@ public class BuildingPlacement : BuildMode
     /// Initializes the BuildingPlacement class
     /// </summary>
     void Start () {
-        //validPlacement = true;
-        //myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
+        
     }
 
     /// <summary>
@@ -235,6 +234,9 @@ public class BuildingPlacement : BuildMode
                 Vector2 buildingVec = new Vector2(mousePos.x + adjustedX, mousePos.y + adjustedY);
                 //create the new building in the game world
                 GameObject buildingObj = Instantiate(building, buildingVec, Quaternion.identity) as GameObject;
+                AudioSource buildAudioSource = GameObject.Find(World.BUILD_AUDIO).GetComponent<AudioSource>();
+                buildAudioSource.clip = buildAudioClip;
+                buildAudioSource.Play();
                 myWorld.updateCurrency(-buildingCost);
                 for (r = 0; r < height; r++)
                 {

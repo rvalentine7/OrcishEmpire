@@ -172,6 +172,9 @@ public class RoadPlacement : BuildMode {
                     if (!tempRoadObject.GetComponent<SpriteRenderer>().sprite.name.Contains("Im"))
                     {
                         GameObject roadObj = Instantiate(road, buildPos, Quaternion.identity) as GameObject;
+                        AudioSource buildAudioSource = GameObject.Find(World.BUILD_AUDIO).GetComponent<AudioSource>();
+                        buildAudioSource.clip = buildAudioClip;
+                        buildAudioSource.Play();
                         myWorld.updateCurrency(-buildingCost);
                         structureArr = myWorld.constructNetwork.getConstructArr();
                         GameObject aqueductObj = null;

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Contains information about the world the player is in.
@@ -45,15 +46,30 @@ public class World : MonoBehaviour {
     public List<string> aqueductTerrain;
     public List<string> mountainousTerrain;
     public List<string> wateryTerrain;
+    public GameObject pauseMenu;
 
     //Trade Management
     private TradeManager tradeManager;
+    public ResourceTradeInputs wheatTradeInputs;
+    public ResourceTradeInputs meatTradeInputs;
+    public ResourceTradeInputs eggsTradeInputs;
+    public ResourceTradeInputs fishTradeInputs;
+    public ResourceTradeInputs hopsTradeInputs;
+    public ResourceTradeInputs beerTradeInputs;
+    public ResourceTradeInputs lumberTradeInputs;
+    public ResourceTradeInputs furnitureTradeInputs;
+    public ResourceTradeInputs ironTradeInputs;
+    public ResourceTradeInputs weaponTradeInputs;
+    public ResourceTradeInputs ochreTradeInputs;
+    public ResourceTradeInputs warPaintTradeInputs;
 
     //Value used by multiple different buildings
     public const int HEALTH_BUILDING_RADIUS = 15;
 
     //Strings that are used in multiple places
     public const string WORLD_INFORMATION = "WorldInformation";
+    public const string UI_CANVAS = "UICanvas";
+    public const string BUILD_AUDIO = "BuildAudioSource";
     public const string JOB_PAYMENT = "Job Payment";
     public const string TAX = "Tax";
     //Buildings
@@ -110,7 +126,44 @@ public class World : MonoBehaviour {
         GameObject populationAndCurrencyUI = GameObject.Find("ResourcesPanel");
         populationAndCurrency = populationAndCurrencyUI.GetComponent<PopulationAndCurrency>();
 
-        tradeManager = new TradeManager(this);
+        Dictionary<string, ResourceTrading> tradingPerResource = new Dictionary<string, ResourceTrading>();
+        tradingPerResource.Add(WHEAT, new ResourceTrading(
+            wheatTradeInputs.getTradeStatus(),
+            wheatTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(MEAT, new ResourceTrading(
+            meatTradeInputs.getTradeStatus(),
+            meatTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(EGGS, new ResourceTrading(
+            eggsTradeInputs.getTradeStatus(),
+            eggsTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(FISH, new ResourceTrading(
+            fishTradeInputs.getTradeStatus(),
+            fishTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(HOPS, new ResourceTrading(
+            hopsTradeInputs.getTradeStatus(),
+            hopsTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(BEER, new ResourceTrading(
+            beerTradeInputs.getTradeStatus(),
+            beerTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(LUMBER, new ResourceTrading(
+            lumberTradeInputs.getTradeStatus(),
+            lumberTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(FURNITURE, new ResourceTrading(
+            furnitureTradeInputs.getTradeStatus(),
+            furnitureTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(IRON, new ResourceTrading(
+            ironTradeInputs.getTradeStatus(),
+            ironTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(WEAPON, new ResourceTrading(
+            weaponTradeInputs.getTradeStatus(),
+            weaponTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(OCHRE, new ResourceTrading(
+            ochreTradeInputs.getTradeStatus(),
+            ochreTradeInputs.getMaxPerTrader()));
+        tradingPerResource.Add(WAR_PAINT, new ResourceTrading(
+            warPaintTradeInputs.getTradeStatus(),
+            warPaintTradeInputs.getMaxPerTrader()));
+        tradeManager = new TradeManager(this, tradingPerResource);
     }
 
     // Use this for initialization
@@ -120,6 +173,11 @@ public class World : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (Input.GetKeyDown("escape"))
+        {
+            pauseMenu.SetActive(!pauseMenu.activeSelf);
+        }
+
         //Updates the time at which workers should be paid
         if (paymentInterval > 0.0f && Time.time > paymentTime)
         {

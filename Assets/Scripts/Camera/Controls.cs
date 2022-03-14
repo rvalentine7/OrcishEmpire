@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 /// <summary>
@@ -55,11 +56,11 @@ public class Controls : MonoBehaviour {
 
         //Zooming in and out with the mouse scrollwheel
         float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll > 0f && myCamera.orthographicSize > 1)
+        if (!EventSystem.current.IsPointerOverGameObject() && scroll > 0f && myCamera.orthographicSize > 1)
         {
             myCamera.orthographicSize -= 1;
         }
-        else if (scroll < 0f && myCamera.orthographicSize < 8)
+        else if (!EventSystem.current.IsPointerOverGameObject() && scroll < 0f && myCamera.orthographicSize < 8)
         {
             myCamera.orthographicSize += 1;
         }

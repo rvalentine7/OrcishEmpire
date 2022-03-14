@@ -11,6 +11,7 @@ public abstract class Popup : MonoBehaviour
 {
     protected GameObject objectOfPopup;
     protected bool initialClick;
+    private AudioSource clickAudio;
 
     /// <summary>
     /// Initialization
@@ -23,6 +24,8 @@ public abstract class Popup : MonoBehaviour
             panel.SetActive(false);
         }
         initialClick = true;
+
+        clickAudio = GameObject.Find(World.UI_CANVAS).GetComponent<AudioSource>();
     }
 
     /// <summary>
@@ -57,5 +60,13 @@ public abstract class Popup : MonoBehaviour
     public void destroyObject()
     {
         Destroy(gameObject);
+    }
+
+    /// <summary>
+    /// Plays the standard click sound
+    /// </summary>
+    public void playClickSound()
+    {
+        clickAudio.Play();
     }
 }

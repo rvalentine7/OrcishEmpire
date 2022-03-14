@@ -10,6 +10,7 @@ public class BuildMode : MonoBehaviour
     public int width;
     public int height;
     public GameObject grid;
+    public AudioClip buildAudioClip;
 
     protected World myWorld;
     protected Vector2 mousePos;
