@@ -20,6 +20,7 @@ e1bbf0ab858085e38fae6b12ebbdcd35 UnityEngine.Timeline.dll:UnityEngine.Timeline.G
 e1bbf0ab858085e38fae6b12ebbdcd35 UnityEngine.Timeline.dll:UnityEngine.Timeline.PlayableTrack
 201e3fde670b00545944bb3db215c80a UnityEngine.Timeline.dll:UnityEngine.Timeline.TimelineAsset
 4c4ab0d321bc4b0891530e2a18729713 Assembly-CSharp.dll:.ChangeTabs
+71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.QuitGame
 e7a73f5f78ba6445195ec23b74a1ce2d Unity.TextMeshPro.dll:TMPro.TMP_ScrollbarEventHandler
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.HopsFarmPopup
 a6e7a86a9278ba5ddbe6aaccdf37cea5 Assembly-CSharp.dll:.Production
@@ -57,7 +58,6 @@ fc108ce7d98c40ac0907e8ca7f500c76 UnityEngine.UI.dll:UnityEngine.UI.Text
 abf1930d8126d0b2e00e9449129a0190 UnityEngine.UI.dll:UnityEngine.EventSystems.TouchInputModule
 64e54c0cbb0177c5ea26f340efb9ff85 UnityEngine.UI.dll:UnityEngine.UI.VerticalLayoutGroup
 71795b122c90dcc2e4fd3a186337a49c Assembly-CSharp.dll:.Animated
-ebfa93e8c9a1129469e5eeb8778a8d8a Assembly-CSharp.dll:.MyTradePanel
 98ad81e9f689a492509f07e75b810aaa Unity.TextMeshPro.dll:TMPro.TMP_InputField
 e29ab0d731322db4e36c35e7f570f8c6 Assembly-CSharp.dll:.SpeedAdjustment
 92bd6564b0e7c1d9e7b0e64cba1a5bbb Assembly-CSharp.dll:.PauseMenu
@@ -219,7 +219,7 @@ fb6a1ea36b4f6ef5948d283d93760765 UnityEngine.GoogleAudioSpatializer.dll:UnityEng
 5b0391b7e3d9ea9db6c0a8fbd0ca23f6 UnityEngine.GoogleAudioSpatializer.dll:UnityEngine.Experimental.Audio.Google.GvrAudioSourceExtension
 991fa9c1a3be00fc4ed5fd230e2fc77d Assembly-CSharp.dll:.Deliver
 f32f437684ebb6383d2f46351878d257 Assembly-CSharp.dll:.DeliveryOrcPopup
-5b235a43f32c54c157379a02adff4a0b Assembly-CSharp.dll:.World
+9818cc20f806477f620699ec7dc9817b Assembly-CSharp.dll:.World
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.PigFarmPopup
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.FishingWharfPopup
 a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
@@ -248,6 +248,7 @@ d791aa6007fa3640be1164ea75bb087d Unity.TextMeshPro.dll:TMPro.TMP_StyleSheet
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.WheatFarmPopup
 dc3dacb20a08427bc6e7f509da12d37e Assembly-CSharp.dll:.Boatyard
 b78d4a7fd1b32a0fb4bb02cd26d700fb Assembly-CSharp.dll:.Barber
+84efa2b871d37f0e5fe47763c9d5dcbc Assembly-CSharp.dll:.ResourceTradeInputs
 02a8a097ae0fe443836f5557a1257b00 Assembly-CSharp.dll:.TaxCollectorPopup
 b9a98c86a6a0c179135025b19183c9e8 Assembly-CSharp.dll:.WarPaintWorkshopPopup
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.PopupRemoval
@@ -265,4 +266,4 @@ ff3fa92641f4afc26fe43c6f618eaf19 Assembly-CSharp.dll:.WaterTile
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.OchrePitPopup
 6d66e7628528b05b0dcb8c8c42956cd9 Assembly-CSharp.dll:.Aqueduct
 10e33d6fad2aec1164fac23cb719827a Assembly-CSharp.dll:.TogglePanel
-71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.QuitGame
+77d6b67135a3c1d87698ab2eccde7dea Assembly-CSharp.dll:.SettingsMenu

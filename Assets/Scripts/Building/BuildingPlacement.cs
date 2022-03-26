@@ -236,6 +236,7 @@ public class BuildingPlacement : BuildMode
                 GameObject buildingObj = Instantiate(building, buildingVec, Quaternion.identity) as GameObject;
                 AudioSource buildAudioSource = GameObject.Find(World.BUILD_AUDIO).GetComponent<AudioSource>();
                 buildAudioSource.clip = buildAudioClip;
+                buildAudioSource.volume = myWorld.getSettingsMenu().getClickVolume();
                 buildAudioSource.Play();
                 myWorld.updateCurrency(-buildingCost);
                 for (r = 0; r < height; r++)

@@ -47,6 +47,7 @@ public class World : MonoBehaviour {
     public List<string> mountainousTerrain;
     public List<string> wateryTerrain;
     public GameObject pauseMenu;
+    public SettingsMenu settingsMenu;
 
     //Trade Management
     private TradeManager tradeManager;
@@ -69,6 +70,7 @@ public class World : MonoBehaviour {
     //Strings that are used in multiple places
     public const string WORLD_INFORMATION = "WorldInformation";
     public const string UI_CANVAS = "UICanvas";
+    public const string SETTINGS_MENU = "SettingsMenu";
     public const string BUILD_AUDIO = "BuildAudioSource";
     public const string JOB_PAYMENT = "Job Payment";
     public const string TAX = "Tax";
@@ -167,8 +169,9 @@ public class World : MonoBehaviour {
     }
 
     // Use this for initialization
-    void Start() {
-
+    void Start()
+    {
+        
     }
 
     // Update is called once per frame
@@ -425,6 +428,15 @@ public class World : MonoBehaviour {
             return warPaintCost;
         }
          return -1;
+    }
+
+    /// <summary>
+    /// Get the game's settings menu
+    /// </summary>
+    /// <returns>The game's settings menu</returns>
+    public SettingsMenu getSettingsMenu()
+    {
+        return settingsMenu;
     }
 
     //with a level manager, I will need getters and setters for information such as "spawnLocation" so that

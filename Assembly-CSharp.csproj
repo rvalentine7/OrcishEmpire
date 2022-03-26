@@ -162,6 +162,7 @@
     <Compile Include="Assets\Scripts\UI\Popup.cs" />
     <Compile Include="Assets\Scripts\UI\QuitGame.cs" />
     <Compile Include="Assets\Scripts\UI\ResourceTradeInputs.cs" />
+    <Compile Include="Assets\Scripts\UI\SettingsMenu.cs" />
     <Compile Include="Assets\Scripts\UI\SpeedAdjustment.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
     <Compile Include="Assets\Scripts\UI\TradeCityObject.cs" />

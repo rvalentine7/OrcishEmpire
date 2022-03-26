@@ -218,6 +218,7 @@ public class AqueductPlacement : BuildMode {
                         GameObject aqueductObj = Instantiate(building, positionToBuild, Quaternion.identity) as GameObject;
                         AudioSource buildAudioSource = GameObject.Find(World.BUILD_AUDIO).GetComponent<AudioSource>();
                         buildAudioSource.clip = buildAudioClip;
+                        buildAudioSource.volume = myWorld.getSettingsMenu().getClickVolume();
                         buildAudioSource.Play();
                         myWorld.updateCurrency(-buildingCost);
                         if (roadAqueductIsOn != null)

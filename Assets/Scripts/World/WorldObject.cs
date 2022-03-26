@@ -37,6 +37,7 @@ public class WorldObject : MonoBehaviour
             //sound
             if (clickSound != null)
             {
+                clickSound.volume = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>().getSettingsMenu().getClickVolume();
                 clickSound.Play();
             }
         }

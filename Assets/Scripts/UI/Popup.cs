@@ -12,6 +12,7 @@ public abstract class Popup : MonoBehaviour
     protected GameObject objectOfPopup;
     protected bool initialClick;
     private AudioSource clickAudio;
+    private SettingsMenu settingsMenu;
 
     /// <summary>
     /// Initialization
@@ -26,6 +27,7 @@ public abstract class Popup : MonoBehaviour
         initialClick = true;
 
         clickAudio = GameObject.Find(World.UI_CANVAS).GetComponent<AudioSource>();
+        settingsMenu = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>().getSettingsMenu();
     }
 
     /// <summary>
@@ -67,6 +69,7 @@ public abstract class Popup : MonoBehaviour
     /// </summary>
     public void playClickSound()
     {
+        clickAudio.volume = settingsMenu.getClickVolume();
         clickAudio.Play();
     }
 }

@@ -197,6 +197,10 @@ public class HousingPlacement : BuildMode
                     if (!houseToCreate.GetComponent<SpriteRenderer>().sprite.name.Contains("Impossible"))
                     {
                         Vector2 housePosition = houseToCreate.transform.position;
+                        AudioSource buildAudioSource = GameObject.Find(World.BUILD_AUDIO).GetComponent<AudioSource>();
+                        buildAudioSource.clip = buildAudioClip;
+                        buildAudioSource.volume = myWorld.getSettingsMenu().getClickVolume();
+                        buildAudioSource.Play();
                         GameObject buildingObj = Instantiate(house, housePosition, Quaternion.identity) as GameObject;
                         myWorld.updateCurrency(-buildingCost);
                         myWorld.constructNetwork.setConstructArr((int)housePosition.x, (int)housePosition.y, buildingObj);
