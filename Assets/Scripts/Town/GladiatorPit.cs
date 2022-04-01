@@ -44,7 +44,7 @@ public class GladiatorPit : Building {
             {
                 if (trainingProgress < progressRequired)
                 {
-                    float progressedTime = Time.unscaledTime - prevUpdateTime;
+                    float progressedTime = Time.time - prevUpdateTime;
                     float effectiveTimeToFinish = timeToTrain / (employment.getNumWorkers() / numHealthyWorkers);
                     trainingProgress += progressedTime / effectiveTimeToFinish * 100;
                     if (trainingProgress >= progressRequired)
@@ -60,7 +60,7 @@ public class GladiatorPit : Building {
             }
         }
 
-        prevUpdateTime = Time.unscaledTime;
+        prevUpdateTime = Time.time;
     }
 
     /// <summary>

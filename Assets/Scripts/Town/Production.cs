@@ -79,7 +79,7 @@ public class Production : Building {
         {
             if (progress < 100)
             {
-                float progressedTime = (Time.unscaledTime - prevUpdateTime) * Time.timeScale;
+                float progressedTime = Time.time - prevUpdateTime;
                 float effectiveTimeToFinish = timeToProduce / (numWorkers / employment.getNumHealthyWorkers());
                 progress += progressedTime / effectiveTimeToFinish * 100;
                 if (progress >= 100)
@@ -96,7 +96,7 @@ public class Production : Building {
             createDeliveryOrc();
         }
 
-        prevUpdateTime = Time.unscaledTime;
+        prevUpdateTime = Time.time;
     }
 
     /// <summary>

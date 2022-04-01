@@ -168,8 +168,8 @@ public class Gladiator : Animated {
                 Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
                 float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
                 Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
-                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.timeScale, currentLocation.y
-                    + unitVector.y * stepSize * Time.timeScale);
+                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
+                    + unitVector.y * stepSize * Time.deltaTime);
                 gameObject.transform.position = newLocation;
 
                 //animation
@@ -235,7 +235,7 @@ public class Gladiator : Animated {
                 {
                     nextIsGoal = true;
                 }
-                if (distanceBetweenPoints < stepSize)
+                if (distanceBetweenPoints < 0.05f)
                 {
                     path.RemoveAt(0);
                 }

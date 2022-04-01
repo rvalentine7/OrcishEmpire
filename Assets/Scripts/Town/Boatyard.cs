@@ -90,7 +90,7 @@ public class Boatyard : Building
             {
                 if (progress < 100)
                 {
-                    float progressedTime = Time.unscaledTime - prevUpdateTime;
+                    float progressedTime = Time.time - prevUpdateTime;
                     float effectiveTimeToFinish = timeToProduce / (employment.getNumWorkers() / numHealthyWorkers);
                     progress += progressedTime / effectiveTimeToFinish * 100;
                     if (progress >= 100)
@@ -101,7 +101,7 @@ public class Boatyard : Building
             }
         }
 
-        prevUpdateTime = Time.unscaledTime;
+        prevUpdateTime = Time.time;
     }
 
     /// <summary>

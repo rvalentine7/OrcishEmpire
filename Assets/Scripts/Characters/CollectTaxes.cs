@@ -222,7 +222,7 @@ public class CollectTaxes : Animated {
                 float distance = Mathf.Sqrt((path[0].x - gameObject.transform.position.x)
                         * (path[0].x - gameObject.transform.position.x) + (path[0].y - gameObject.transform.position.y)
                         * (path[0].y - gameObject.transform.position.y));
-                if (path[0] == currentLocation || distance < stepSize)
+                if (path[0] == currentLocation || distance < 0.05f)
                 {
                     path.RemoveAt(0);
                 }
@@ -244,8 +244,8 @@ public class CollectTaxes : Animated {
                     Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
                     float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
                     Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
-                    Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize, currentLocation.y
-                        + unitVector.y * stepSize);
+                    Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
+                        + unitVector.y * stepSize * Time.deltaTime);
                     gameObject.transform.position = newLocation;
 
                     //animation
@@ -309,7 +309,7 @@ public class CollectTaxes : Animated {
                     {
                         nextIsGoal = true;
                     }
-                    if (distanceBetweenPoints < stepSize)
+                    if (distanceBetweenPoints < 0.05f)
                     {
                         path.RemoveAt(0);
                         if (!headingHome)
@@ -331,7 +331,7 @@ public class CollectTaxes : Animated {
                             distanceBetweenPoints = Mathf.Sqrt((goal.x - gameObject.transform.position.x)
                                 * (goal.x - gameObject.transform.position.x) + (goal.y - gameObject.transform.position.y)
                                 * (goal.y - gameObject.transform.position.y));
-                            if (distanceBetweenPoints < stepSize)
+                            if (distanceBetweenPoints < 0.05f)
                             {
                                 TaxCollector taxCollector = placeOfEmployment.GetComponent<TaxCollector>();
                                 taxCollector.setCollectorStatus(false);

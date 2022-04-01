@@ -88,6 +88,7 @@
     <Compile Include="Assets\Scripts\Characters\OrcInformation.cs" />
     <Compile Include="Assets\Scripts\Characters\OrcInhabitant.cs" />
     <Compile Include="Assets\Scripts\Characters\StandardBoat.cs" />
+    <Compile Include="Assets\Scripts\Characters\Trade.cs" />
     <Compile Include="Assets\Scripts\Town\Aqueduct.cs" />
     <Compile Include="Assets\Scripts\Town\Arena.cs" />
     <Compile Include="Assets\Scripts\Town\AStarForWaterBuildings.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Assets\Scripts\Town\RoadInformation.cs" />
     <Compile Include="Assets\Scripts\Town\Storage.cs" />
     <Compile Include="Assets\Scripts\Town\TaxCollector.cs" />
+    <Compile Include="Assets\Scripts\Town\TradingPost.cs" />
     <Compile Include="Assets\Scripts\Town\Warehouse.cs" />
     <Compile Include="Assets\Scripts\Town\Well.cs" />
     <Compile Include="Assets\Scripts\UI\AncientHistory\CitizenPopup.cs" />
@@ -140,6 +142,7 @@
     <Compile Include="Assets\Scripts\UI\BuildingPopups\PubPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BuildingPopups\ReservoirPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BuildingPopups\TaxCollectorPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\BuildingPopups\TradingPostPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BuildingPopups\WarehousePopup.cs" />
     <Compile Include="Assets\Scripts\UI\BuildingPopups\WarPaintWorkshopPopup.cs" />
     <Compile Include="Assets\Scripts\UI\BuildingPopups\WeaponsmithPopup.cs" />
@@ -155,6 +158,7 @@
     <Compile Include="Assets\Scripts\UI\CharacterPopups\MarketWorkerPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterPopups\StandardBoatPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterPopups\TaxCollectorOrcPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\CharacterPopups\TraderPopup.cs" />
     <Compile Include="Assets\Scripts\UI\ClosePanel.cs" />
     <Compile Include="Assets\Scripts\UI\Highlightable.cs" />
     <Compile Include="Assets\Scripts\UI\PauseMenu.cs" />

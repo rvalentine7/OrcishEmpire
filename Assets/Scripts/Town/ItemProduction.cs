@@ -72,7 +72,7 @@ public class ItemProduction : Building
         {
             if (progress < 100)
             {
-                float progressedTime = Time.unscaledTime - prevUpdateTime;
+                float progressedTime = Time.time - prevUpdateTime;
                 float effectiveTimeToFinish = timeToProduce / (numWorkers / numHealthyWorkers);
                 progress += progressedTime / effectiveTimeToFinish * 100;
                 if (progress >= 100)
@@ -82,7 +82,7 @@ public class ItemProduction : Building
             }
         }
 
-        prevUpdateTime = Time.unscaledTime;
+        prevUpdateTime = Time.time;
     }
 
     /// <summary>

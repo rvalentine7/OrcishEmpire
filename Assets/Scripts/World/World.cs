@@ -28,6 +28,7 @@ public class World : MonoBehaviour {
     public int mapSize;
     public Vector2 spawnLocation;//location where immigrants will spawn in
     public Vector2 exitLocation;//locations where emmigrants will exit the world
+    public GameObject trader;
     public int wheatCost;
     public int meatCost;
     public int fishCost;
@@ -165,7 +166,7 @@ public class World : MonoBehaviour {
         tradingPerResource.Add(WAR_PAINT, new ResourceTrading(
             warPaintTradeInputs.getTradeStatus(),
             warPaintTradeInputs.getMaxPerTrader()));
-        tradeManager = new TradeManager(this, tradingPerResource);
+        tradeManager = new TradeManager(this, tradingPerResource, trader);
     }
 
     // Use this for initialization
@@ -437,6 +438,15 @@ public class World : MonoBehaviour {
     public SettingsMenu getSettingsMenu()
     {
         return settingsMenu;
+    }
+
+    /// <summary>
+    /// Retunrs the game time
+    /// </summary>
+    /// <returns>The game time</returns>
+    public float getGameTime()
+    {
+        return Time.time;
     }
 
     //with a level manager, I will need getters and setters for information such as "spawnLocation" so that

@@ -68,8 +68,8 @@ public class FishingBoat : Animated
         }
         else if (startedFishing && !finishedFishing)
         {
-            float progressedTime = Time.unscaledTime - prevFishingTime;
-            prevFishingTime = Time.unscaledTime;
+            float progressedTime = Time.time - prevFishingTime;
+            prevFishingTime = Time.time;
             float effectiveTimeToFish = fishingTime / (employment.getNumWorkers() / employment.getNumHealthyWorkers());
             effectiveProgress += progressedTime / effectiveTimeToFish * 100;
             if (effectiveProgress >= 100)
@@ -135,8 +135,8 @@ public class FishingBoat : Animated
             Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
             float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
             Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
-            Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.timeScale, currentLocation.y
-                + unitVector.y * stepSize * Time.timeScale);
+            Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
+                + unitVector.y * stepSize * Time.deltaTime);
             gameObject.transform.position = newLocation;
 
             //animation
@@ -180,7 +180,7 @@ public class FishingBoat : Animated
             //if the agent gets to the next vector then delete it from the path
             // and go to the next available vector
             float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, nextLocation);
-            if (distanceBetweenPoints < stepSize)
+            if (distanceBetweenPoints < 0.05f)
             {
                 path.RemoveAt(0);
                 if (path.Count > 0 && structureArr[(int)path[0].x, (int)path[0].y] != null

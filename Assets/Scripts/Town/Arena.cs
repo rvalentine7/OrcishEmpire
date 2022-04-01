@@ -68,7 +68,7 @@ public class Arena : Building {
                 //Make progress towards setting up a fight
                 if (setupProgress < 100 && !ongoingFight)
                 {
-                    float progressedTime = Time.unscaledTime - prevUpdateTime;
+                    float progressedTime = Time.time - prevUpdateTime;
                     float effectiveTimeToFinish = timeToSetup / (employment.getNumWorkers() / numHealthyWorkers);
                     setupProgress += progressedTime / effectiveTimeToFinish * 100;
                     if (setupProgress >= 100)
@@ -158,7 +158,7 @@ public class Arena : Building {
             }
         }
 
-        prevUpdateTime = Time.unscaledTime;
+        prevUpdateTime = Time.time;
     }
 
     /// <summary>
