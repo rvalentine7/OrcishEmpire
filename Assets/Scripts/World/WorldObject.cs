@@ -46,7 +46,7 @@ public class WorldObject : MonoBehaviour
     /// <summary>
     /// Destroys the popup if it still exists
     /// </summary>
-    private void OnDestroy()
+    protected void OnDestroy()
     {
         if (createdPopup)
         {
