@@ -17,7 +17,7 @@ public class Trade : Animated
     private Vector2 navigationGoal;
     private GameObject tradingPostGoal;
     private bool waitingOnTradingPost;
-    private bool finishedTrading;
+    //private bool finishedTrading;
     private bool changePath;
     private bool runningAStar;
     private World myWorld;
@@ -31,7 +31,7 @@ public class Trade : Animated
     private void Awake()
     {
         waitingOnTradingPost = false;
-        finishedTrading = false;
+        //finishedTrading = false;
         changePath = false;
         runningAStar = false;
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
@@ -301,6 +301,15 @@ public class Trade : Animated
     }
 
     /// <summary>
+    /// Gets the trader's TradeCityObject
+    /// </summary>
+    /// <returns>The trader's TradeCityObject</returns>
+    public TradeCityObject getTraderCityObject()
+    {
+        return myTradeCity;
+    }
+
+    /// <summary>
     /// Notifies the trader its trading post has been destroyed and it can leave the city
     /// </summary>
     public void receiveTradingPostDestruction()
@@ -319,7 +328,7 @@ public class Trade : Animated
     /// <param name="finished">Whether the trader is finished trading</param>
     public void setFinishedTrading(bool finished)
     {
-        finishedTrading = finished;
+        //finishedTrading = finished;
         waitingOnTradingPost = false;
         navigationGoal = exitLocation;
     }

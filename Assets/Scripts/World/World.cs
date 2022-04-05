@@ -132,40 +132,52 @@ public class World : MonoBehaviour {
         Dictionary<string, ResourceTrading> tradingPerResource = new Dictionary<string, ResourceTrading>();
         tradingPerResource.Add(WHEAT, new ResourceTrading(
             wheatTradeInputs.getTradeStatus(),
-            wheatTradeInputs.getMaxPerTrader()));
+            wheatTradeInputs.getMaxPerTrader(),
+            wheatCost));
         tradingPerResource.Add(MEAT, new ResourceTrading(
             meatTradeInputs.getTradeStatus(),
-            meatTradeInputs.getMaxPerTrader()));
+            meatTradeInputs.getMaxPerTrader(),
+            meatCost));
         tradingPerResource.Add(EGGS, new ResourceTrading(
             eggsTradeInputs.getTradeStatus(),
-            eggsTradeInputs.getMaxPerTrader()));
+            eggsTradeInputs.getMaxPerTrader(),
+            eggsCost));
         tradingPerResource.Add(FISH, new ResourceTrading(
             fishTradeInputs.getTradeStatus(),
-            fishTradeInputs.getMaxPerTrader()));
+            fishTradeInputs.getMaxPerTrader(),
+            fishCost));
         tradingPerResource.Add(HOPS, new ResourceTrading(
             hopsTradeInputs.getTradeStatus(),
-            hopsTradeInputs.getMaxPerTrader()));
+            hopsTradeInputs.getMaxPerTrader(),
+            hopsCost));
         tradingPerResource.Add(BEER, new ResourceTrading(
             beerTradeInputs.getTradeStatus(),
-            beerTradeInputs.getMaxPerTrader()));
+            beerTradeInputs.getMaxPerTrader(),
+            beerCost));
         tradingPerResource.Add(LUMBER, new ResourceTrading(
             lumberTradeInputs.getTradeStatus(),
-            lumberTradeInputs.getMaxPerTrader()));
+            lumberTradeInputs.getMaxPerTrader(),
+            lumberCost));
         tradingPerResource.Add(FURNITURE, new ResourceTrading(
             furnitureTradeInputs.getTradeStatus(),
-            furnitureTradeInputs.getMaxPerTrader()));
+            furnitureTradeInputs.getMaxPerTrader(),
+            furnitureCost));
         tradingPerResource.Add(IRON, new ResourceTrading(
             ironTradeInputs.getTradeStatus(),
-            ironTradeInputs.getMaxPerTrader()));
+            ironTradeInputs.getMaxPerTrader(),
+            ironCost));
         tradingPerResource.Add(WEAPON, new ResourceTrading(
             weaponTradeInputs.getTradeStatus(),
-            weaponTradeInputs.getMaxPerTrader()));
+            weaponTradeInputs.getMaxPerTrader(),
+            weaponCost));
         tradingPerResource.Add(OCHRE, new ResourceTrading(
             ochreTradeInputs.getTradeStatus(),
-            ochreTradeInputs.getMaxPerTrader()));
+            ochreTradeInputs.getMaxPerTrader(),
+            ochreCost));
         tradingPerResource.Add(WAR_PAINT, new ResourceTrading(
             warPaintTradeInputs.getTradeStatus(),
-            warPaintTradeInputs.getMaxPerTrader()));
+            warPaintTradeInputs.getMaxPerTrader(),
+            warPaintCost));
         tradeManager = new TradeManager(this, tradingPerResource, trader);
     }
 

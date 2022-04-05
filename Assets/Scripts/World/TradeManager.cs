@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Manages the trade in the game
+/// </summary>
 public class TradeManager
 {
     private World myWorld;
@@ -17,7 +20,12 @@ public class TradeManager
     private GameObject trader;
     private float lastTraderSpawnTime;
     
-
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="myWorld">The world this TradeManager is tied to</param>
+    /// <param name="tradingPerResource">The trading for each resource</param>
+    /// <param name="trader">The trader prefab</param>
     public TradeManager(World myWorld, Dictionary<string, ResourceTrading> tradingPerResource, GameObject trader)
     {
         this.myWorld = myWorld;
@@ -28,15 +36,13 @@ public class TradeManager
         lastTraderSpawnTime = 0.0f;
     }
 
+    /// <summary>
+    /// Manages the trade routes in the world
+    /// </summary>
     public void manageTradeRoutes()
     {
-        /*
-         This is where timers would occur for determining if a trader should spawn.  
-         Respawn timers for traders only start when a trade route is first opened and whenever the trader for the particular trade city leaves the map (after visiting)
-         
-        When a trader tries to trade, make sure to reference tradingPerResource to see the max amount they can buy/sell (if there is available supply/storage space)
-         */
         //TODO: is there a smarter/more efficient way of doing this?
+        //Goes through the trade routes to determine if a trader should spawn
         foreach(TradeCityObject tradeCityObject in activeTradeRoutes)
         {
             //5.0f is an arbitrary time I chose to spread out the spawn times for traders
@@ -51,16 +57,29 @@ public class TradeManager
         }
     }
     
+    /// <summary>
+    /// Adds a potential city to trade with
+    /// </summary>
+    /// <param name="tradeCityObject">The potential city to trade with</param>
     public void addTradeCity(TradeCityObject tradeCityObject)
     {
         tradeCities.Add(tradeCityObject.getCityName(), tradeCityObject);
     }
 
+    /// <summary>
+    /// Gets a information on a city from its name
+    /// </summary>
+    /// <param name="tradeCityName">The name of the city to get information on</param>
+    /// <returns>Information on a city from its name</returns>
     public TradeCityObject getTradeCityObject(string tradeCityName)
     {
         return tradeCities[tradeCityName];
     }
 
+    /// <summary>
+    /// Adds a city that the player has opened a trade route with
+    /// </summary>
+    /// <param name="tradeCityObject">The city the player has opened a trade route with</param>
     public void addActiveTradeRoute(TradeCityObject tradeCityObject)
     {
         if (!activeTradeRoutes.Contains(tradeCityObject))
@@ -70,13 +89,32 @@ public class TradeManager
         }
     }
 
+    /// <summary>
+    /// Sets the max amount of goods a trader can trade per visit
+    /// </summary>
+    /// <param name="resourceName">The resource a trade limit is being imposed on</param>
+    /// <param name="maxAmount">The maximum amount of the resource that can be traded</param>
     public void setMaxPerTrader(string resourceName, int maxAmount)
     {
         tradingPerResource[resourceName].setTradeAmount(maxAmount);
     }
 
+    /// <summary>
+    /// Sets the trade status of a resource
+    /// </summary>
+    /// <param name="resourceName">The resource we're updating the trade status of</param>
+    /// <param name="tradeStatus">The trade status for the resource</param>
     public void setTradeStatus(string resourceName, TradeStatus tradeStatus)
     {
         tradingPerResource[resourceName].setTradeStatus(tradeStatus);
+    }
+
+    /// <summary>
+    /// Gets the tradingPerResource
+    /// </summary>
+    /// <returns>The tradingPerResource</returns>
+    public Dictionary<string, ResourceTrading> getTradingPerResource()
+    {
+        return tradingPerResource;
     }
 }

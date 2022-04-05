@@ -78,6 +78,7 @@
     <Compile Include="Assets\Scripts\Characters\Citizen.cs" />
     <Compile Include="Assets\Scripts\Characters\Collect.cs" />
     <Compile Include="Assets\Scripts\Characters\CollectTaxes.cs" />
+    <Compile Include="Assets\Scripts\Characters\CollectTradeGoods.cs" />
     <Compile Include="Assets\Scripts\Characters\Deliver.cs" />
     <Compile Include="Assets\Scripts\Characters\Distribute.cs" />
     <Compile Include="Assets\Scripts\Characters\Emigrate.cs" />
