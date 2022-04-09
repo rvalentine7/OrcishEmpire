@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-//When a trader tries to trade, make sure to reference tradingPerResource to see the max amount they can buy/sell (if there is available supply/storage space)
+/// <summary>
+/// Acts on behalf of a trader by going around buying/selling goods at nearby warehouses
+/// </summary>
 public class CollectTradeGoods : Animated
 {
     private List<string> goodsToSell;//Goods the player can sell
@@ -46,10 +48,6 @@ public class CollectTradeGoods : Animated
         collectedGoods = false;
         visitedWarehouses = new List<GameObject>();
 
-        //TODO: need to track how many resources have been imported/exported
-        //ResourceTrading exampleResourceTrading = tradeManager.getTradingPerResource("example");
-        //TradeManager.TradeStatus exmpleResourceStatus = exampleResourceTrading.getTradeStatus();
-        //int exampleMaxAmount = exampleResourceTrading.getTradeAmount();
         goodsToSell = new List<string>();
         goodsToBuy = new List<string>();
     }
@@ -327,6 +325,11 @@ public class CollectTradeGoods : Animated
                                 storage.removeResource(goodToSell, amountToSell);
                                 //Increasing city's gold from the sale
                                 myWorld.updateCurrency(goodResourceTrading.getCostPerGood() * amountToSell);
+                                //Collector will visibly have goods it brings back to the trader
+                                if (amountToSell > 0)
+                                {
+                                    collectedGoods = true;
+                                }
                             }
                             k++;
                         }
@@ -369,7 +372,7 @@ public class CollectTradeGoods : Animated
                                 k++;
                             }
                         }
-                        
+
                         //Look into doing more trading
                         yield return StartCoroutine(findPathToStorage(returnPath =>
                         {
@@ -675,12 +678,21 @@ public class CollectTradeGoods : Animated
         placeOfEmployment = employment;
     }
 
-    public void setImportsAndExports(List<string> imports, List<string> exports)
+    /// <summary>
+    /// Sets the goods the player city is selling and buying
+    /// </summary>
+    /// <param name="imports">What goods the city we're trading with is importing</param>
+    /// <param name="exports">What goods the city we're trading with is exporting</param>
+    public void setSellingAndBuying(List<string> imports, List<string> exports)
     {
         this.goodsToSell = imports;
         this.goodsToBuy = exports;
     }
 
+    /// <summary>
+    /// Sets a deep copy of TradeManager's tradingPerResource for this class to work with
+    /// </summary>
+    /// <param name="tradingPerResource">A deep copy of TradeManager's tradingPerResource</param>
     public void setTradingPerResource(Dictionary<string, ResourceTrading> tradingPerResource)
     {
         this.tradingPerResource = new Dictionary<string, ResourceTrading>();
@@ -688,5 +700,14 @@ public class CollectTradeGoods : Animated
         {
             this.tradingPerResource.Add(key, tradingPerResource[key].deepCopy());
         }
+    }
+
+    /// <summary>
+    /// Gets whether the collector is heading back to its place of employment
+    /// </summary>
+    /// <returns>Whether the collector is heading back to its place of employment</returns>
+    public bool getHeadingHome()
+    {
+        return headingHome;
     }
 }

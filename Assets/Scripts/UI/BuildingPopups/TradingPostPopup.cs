@@ -11,6 +11,7 @@ public class TradingPostPopup : EmploymentPopup
     public Text status;
     public Text employeeNum;
     public Text sickEmployeeNum;
+    private TradingPost tradingPost;
 
     /// <summary>
     /// Provides information on the tax collector
@@ -21,13 +22,28 @@ public class TradingPostPopup : EmploymentPopup
 
         employeeNum.text = "" + employment.getNumWorkers();
         sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
-        if (employment.getNumWorkers() == 0)
+        if (tradingPost == null)
         {
-            status.text = "The trading post is unable to assist traders with no workers";
+            tradingPost = objectOfPopup.GetComponent<TradingPost>();
         }
         else
         {
-            status.text = "The trading post is assisting traders that visit the city";
+            if (employment.getNumWorkers() == 0)
+            {
+                status.text = "Unable to assist traders with no workers.";
+            }
+            else if (employment.getNumHealthyWorkers() == 0)
+            {
+                status.text = "Unable to assist traders with no healthy workers.";
+            }
+            else if (tradingPost.getCollectingTradeGoods())
+            {
+                status.text = "Currently assisting a trader.";
+            }
+            else
+            {
+                status.text = "Waiting to assist traders.";
+            }
         }
     }
 }

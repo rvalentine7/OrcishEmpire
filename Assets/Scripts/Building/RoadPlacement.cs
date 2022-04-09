@@ -9,7 +9,8 @@ using System.Collections.Generic;
 /// road can be placed in a given location.It also updates
 /// roads to connect visually when placed next to each other.
 /// </summary>
-public class RoadPlacement : BuildMode {
+public class RoadPlacement : BuildMode
+{
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
     private Dictionary<Vector2, GameObject> tempRoads;
@@ -25,7 +26,6 @@ public class RoadPlacement : BuildMode {
     public Sprite impossibleSprite;
     public GameObject tempRoad;
     public GameObject road;
-    public int buildingCost;
 
 
     /// <summary>

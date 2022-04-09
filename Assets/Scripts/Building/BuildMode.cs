@@ -11,6 +11,7 @@ public class BuildMode : MonoBehaviour
     public int height;
     public GameObject grid;
     public AudioClip buildAudioClip;
+    public int buildingCost;
 
     protected World myWorld;
     protected Vector2 mousePos;
@@ -45,5 +46,10 @@ public class BuildMode : MonoBehaviour
 
         Vector2 gridVector = new Vector2(mousePos.x, mousePos.y);
         gridObject.transform.position = Vector2.Lerp(transform.position, gridVector, 1f);
+    }
+
+    public int getBuildingCost()
+    {
+        return -1;
     }
 }

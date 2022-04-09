@@ -12,7 +12,6 @@ public class BuildingPlacement : BuildMode
     public Sprite impossibleSprite;
     public Sprite impossibleSprite2;
     public GameObject building;
-    public int buildingCost;
     private bool validPlacement;
 
     /// <summary>

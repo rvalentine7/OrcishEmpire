@@ -136,7 +136,6 @@ public class OrcInhabitant
         {
             Employment employment = workLocation.GetComponent<Employment>();
             employment.updateSickWorkers(-1);
-            Debug.Log("updating sick workers");
         }
     }
 

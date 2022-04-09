@@ -24,7 +24,18 @@ public class TraderPopup : Popup
         }
         else
         {
-            //TODO: status logic
+            if (trade.leavingTheCity())
+            {
+                status.text = "Leaving the city.";
+            }
+            else if (trade.getWaitingOnTradingPost())
+            {
+                status.text = "Trading with the trading post.";
+            }
+            else
+            {
+                status.text = "Going to a trading post to trade goods.";
+            }
         }
     }
 }

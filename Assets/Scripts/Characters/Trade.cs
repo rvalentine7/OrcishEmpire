@@ -17,7 +17,6 @@ public class Trade : Animated
     private Vector2 navigationGoal;
     private GameObject tradingPostGoal;
     private bool waitingOnTradingPost;
-    //private bool finishedTrading;
     private bool changePath;
     private bool runningAStar;
     private World myWorld;
@@ -31,7 +30,6 @@ public class Trade : Animated
     private void Awake()
     {
         waitingOnTradingPost = false;
-        //finishedTrading = false;
         changePath = false;
         runningAStar = false;
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
@@ -115,11 +113,6 @@ public class Trade : Animated
         {
             StartCoroutine(navigate());
         }
-        /*else if (waitingOnTradingPost)
-        {
-            //TODO: if I still notice the bug where one trader stays idle forever (waitingOnTradingPost?),
-            // update this to check for if it's waiting and try to re-insert it in the traders for the trading post
-        }*/
     }
 
     /// <summary>
@@ -328,7 +321,7 @@ public class Trade : Animated
     /// <param name="finished">Whether the trader is finished trading</param>
     public void setFinishedTrading(bool finished)
     {
-        //finishedTrading = finished;
+        changePath = true;
         waitingOnTradingPost = false;
         navigationGoal = exitLocation;
     }
@@ -339,5 +332,23 @@ public class Trade : Animated
     public void moveUpInWaitLine()
     {
         waitingOnTradingPost = false;
+    }
+
+    /// <summary>
+    /// Returns whether the trader is waiting on the trading post to finish buying/selling goods
+    /// </summary>
+    /// <returns>Whether the trader is waiting on the trading post to finish buying/selling goods</returns>
+    public bool getWaitingOnTradingPost()
+    {
+        return waitingOnTradingPost;
+    }
+
+    /// <summary>
+    /// Returns whether the trader is leaving the city
+    /// </summary>
+    /// <returns>Whether the trader is leaving the city</returns>
+    public bool leavingTheCity()
+    {
+        return navigationGoal.Equals(exitLocation);
     }
 }

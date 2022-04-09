@@ -13,7 +13,6 @@ public class HousingPlacement : BuildMode
     public GameObject validTempHouse;
     public GameObject invalidTempHouse;
     public GameObject house;
-    public int buildingCost;
     private SpriteRenderer spriteRenderer;
     private bool startingPositionChosen;
     private Vector2 startingPosition;

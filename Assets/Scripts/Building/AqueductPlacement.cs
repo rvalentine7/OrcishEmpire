@@ -5,7 +5,8 @@ using System.Collections.Generic;
 /// <summary>
 /// Places an aqueduct in the world
 /// </summary>
-public class AqueductPlacement : BuildMode {
+public class AqueductPlacement : BuildMode
+{
     public Sprite possibleSprite2WE;
     public Sprite possibleSprite2WEArch;
     public Sprite possibleSprite2NS;
@@ -20,7 +21,6 @@ public class AqueductPlacement : BuildMode {
     public Sprite possibleSprite4;
     public Sprite impossibleSprite;
     public GameObject building;
-    public int buildingCost;
     public GameObject tempAqueduct;
     
     private Dictionary<Vector2, GameObject> roadsUnderTempAqueducts;

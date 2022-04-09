@@ -32,22 +32,7 @@ public class TradingPost : Building
         {
             collectingTradeGoods = true;
             createTradeCollector();
-
-            //testTime = Time.time + 10.0f;//TODO: to be removed once the trade collector is in (collectingTradeGoods will suffice)
         }
-        /*if (collectingTradeGoods && Time.time > testTime)//TODO: remove the time and add the contents of this if statement to a method the trade collector calls when it returns from collecting
-        {
-            collectingTradeGoods = false;
-
-            waitingTraders[0].setFinishedTrading(true);
-            waitingTraders.RemoveAt(0);
-            traders.Remove(traders[0]);
-
-            foreach (Trade trade in waitingTraders)
-            {
-                trade.moveUpInWaitLine();
-            }
-        }*/
     }
 
     /// <summary>
@@ -162,7 +147,7 @@ public class TradingPost : Building
         GameObject newTradeGoodsCollector = Object.Instantiate(tradeGoodsCollector, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
         CollectTradeGoods collectTradeGoods = newTradeGoodsCollector.GetComponent<CollectTradeGoods>();
         TradeCityObject tradeCity = waitingTraders[0].GetComponent<Trade>().getTraderCityObject();
-        collectTradeGoods.setImportsAndExports(tradeCity.getImports(), tradeCity.getExports());
+        collectTradeGoods.setSellingAndBuying(tradeCity.getImports(), tradeCity.getExports());
         collectTradeGoods.setTradingPerResource(myWorld.getTradeManager().getTradingPerResource());
         collectTradeGoods.setOrcEmployment(gameObject);
     }
@@ -195,5 +180,14 @@ public class TradingPost : Building
         }
 
         base.OnDestroy();
+    }
+
+    /// <summary>
+    /// Returns whether the trading post is currently helping a trader buy/sell
+    /// </summary>
+    /// <returns>Whether the trading post is currently helping a trader buy/sell</returns>
+    public bool getCollectingTradeGoods()
+    {
+        return collectingTradeGoods;
     }
 }

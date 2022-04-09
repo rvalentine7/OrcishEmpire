@@ -6,9 +6,9 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// Used to place bridges in the world
 /// </summary>
-public class BridgePlacement : BuildMode {
+public class BridgePlacement : BuildMode
+{
     public GameObject bridgeObject;
-    public int bridgeSegmentCost;
     public GameObject tempBridgeObject;
     public Sprite possibleSouthConnection;
     public Sprite possibleNorthConnection;
@@ -77,7 +77,7 @@ public class BridgePlacement : BuildMode {
         validPlacement = false;
         bool valid = true;
         //Need enough currency to build the road
-        if (myWorld.getCurrency() < bridgeSegmentCost * tempBridgeSegments.Count)
+        if (myWorld.getCurrency() < buildingCost * tempBridgeSegments.Count)
         {
             valid = false;
         }
@@ -261,7 +261,7 @@ public class BridgePlacement : BuildMode {
                 if (new Vector2(mousePos.x, mousePos.y) != startingPosition)
                 {
                     //Update the city's currency for building the bridge
-                    myWorld.updateCurrency(-(bridgeSegmentCost * tempBridgeSegments.Count));
+                    myWorld.updateCurrency(-(buildingCost * tempBridgeSegments.Count));
 
                     //Go through all of the segments and have them build an actual bridge segment and the location and destroy themselves
                     float xDifference = startingPosition.x - endingPosition.x;

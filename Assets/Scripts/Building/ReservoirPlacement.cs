@@ -6,7 +6,8 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// Allows the user to place a reservoir in the world
 /// </summary>
-public class ReservoirPlacement : BuildMode {
+public class ReservoirPlacement : BuildMode
+{
     public Sprite impossibleEmptySprite;
     public Sprite impossibleFilledSprite;
     public Sprite possibleEmptySprite;
@@ -43,7 +44,6 @@ public class ReservoirPlacement : BuildMode {
     public Sprite possibleFilledSprite4;
 
     public GameObject building;
-    public int buildingCost;
     private bool validPlacement;
     private SpriteRenderer spriteRenderer;
 

@@ -159,8 +159,8 @@
     <Compile Include="Assets\Scripts\UI\CharacterPopups\MarketWorkerPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterPopups\StandardBoatPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterPopups\TaxCollectorOrcPopup.cs" />
+    <Compile Include="Assets\Scripts\UI\CharacterPopups\TradeGoodsCollectorPopup.cs" />
     <Compile Include="Assets\Scripts\UI\CharacterPopups\TraderPopup.cs" />
-    <Compile Include="Assets\Scripts\UI\ClosePanel.cs" />
     <Compile Include="Assets\Scripts\UI\Highlightable.cs" />
     <Compile Include="Assets\Scripts\UI\PauseMenu.cs" />
     <Compile Include="Assets\Scripts\UI\PopulationAndCurrency.cs" />
@@ -170,12 +170,14 @@
     <Compile Include="Assets\Scripts\UI\SettingsMenu.cs" />
     <Compile Include="Assets\Scripts\UI\SpeedAdjustment.cs" />
     <Compile Include="Assets\Scripts\UI\TogglePanel.cs" />
+    <Compile Include="Assets\Scripts\UI\Tooltips\BuildingTooltip.cs" />
     <Compile Include="Assets\Scripts\UI\TradeCityObject.cs" />
     <Compile Include="Assets\Scripts\UI\TradeCityObjectsHolder.cs" />
     <Compile Include="Assets\Scripts\UI\TradeCityPanel.cs" />
-    <Compile Include="Assets\Scripts\UI\TreePopup.cs" />
-    <Compile Include="Assets\Scripts\UI\WorldPopupButton.cs" />
-    <Compile Include="Assets\Scripts\UI\WorldPopupPanel.cs" />
+    <Compile Include="Assets\Scripts\UI\WorldPopups\ClosePanel.cs" />
+    <Compile Include="Assets\Scripts\UI\WorldPopups\TreePopup.cs" />
+    <Compile Include="Assets\Scripts\UI\WorldPopups\WorldPopupButton.cs" />
+    <Compile Include="Assets\Scripts\UI\WorldPopups\WorldPopupPanel.cs" />
     <Compile Include="Assets\Scripts\UI\WorldUI.cs" />
     <Compile Include="Assets\Scripts\World\Animated.cs" />
     <Compile Include="Assets\Scripts\World\ConstructNetwork.cs" />
