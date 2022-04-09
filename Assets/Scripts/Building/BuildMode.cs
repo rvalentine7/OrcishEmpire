@@ -48,8 +48,12 @@ public class BuildMode : MonoBehaviour
         gridObject.transform.position = Vector2.Lerp(transform.position, gridVector, 1f);
     }
 
+    /// <summary>
+    /// Gets the cost of constructing the building in the world
+    /// </summary>
+    /// <returns>The cost of constructing the building in the world</returns>
     public int getBuildingCost()
     {
-        return -1;
+        return buildingCost;
     }
 }

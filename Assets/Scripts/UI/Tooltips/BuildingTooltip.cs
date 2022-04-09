@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class BuildingTooltip : MonoBehaviour
 {
     public BuildMode buildGameObject;
-    private int buildCost;
+    public Text buildCost;
 
     /// <summary>
     /// Initialization
@@ -12,17 +13,11 @@ public class BuildingTooltip : MonoBehaviour
     {
         if (buildGameObject != null)
         {
-            buildCost = buildGameObject.getBuildingCost();
+            buildCost.text = buildGameObject.getBuildingCost() + "";
         }
         else
         {
-            buildCost = -1;
+            buildCost.text = -1 + "";
         }
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }
