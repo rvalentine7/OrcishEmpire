@@ -18,7 +18,6 @@ public class ItemProduction : Building
     public int resourceProduced;
     private float progress;
     private float prevUpdateTime;
-    private int numWorkers;
     private Employment employment;
     private Storage storage;
     private int requiredResourcesInUse;
@@ -33,7 +32,6 @@ public class ItemProduction : Building
         storage = gameObject.GetComponent<Storage>();
         progress = 0;
         prevUpdateTime = 0.0f;
-        numWorkers = employment.getNumHealthyWorkers();
         requiredResourcesInUse = 0;
         orcMovingGoods = false;
     }
@@ -45,7 +43,6 @@ public class ItemProduction : Building
     void Update()
     {
         orcMovingGoods = employment.getWorkerDeliveringGoods();
-        numWorkers = employment.getNumWorkers();
         int numHealthyWorkers = employment.getNumHealthyWorkers();
         //Deliver Goods
         if (progress == 100 && orcMovingGoods == false)
@@ -53,16 +50,17 @@ public class ItemProduction : Building
             progress = 0;
             requiredResourcesInUse = 0;
             employment.setWorkerDeliveringGoods(true);
+            orcMovingGoods = employment.getWorkerDeliveringGoods();
             createDeliveryOrc();
         }
         //Collect goods
-        if (numHealthyWorkers > 0 && storage.getResourceCount(requiredResourceName) < storage.getStorageMax() && orcMovingGoods == false)
+        if (numHealthyWorkers > 0 && storage.getResourceCount(requiredResourceName) + collectorCarryCapacity <= storage.getStorageMax() && orcMovingGoods == false)
         {
             employment.setWorkerDeliveringGoods(true);
             createCollectionOrc();
         }
         //Starts using the required raw resource
-        if (requiredResourcesInUse == 0 && storage.getResourceCount(requiredResourceName) == storage.getStorageMax())
+        if (requiredResourcesInUse == 0 && storage.getResourceCount(requiredResourceName) >= collectorCarryCapacity)
         {
             requiredResourcesInUse = storage.getStorageMax();
             storage.removeResource(requiredResourceName, collectorCarryCapacity);
@@ -73,7 +71,7 @@ public class ItemProduction : Building
             if (progress < 100)
             {
                 float progressedTime = Time.time - prevUpdateTime;
-                float effectiveTimeToFinish = timeToProduce / (numWorkers / numHealthyWorkers);
+                float effectiveTimeToFinish = timeToProduce * (employment.getWorkerCap() / numHealthyWorkers);
                 progress += progressedTime / effectiveTimeToFinish * 100;
                 if (progress >= 100)
                 {

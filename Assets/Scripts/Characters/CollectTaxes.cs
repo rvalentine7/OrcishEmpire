@@ -222,7 +222,7 @@ public class CollectTaxes : Animated {
                 float distance = Mathf.Sqrt((path[0].x - gameObject.transform.position.x)
                         * (path[0].x - gameObject.transform.position.x) + (path[0].y - gameObject.transform.position.y)
                         * (path[0].y - gameObject.transform.position.y));
-                if (path[0] == currentLocation || distance < 0.05f)
+                if (path[0] == currentLocation || distance < World.CLOSE_ENOUGH_DIST)
                 {
                     path.RemoveAt(0);
                 }
@@ -309,7 +309,7 @@ public class CollectTaxes : Animated {
                     {
                         nextIsGoal = true;
                     }
-                    if (distanceBetweenPoints < 0.05f)
+                    if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
                     {
                         path.RemoveAt(0);
                         if (!headingHome)
@@ -331,7 +331,7 @@ public class CollectTaxes : Animated {
                             distanceBetweenPoints = Mathf.Sqrt((goal.x - gameObject.transform.position.x)
                                 * (goal.x - gameObject.transform.position.x) + (goal.y - gameObject.transform.position.y)
                                 * (goal.y - gameObject.transform.position.y));
-                            if (distanceBetweenPoints < 0.05f)
+                            if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
                             {
                                 TaxCollector taxCollector = placeOfEmployment.GetComponent<TaxCollector>();
                                 taxCollector.setCollectorStatus(false);

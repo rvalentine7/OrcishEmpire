@@ -5,7 +5,8 @@ using UnityEngine;
 /// <summary>
 /// Provides entertainment to nearby houses through the use of beer!
 /// </summary>
-public class Pub : Building {
+public class Pub : Building
+{
     private bool active;
     private World myWorld;
     private GameObject[,] structureArr;
@@ -27,7 +28,8 @@ public class Pub : Building {
     /// <summary>
     /// Initializes the pub
     /// </summary>
-    void Start () {
+    void Start()
+    {
         active = true;
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
@@ -40,8 +42,9 @@ public class Pub : Building {
     /// <summary>
     /// Logic for the pub
     /// </summary>
-    void Update () {
-		if (active)
+    void Update()
+    {
+        if (active)
         {
             Employment employment = gameObject.GetComponent<Employment>();
             if (employment.getNumHealthyWorkers() > 0)
@@ -53,7 +56,7 @@ public class Pub : Building {
                     employment.setWorkerDeliveringGoods(true);
                     createCollectionOrc();
                 }
-                
+
                 if (myStorage.getBeerCount() > 0)
                 {
                     //checkTime takes longer if there are fewer than the maximum number of employees
@@ -96,7 +99,7 @@ public class Pub : Building {
                 }
             }
         }
-	}
+    }
 
     /// <summary>
     /// Creates an orc to collect resources for the marketplace to distribute.

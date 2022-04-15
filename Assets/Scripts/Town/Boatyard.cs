@@ -61,21 +61,33 @@ public class Boatyard : Building
             //A boat has been made. Deliver it if there is someone waiting on it
             if (progress == 100 && boatRequesters.Count > 0)
             {
+                List<BoatRequester> nullBoatRequesters = new List<BoatRequester>();
                 bool deliveredBoat = false;
                 int i = 0;
                 while (!deliveredBoat && i < boatRequesters.Count)
                 {
-                    List<int> waterSectionNumbers = boatRequesters[i].getNearbyWaterSections();
-                    Vector2 connectionLocation = findBoatSpawnLocation(waterSectionNumbers);
-                    //If the requester is still looking for a boat, deliver this one
-                    if (connectionLocation.x != -1 && boatRequesters[i].canReceiveBoat())
+                    if (boatRequesters[i] == null)
                     {
-                        spawnBoat(boatRequesters[i], connectionLocation);
-                        deliveredBoat = true;
-                        progress = 0;
-                        boatRequesters.RemoveAt(i);
+                        nullBoatRequesters.Add(boatRequesters[i]);
+                    }
+                    else
+                    {
+                        List<int> waterSectionNumbers = boatRequesters[i].getNearbyWaterSections();
+                        Vector2 connectionLocation = findBoatSpawnLocation(waterSectionNumbers);
+                        //If the requester is still looking for a boat, deliver this one
+                        if (connectionLocation.x != -1 && boatRequesters[i].canReceiveBoat())
+                        {
+                            spawnBoat(boatRequesters[i], connectionLocation);
+                            deliveredBoat = true;
+                            progress = 0;
+                            boatRequesters.RemoveAt(i);
+                        }
                     }
                     i++;
+                }
+                foreach (BoatRequester nullBoatRequester in nullBoatRequesters)
+                {
+                    boatRequesters.Remove(nullBoatRequester);
                 }
 
             }
@@ -88,10 +100,10 @@ public class Boatyard : Building
             //Work on producing goods
             if (requiredResourcesInUse == collectorCarryCapacity)
             {
-                if (progress < 100)
+                if (progress < 100 && numHealthyWorkers > 0)
                 {
                     float progressedTime = Time.time - prevUpdateTime;
-                    float effectiveTimeToFinish = timeToProduce / (employment.getNumWorkers() / numHealthyWorkers);
+                    float effectiveTimeToFinish = timeToProduce * (employment.getWorkerCap() / numHealthyWorkers);
                     progress += progressedTime / effectiveTimeToFinish * 100;
                     if (progress >= 100)
                     {

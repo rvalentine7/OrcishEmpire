@@ -288,7 +288,7 @@ public class Collect : Animated
                 {
                     nextIsGoal = true;
                 }
-                if (distanceBetweenPoints < 0.05f)
+                if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
                 {
                     path.RemoveAt(0);
                 }

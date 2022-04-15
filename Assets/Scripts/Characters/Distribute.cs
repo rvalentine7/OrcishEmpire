@@ -11,6 +11,7 @@ using UnityEngine;
 public class Distribute : Animated
 {
     //private Dictionary<string, int> resources;
+    private bool initialized;
     private GameObject[,] network;
     private Vector2 originalLocation;
     private GameObject placeOfEmployment;
@@ -36,6 +37,7 @@ public class Distribute : Animated
     /// </summary>
     void Awake()
     {
+        initialized = false;
         //resources = new Dictionary<string, int>();
         originalLocation = new Vector2();
         reachedGoal = false;
@@ -106,16 +108,17 @@ public class Distribute : Animated
                 }
             }
         }
+        StartCoroutine(runDistribute());
     }
 
     /// <summary>
     /// Runs the distribution orc
     /// </summary>
     void Update () {
-        if (runningAStar == false)
-        {
-            StartCoroutine(runDistribute());
-        }
+        //if (runningAStar == false)
+        //{
+        //    StartCoroutine(runDistribute());
+        //}
     }
 
     /// <summary>
@@ -124,261 +127,277 @@ public class Distribute : Animated
     /// <returns>A time delay to split the method execution over multiple frames</returns>
     private IEnumerator runDistribute()
     {
-        //if the place of employment is destroyed, this gameobject should be as well
-        if (placeOfEmployment == null)
+        while (true)
         {
-            Destroy(gameObject);
-        }
-        //if the place of employment has no more goods to distribute, set locationsToVisit
-        // to an empty dictionary and set it to change the path
-        Storage employmentStorage = placeOfEmployment.GetComponent<Storage>();
-        if ((locationsToVisit.Count == 0 && !headingHome) || 
-            (!headingHome && employmentStorage.getFoodCount() == 0
-            && employmentStorage.getWaterCount() == 0))
-        {
-            locationsToVisit = new Dictionary<GameObject, GameObject>();
-            changePath = true;
-            headingHome = true;
-        }
-        //plan a path to the closest value in locationsToVisit
-        if (path == null || path.Count == 0 || changePath == true)
-        {
-            animator.SetBool(Animated.MOVING_DOWN, false);
-            animator.SetBool(Animated.MOVING_UP, false);
-            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-            animator.SetBool(Animated.IDLE, true);
-            currentCharacterAnimation = characterAnimation.Idle;
-
-            network = new GameObject[myWorld.mapSize, myWorld.mapSize];
-            for (int i = 0; i < network.GetLength(0); i++)
+            if (initialized)
             {
-                for (int j = 0; j < network.GetLength(1); j++)
-                {
-                    if (structureArr[i, j] == null)
-                    {
-                        network[i, j] = terrainArr[i, j];
-                    }
-                    else if (structureArr[i, j].tag != World.HOUSE)
-                    {
-                        network[i, j] = structureArr[i, j];
-                    }
-                }
-            }
-            //can start searching locations closest to the worker by starting the search around its current location in the dictionary
-            //this will require going through the dictionary and checking distance from current gameobject location to the location
-            // of the road associated with each house
-            int shortestDistance = int.MaxValue;
-            goalObject = null;
-            foreach (KeyValuePair<GameObject, GameObject> kvp in locationsToVisit)
-            {
-                int kvpDistance = distance(kvp.Value.transform.position, gameObject.transform.position);
-                if (kvpDistance < shortestDistance)
-                {
-                    shortestDistance = kvpDistance;
-                    goalObject = kvp.Value;
-                }
-            }
-            //if there are no houses left to visit, return to employment
-            if (locationsToVisit.Count == 0)
-            {
-                goalObject = network[Mathf.RoundToInt(originalLocation.x), Mathf.RoundToInt(originalLocation.y)];
-                headingHome = true;
-            }
-            AstarSearch aStarSearch = new AstarSearch();
-            if (goalObject != null)
-            {
-                runningAStar = true;
-                Vector2 location = gameObject.transform.position;
-                yield return StartCoroutine(aStarSearch.aStar(tempPath =>
-                {
-                    runningAStar = false;
-                    path = tempPath;
-                    if (path != null)
-                    {
-                        goal = path[path.Count - 1];
-                    }
-                }, new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)), goalObject, network));
                 //if the place of employment is destroyed, this gameobject should be as well
                 if (placeOfEmployment == null)
                 {
                     Destroy(gameObject);
                 }
-            }
-            if (path != null)
-            {
-                changePath = false;
-                SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-                if (spriteRenderer.enabled == false)
+                //if the place of employment has no more goods to distribute, set locationsToVisit
+                // to an empty dictionary and set it to change the path
+                Storage employmentStorage = placeOfEmployment.GetComponent<Storage>();
+                if ((locationsToVisit.Count == 0 && !headingHome) ||
+                    (!headingHome && employmentStorage.getFoodCount() == 0
+                    && employmentStorage.getWaterCount() == 0))
                 {
-                    spriteRenderer.enabled = true;
-                }
-            }
-        }
-        if (path != null && path.Count > 0)
-        {
-            Vector2 currentLocation = gameObject.transform.position;
-            //If the orc starts in the goal spot
-            if (network[(int)originalLocation.x, Mathf.RoundToInt(originalLocation.y)] != null
-                && goalObject == network[Mathf.RoundToInt(originalLocation.x), Mathf.RoundToInt(originalLocation.y)]
-                && currentLocation.x == originalLocation.x && Mathf.RoundToInt(currentLocation.y) == originalLocation.y)
-            {
-                path.RemoveAt(0);
-                distributeGoods();
-                //If the orc delivered right when it spawned and it has no more food, it is done
-                if (headingHome && path.Count == 0)
-                {
-                    Marketplace market = placeOfEmployment.GetComponent<Marketplace>();
-                    market.setDistributorStatus(false);
-                    Destroy(gameObject);
-                }
-            }
-            else
-            {
-                //use path to go to the next available vector2 in it
-                float distance = Mathf.Sqrt((path[0].x - gameObject.transform.position.x)
-                        * (path[0].x - gameObject.transform.position.x) + (path[0].y - gameObject.transform.position.y)
-                        * (path[0].y - gameObject.transform.position.y));
-                if (path[0] == currentLocation || distance < 0.05f)
-                {
-                    path.RemoveAt(0);
-                }
-                Vector2 nextLocation = originalLocation;//TODO: this will need to be updated to make sure the location still exists
-                if (path.Count > 0)
-                {
-                    nextLocation = path[0];
-                }
-                else
-                {
+                    locationsToVisit = new Dictionary<GameObject, GameObject>();
                     changePath = true;
+                    headingHome = true;
                 }
-                //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
-                if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                    && (!network[(int)nextLocation.x, (int)nextLocation.y].tag.Equals(World.BUILDING)
-                    || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
+                //plan a path to the closest value in locationsToVisit
+                if (path == null || path.Count == 0 || changePath == true)
                 {
-                    //take a step towards the nextLocation
-                    Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
-                    float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
-                    Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
-                    Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
-                        + unitVector.y * stepSize * Time.deltaTime);
-                    gameObject.transform.position = newLocation;
+                    animator.SetBool(Animated.MOVING_DOWN, false);
+                    animator.SetBool(Animated.MOVING_UP, false);
+                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                    animator.SetBool(Animated.IDLE, true);
+                    currentCharacterAnimation = characterAnimation.Idle;
 
-                    //animation
-                    if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                    network = new GameObject[myWorld.mapSize, myWorld.mapSize];
+                    for (int i = 0; i < network.GetLength(0); i++)
                     {
-                        if (flipped)
+                        for (int j = 0; j < network.GetLength(1); j++)
                         {
-                            flipSprite();
+                            if (structureArr[i, j] == null)
+                            {
+                                network[i, j] = terrainArr[i, j];
+                            }
+                            else if (structureArr[i, j].tag != World.HOUSE)
+                            {
+                                network[i, j] = structureArr[i, j];
+                            }
                         }
-                        animator.SetBool(Animated.IDLE, false);
-                        animator.SetBool(Animated.MOVING_DOWN, false);
-                        animator.SetBool(Animated.MOVING_UP, false);
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
-                        currentCharacterAnimation = characterAnimation.Right;
                     }
-                    else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                    //can start searching locations closest to the worker by starting the search around its current location in the dictionary
+                    //this will require going through the dictionary and checking distance from current gameobject location to the location
+                    // of the road associated with each house
+                    int shortestDistance = int.MaxValue;
+                    goalObject = null;
+                    foreach (KeyValuePair<GameObject, GameObject> kvp in locationsToVisit)
                     {
-                        //left. needs to flip sprite because it reuses the sprite for moving right
-                        if (!flipped)
+                        if (kvp.Key != null)
                         {
-                            flipSprite();
+                            int kvpDistance = distance(kvp.Value.transform.position, gameObject.transform.position);
+                            if (kvpDistance < shortestDistance)
+                            {
+                                shortestDistance = kvpDistance;
+                                goalObject = kvp.Value;
+                            }
                         }
-                        animator.SetBool(Animated.IDLE, false);
-                        animator.SetBool(Animated.MOVING_DOWN, false);
-                        animator.SetBool(Animated.MOVING_UP, false);
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
-                        currentCharacterAnimation = characterAnimation.Left;
                     }
-                    else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                    //if there are no houses left to visit, return to employment
+                    if (goalObject == null || locationsToVisit.Count == 0)
                     {
-                        if (flipped)
+                        goalObject = network[Mathf.RoundToInt(originalLocation.x), Mathf.RoundToInt(originalLocation.y)];
+                        headingHome = true;
+                    }
+                    AstarSearch aStarSearch = new AstarSearch();
+                    if (goalObject != null)
+                    {
+                        runningAStar = true;
+                        Vector2 location = gameObject.transform.position;
+                        yield return StartCoroutine(aStarSearch.aStar(tempPath =>
                         {
-                            flipSprite();
-                        }
-                        animator.SetBool(Animated.IDLE, false);
-                        animator.SetBool(Animated.MOVING_DOWN, false);
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                        animator.SetBool(Animated.MOVING_UP, true);
-                        currentCharacterAnimation = characterAnimation.Up;
-                    }
-                    else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
-                    {
-                        if (flipped)
+                            runningAStar = false;
+                            path = tempPath;
+                            if (path != null)
+                            {
+                                goal = path[path.Count - 1];
+                            }
+                        }, new Vector2(Mathf.RoundToInt(location.x), Mathf.RoundToInt(location.y)), goalObject, network));
+                        //if the place of employment is destroyed, this gameobject should be as well
+                        if (placeOfEmployment == null)
                         {
-                            flipSprite();
+                            Destroy(gameObject);
                         }
-                        animator.SetBool(Animated.IDLE, false);
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                        animator.SetBool(Animated.MOVING_UP, false);
-                        animator.SetBool(Animated.MOVING_DOWN, true);
-                        currentCharacterAnimation = characterAnimation.Down;
                     }
-
-                    //if the agent gets to the next vector then delete it from the path
-                    // and go to the next available vector
-                    float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
-                        * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
-                        * (nextLocation.y - gameObject.transform.position.y));
-                    bool nextIsGoal = false;
-                    if (nextLocation == goal)
+                    if (path != null)
                     {
-                        nextIsGoal = true;
+                        changePath = false;
+                        SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+                        if (spriteRenderer.enabled == false)
+                        {
+                            spriteRenderer.enabled = true;
+                        }
                     }
-                    if (distanceBetweenPoints < 0.05f)
+                }
+                if (path != null && path.Count > 0)
+                {
+                    Vector2 currentLocation = gameObject.transform.position;
+                    //If the orc starts in the goal spot
+                    if ((network[Mathf.RoundToInt(originalLocation.x), Mathf.RoundToInt(originalLocation.y)] != null
+                        && goalObject == network[Mathf.RoundToInt(originalLocation.x), Mathf.RoundToInt(originalLocation.y)]
+                        && currentLocation.x == originalLocation.x && Mathf.RoundToInt(currentLocation.y) == originalLocation.y))
                     {
                         path.RemoveAt(0);
-                        if (!headingHome)
+                        distributeGoods();
+                        //If the orc delivered right when it spawned and it has no more food, it is done
+                        if (headingHome && path.Count == 0)
                         {
-                            distributeGoods();
-                            //If the agent is done distributing goods
-                            if (changePath == true)
-                            {
-                                nextIsGoal = false;
-                            }
+                            Marketplace market = placeOfEmployment.GetComponent<Marketplace>();
+                            market.setDistributorStatus(false);
+                            Destroy(gameObject);
                         }
                     }
-                    if (path.Count == 0)
+                    else
                     {
-                        changePath = true;
-                        //If the agent has distributed goods and is back home
-                        if (nextIsGoal && headingHome)
+                        //use path to go to the next available vector2 in it
+                        float distance = Mathf.Sqrt((path[0].x - gameObject.transform.position.x)
+                                * (path[0].x - gameObject.transform.position.x) + (path[0].y - gameObject.transform.position.y)
+                                * (path[0].y - gameObject.transform.position.y));
+                        if (path[0] == currentLocation || distance < World.CLOSE_ENOUGH_DIST)
                         {
-                            distanceBetweenPoints = Mathf.Sqrt((goal.x - gameObject.transform.position.x)
-                                * (goal.x - gameObject.transform.position.x) + (goal.y - gameObject.transform.position.y)
-                                * (goal.y - gameObject.transform.position.y));
-                            if (distanceBetweenPoints < 0.05f)
-                            {
-                                Marketplace market = placeOfEmployment.GetComponent<Marketplace>();
-                                market.setDistributorStatus(false);
-                                Destroy(gameObject);
+                            path.RemoveAt(0);
+                        }
+                        Vector2 nextLocation = originalLocation;//TODO: this will need to be updated to make sure the location still exists
+                        if (path.Count > 0)
+                        {
+                            nextLocation = path[0];
+                        }
+                        else
+                        {
+                            if (!headingHome && network[Mathf.RoundToInt(currentLocation.x), Mathf.RoundToInt(currentLocation.y)] != null
+                                && goalObject == network[Mathf.RoundToInt(currentLocation.x), Mathf.RoundToInt(currentLocation.y)]) {
+                                distributeGoods();
                             }
+                            changePath = true;
+                        }
+                        //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
+                        if (!changePath && (goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                            && (!network[(int)nextLocation.x, (int)nextLocation.y].tag.Equals(World.BUILDING)
+                            || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
+                        {
+                            //take a step towards the nextLocation
+                            Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
+                            float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
+                            Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
+                            if (path.Count > 0)
+                            {
+                                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
+                                    + unitVector.y * stepSize * Time.deltaTime);
+                                gameObject.transform.position = newLocation;
+                            }
+
+                            //animation
+                            if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                            {
+                                if (flipped)
+                                {
+                                    flipSprite();
+                                }
+                                animator.SetBool(Animated.IDLE, false);
+                                animator.SetBool(Animated.MOVING_DOWN, false);
+                                animator.SetBool(Animated.MOVING_UP, false);
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                                currentCharacterAnimation = characterAnimation.Right;
+                            }
+                            else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                            {
+                                //left. needs to flip sprite because it reuses the sprite for moving right
+                                if (!flipped)
+                                {
+                                    flipSprite();
+                                }
+                                animator.SetBool(Animated.IDLE, false);
+                                animator.SetBool(Animated.MOVING_DOWN, false);
+                                animator.SetBool(Animated.MOVING_UP, false);
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                                currentCharacterAnimation = characterAnimation.Left;
+                            }
+                            else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                            {
+                                if (flipped)
+                                {
+                                    flipSprite();
+                                }
+                                animator.SetBool(Animated.IDLE, false);
+                                animator.SetBool(Animated.MOVING_DOWN, false);
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                                animator.SetBool(Animated.MOVING_UP, true);
+                                currentCharacterAnimation = characterAnimation.Up;
+                            }
+                            else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
+                            {
+                                if (flipped)
+                                {
+                                    flipSprite();
+                                }
+                                animator.SetBool(Animated.IDLE, false);
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                                animator.SetBool(Animated.MOVING_UP, false);
+                                animator.SetBool(Animated.MOVING_DOWN, true);
+                                currentCharacterAnimation = characterAnimation.Down;
+                            }
+
+                            //if the agent gets to the next vector then delete it from the path
+                            // and go to the next available vector
+                            float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
+                                * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
+                                * (nextLocation.y - gameObject.transform.position.y));
+                            bool nextIsGoal = false;
+                            if (nextLocation == goal)
+                            {
+                                nextIsGoal = true;
+                            }
+                            if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
+                            {
+                                path.RemoveAt(0);
+                                if (!headingHome)
+                                {
+                                    distributeGoods();
+                                    //If the agent is done distributing goods
+                                    if (changePath == true)
+                                    {
+                                        nextIsGoal = false;
+                                    }
+                                }
+                            }
+                            if (path.Count == 0)
+                            {
+                                changePath = true;
+                                //If the agent has distributed goods and is back home
+                                if (nextIsGoal && headingHome)
+                                {
+                                    distanceBetweenPoints = Mathf.Sqrt((goal.x - gameObject.transform.position.x)
+                                        * (goal.x - gameObject.transform.position.x) + (goal.y - gameObject.transform.position.y)
+                                        * (goal.y - gameObject.transform.position.y));
+                                    if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
+                                    {
+                                        Marketplace market = placeOfEmployment.GetComponent<Marketplace>();
+                                        market.setDistributorStatus(false);
+                                        Destroy(gameObject);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            changePath = true;
+                        }
+                        if (runningAStar == false && goalObject == null && !reachedGoal && !headingHome)
+                        {
+                            changePath = true;
                         }
                     }
                 }
                 else
                 {
-                    changePath = true;
-                }
-                if (runningAStar == false && goalObject == null && !reachedGoal && !headingHome)
-                {
-                    changePath = true;
+                    runningAStar = true;//Stopping the Update() method from  calling a new runDistribute()
+                    yield return new WaitForSeconds(1.0f);
+                    //if the place of employment is destroyed, this gameobject should be as well
+                    if (placeOfEmployment == null)
+                    {
+                        Destroy(gameObject);
+                    }
+                    runningAStar = false;
                 }
             }
-        }
-        else
-        {
-            runningAStar = true;//Stopping the Update() method from  calling a new runDistribute()
-            yield return new WaitForSeconds(1.0f);
-            //if the place of employment is destroyed, this gameobject should be as well
-            if (placeOfEmployment == null)
-            {
-                Destroy(gameObject);
-            }
-            runningAStar = false;
-        }
 
-        yield return null;
+            yield return null;
+        }
     }
 
     /// <summary>
@@ -520,6 +539,7 @@ public class Distribute : Animated
     public void setOrcEmployment(GameObject employment)
     {
         placeOfEmployment = employment;
+        initialized = true;
     }
 
     /// <summary>

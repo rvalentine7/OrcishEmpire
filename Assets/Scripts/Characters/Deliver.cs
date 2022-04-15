@@ -6,7 +6,8 @@ using UnityEngine;
 /// Sends a delivery orc from its current location to the goal where it will deliver goods
 /// before returning to its original location.
 /// </summary>
-public class Deliver : Animated {
+public class Deliver : Animated
+{
     private Dictionary<string, int> resources;
     private GameObject[,] network;
     private Vector2 originalLocation;
@@ -29,7 +30,7 @@ public class Deliver : Animated {
     /// <summary>
     /// Initializes the deliver class
     /// </summary>
-    void Awake ()
+    void Awake()
     {
         resources = new Dictionary<string, int>();
         originalLocation = new Vector2();
@@ -48,7 +49,8 @@ public class Deliver : Animated {
     /// <summary>
     /// Attempts to find the first place to go to
     /// </summary>
-    void Start () {
+    void Start()
+    {
         animator.SetBool(Animated.MOVING_DOWN, false);
         animator.SetBool(Animated.MOVING_UP, false);
         animator.SetBool(Animated.MOVING_SIDEWAYS, false);
@@ -67,21 +69,7 @@ public class Deliver : Animated {
         }
         currentCharacterAnimation = characterAnimation.Idle;
 
-        //TODO: if there is nowhere to go, wait some time before trying again?
-        StartCoroutine(findPathToStorage(returnPath =>
-        {
-            path = returnPath;
-        }));
-    }
-
-    /// <summary>
-    /// Runs the delivery orc
-    /// </summary>
-    void Update () {
-        if (runningAStar == false)
-        {
-            StartCoroutine(runDeliver());
-        }
+        StartCoroutine(runDeliver());
     }
 
     /// <summary>
@@ -90,49 +78,66 @@ public class Deliver : Animated {
     /// <returns>A delay before resuming method execution</returns>
     private IEnumerator runDeliver()
     {
-        //if the place of employment is destroyed, this gameobject should be as well
-        if (!placeOfEmployment)
+        while (true)
         {
-            Destroy(gameObject);
-        }
-        if (path == null || path.Count == 0 || changePath == true)
-        {
-            animator.SetBool(Animated.MOVING_DOWN, false);
-            animator.SetBool(Animated.MOVING_UP, false);
-            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-            animator.SetBool(Animated.DOWN_OBJECT, false);
-            animator.SetBool(Animated.UP_OBJECT, false);
-            animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
-            if (resources.Count == 0)
+            //if the place of employment is destroyed, this gameobject should be as well
+            if (!placeOfEmployment)
             {
-                animator.SetBool(Animated.IDLE, true);
-                animator.SetBool(Animated.IDLE_OBJECT, false);
+                Destroy(gameObject);
             }
-            else
+            if (path == null || path.Count == 0 || changePath == true)
             {
-                animator.SetBool(Animated.IDLE_OBJECT, true);
-                animator.SetBool(Animated.IDLE, false);
-            }
-            currentCharacterAnimation = characterAnimation.Idle;
-
-            //Go to to a storage location
-            if (!reachedGoal && runningAStar == false)
-            {
-                yield return StartCoroutine(findPathToStorage(returnPath =>
+                animator.SetBool(Animated.MOVING_DOWN, false);
+                animator.SetBool(Animated.MOVING_UP, false);
+                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                animator.SetBool(Animated.DOWN_OBJECT, false);
+                animator.SetBool(Animated.UP_OBJECT, false);
+                animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                if (resources.Count == 0)
                 {
-                    path = returnPath;
-                }));
-                //if the place of employment is destroyed, this gameobject should be as well
-                if (!placeOfEmployment)
-                {
-                    Destroy(gameObject);
+                    animator.SetBool(Animated.IDLE, true);
+                    animator.SetBool(Animated.IDLE_OBJECT, false);
                 }
-                //if there are no storage locations, and the orc isn't at its place of employment,
-                // send it back to its place of employment
-                float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
-                    * (originalLocation.x - gameObject.transform.position.x) + (originalLocation.y - gameObject.transform.position.y)
-                    * (originalLocation.y - gameObject.transform.position.y));
-                if (path != null && path.Count == 0 && distanceBetweenPoints > 0.5f)
+                else
+                {
+                    animator.SetBool(Animated.IDLE_OBJECT, true);
+                    animator.SetBool(Animated.IDLE, false);
+                }
+                currentCharacterAnimation = characterAnimation.Idle;
+
+                //Go to to a storage location
+                if (!reachedGoal && runningAStar == false)
+                {
+                    yield return StartCoroutine(findPathToStorage(returnPath =>
+                    {
+                        path = returnPath;
+                    }));
+                    //if the place of employment is destroyed, this gameobject should be as well
+                    if (!placeOfEmployment)
+                    {
+                        Destroy(gameObject);
+                    }
+                    //if there are no storage locations, and the orc isn't at its place of employment,
+                    // send it back to its place of employment
+                    float distanceBetweenPoints = Mathf.Sqrt((originalLocation.x - gameObject.transform.position.x)
+                        * (originalLocation.x - gameObject.transform.position.x) + (originalLocation.y - gameObject.transform.position.y)
+                        * (originalLocation.y - gameObject.transform.position.y));
+                    if (path != null && path.Count == 0 && distanceBetweenPoints > 0.5f)
+                    {
+                        yield return StartCoroutine(findPathHome(returnPath =>
+                        {
+                            path = returnPath;
+                        }));
+                        //if the place of employment is destroyed, this gameobject should be as well
+                        if (!placeOfEmployment)
+                        {
+                            Destroy(gameObject);
+                        }
+                        headingHome = true;
+                    }
+                }
+                //Go to the home location
+                else if (reachedGoal && runningAStar == false)
                 {
                     yield return StartCoroutine(findPathHome(returnPath =>
                     {
@@ -143,249 +148,251 @@ public class Deliver : Animated {
                     {
                         Destroy(gameObject);
                     }
-                    headingHome = true;
+                }
+                if (runningAStar == false)
+                {
+                    changePath = false;
                 }
             }
-            //Go to the home location
-            else if (reachedGoal && runningAStar == false)
+            else if (path != null && runningAStar == false)
             {
-                yield return StartCoroutine(findPathHome(returnPath =>
-                {
-                    path = returnPath;
-                }));
-                //if the place of employment is destroyed, this gameobject should be as well
-                if (!placeOfEmployment)
-                {
-                    Destroy(gameObject);
-                }
-            }
-            if (runningAStar == false)
-            {
-                changePath = false;
-            }
-        }
-        else if (path != null && runningAStar == false)
-        {
-            //use path to go to the next available vector2 in it
-            Vector2 currentLocation = gameObject.transform.position;
-            if (path[0] == currentLocation)
-            {
-                path.RemoveAt(0);
-            }
-            Vector2 nextLocation = path[0];
-            //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
-            if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                && (network[(int)nextLocation.x, (int)nextLocation.y].tag != World.BUILDING
-                || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
-            {
-                //take a step towards the nextLocation
-                Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
-                float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
-                Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
-                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
-                    + unitVector.y * stepSize * Time.deltaTime);
-                gameObject.transform.position = newLocation;
-
-                //animation
-                if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
-                {
-                    if (flipped)
-                    {
-                        flipSprite();
-                    }
-
-                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Right)
-                    {
-                        currentCharacterAnimation = characterAnimation.Right;
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
-                        animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
-                    }
-                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.RightObject)
-                    {
-                        currentCharacterAnimation = characterAnimation.RightObject;
-                        animator.SetBool(Animated.SIDEWAYS_OBJECT, true);
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                    }
-
-                    animator.SetBool(Animated.MOVING_DOWN, false);
-                    animator.SetBool(Animated.MOVING_UP, false);
-                    animator.SetBool(Animated.DOWN_OBJECT, false);
-                    animator.SetBool(Animated.UP_OBJECT, false);
-                    animator.SetBool(Animated.IDLE, false);
-                    animator.SetBool(Animated.IDLE_OBJECT, false);
-                }
-                else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
-                {
-                    //left. needs to flip sprite because it reuses the sprite for moving right
-                    if (!flipped)
-                    {
-                        flipSprite();
-                    }
-
-                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Left)
-                    {
-                        currentCharacterAnimation = characterAnimation.Left;
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, true);
-                        animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
-                    }
-                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.LeftObject)
-                    {
-                        currentCharacterAnimation = characterAnimation.LeftObject;
-                        animator.SetBool(Animated.SIDEWAYS_OBJECT, true);
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                    }
-
-                    animator.SetBool(Animated.MOVING_DOWN, false);
-                    animator.SetBool(Animated.MOVING_UP, false);
-                    animator.SetBool(Animated.DOWN_OBJECT, false);
-                    animator.SetBool(Animated.UP_OBJECT, false);
-                    animator.SetBool(Animated.IDLE, false);
-                    animator.SetBool(Animated.IDLE_OBJECT, false);
-                }
-                else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x))
-                {
-                    if (flipped)
-                    {
-                        flipSprite();
-                    }
-
-                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Up)
-                    {
-                        currentCharacterAnimation = characterAnimation.Up;
-                        animator.SetBool(Animated.MOVING_UP, true);
-                        animator.SetBool(Animated.UP_OBJECT, false);
-                    }
-                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.UpObject)
-                    {
-                        currentCharacterAnimation = characterAnimation.UpObject;
-                        animator.SetBool(Animated.UP_OBJECT, true);
-                        animator.SetBool(Animated.MOVING_UP, false);
-                    }
-
-                    animator.SetBool(Animated.MOVING_DOWN, false);
-                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                    animator.SetBool(Animated.DOWN_OBJECT, false);
-                    animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
-                    animator.SetBool(Animated.IDLE, false);
-                    animator.SetBool(Animated.IDLE_OBJECT, false);
-                }
-                else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x))
-                {
-                    if (flipped)
-                    {
-                        flipSprite();
-                    }
-
-                    if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Down)
-                    {
-                        currentCharacterAnimation = characterAnimation.Down;
-                        animator.SetBool(Animated.MOVING_DOWN, true);
-                        animator.SetBool(Animated.DOWN_OBJECT, false);
-                    }
-                    else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.DownObject)
-                    {
-                        currentCharacterAnimation = characterAnimation.DownObject;
-                        animator.SetBool(Animated.DOWN_OBJECT, true);
-                        animator.SetBool(Animated.MOVING_DOWN, false);
-                    }
-
-                    animator.SetBool(Animated.MOVING_UP, false);
-                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                    animator.SetBool(Animated.UP_OBJECT, false);
-                    animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
-                    animator.SetBool(Animated.IDLE, false);
-                    animator.SetBool(Animated.IDLE_OBJECT, false);
-                }
-
-                //if the agent gets to the next vector then delete it from the path
-                // and go to the next available vector
-                float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, nextLocation);
-                bool nextIsGoal = false;
-                if (nextLocation == goal || (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
-                {
-                    nextIsGoal = true;
-                }
-                if (distanceBetweenPoints < 0.05f)
+                //use path to go to the next available vector2 in it
+                Vector2 currentLocation = gameObject.transform.position;
+                if (path[0] == currentLocation)
                 {
                     path.RemoveAt(0);
                 }
-                if (path.Count == 0 || (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
+                if (path.Count == 0 && getHeadingHome())
                 {
-                    //if the orc is at the storage goal, deliver resources
-                    if (nextIsGoal)
+                    Employment employment = placeOfEmployment.GetComponent<Employment>();
+                    employment.setWorkerDeliveringGoods(false);
+                    Destroy(gameObject);
+                }
+                else
+                {
+                    Vector2 nextLocation = path[0];
+                    //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
+                    if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                        && (!network[(int)nextLocation.x, (int)nextLocation.y].tag.Equals(World.BUILDING)
+                        || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
                     {
-                        //at the goal, deliver any available goods and then plan a path back
-                        Storage storage = goalObject.GetComponent<Storage>();
-                        List<string> removeTheseResources = new List<string>();
-                        foreach (KeyValuePair<string, int> kvp in resources)
+                        Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
+                        float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
+                        Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
+
+                        bool nextIsGoal = false;
+                        if (nextLocation == goal || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                            && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
                         {
-                            if (storage.acceptsResource(kvp.Key, kvp.Value))
-                            {
-                                storage.addResource(kvp.Key, kvp.Value);
-                                removeTheseResources.Add(kvp.Key);
-                            }
+                            nextIsGoal = true;
                         }
-                        //update resources to remove any resources that were given to a storage building
-                        foreach (string resourceToRemove in removeTheseResources)
-                        {
-                            resources.Remove(resourceToRemove);
-                        }
-                        //if this unit still has resources, it should try to get rid of them
-                        if (resources.Count > 0)
-                        {
-                            changePath = true;
-                        }
-                        //if the unit is out of resources, it should head back to its place of employment
                         else
                         {
-                            reachedGoal = true;
-                            if (resources.Count == 0 && hasGoods)
+                            //take a step towards the nextLocation
+                            Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
+                                + unitVector.y * stepSize * Time.deltaTime);
+                            gameObject.transform.position = newLocation;
+                        }
+
+                        //animation
+                        if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
+                        {
+                            if (flipped)
                             {
-                                hasGoods = false;
+                                flipSprite();
+                            }
+
+                            if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Right)
+                            {
+                                currentCharacterAnimation = characterAnimation.Right;
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                                animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                            }
+                            else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.RightObject)
+                            {
+                                currentCharacterAnimation = characterAnimation.RightObject;
+                                animator.SetBool(Animated.SIDEWAYS_OBJECT, true);
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                            }
+
+                            animator.SetBool(Animated.MOVING_DOWN, false);
+                            animator.SetBool(Animated.MOVING_UP, false);
+                            animator.SetBool(Animated.DOWN_OBJECT, false);
+                            animator.SetBool(Animated.UP_OBJECT, false);
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.IDLE_OBJECT, false);
+                        }
+                        else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
+                        {
+                            //left. needs to flip sprite because it reuses the sprite for moving right
+                            if (!flipped)
+                            {
+                                flipSprite();
+                            }
+
+                            if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Left)
+                            {
+                                currentCharacterAnimation = characterAnimation.Left;
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                                animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                            }
+                            else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.LeftObject)
+                            {
+                                currentCharacterAnimation = characterAnimation.LeftObject;
+                                animator.SetBool(Animated.SIDEWAYS_OBJECT, true);
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                            }
+
+                            animator.SetBool(Animated.MOVING_DOWN, false);
+                            animator.SetBool(Animated.MOVING_UP, false);
+                            animator.SetBool(Animated.DOWN_OBJECT, false);
+                            animator.SetBool(Animated.UP_OBJECT, false);
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.IDLE_OBJECT, false);
+                        }
+                        else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x))
+                        {
+                            if (flipped)
+                            {
+                                flipSprite();
+                            }
+
+                            if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Up)
+                            {
+                                currentCharacterAnimation = characterAnimation.Up;
+                                animator.SetBool(Animated.MOVING_UP, true);
+                                animator.SetBool(Animated.UP_OBJECT, false);
+                            }
+                            else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.UpObject)
+                            {
+                                currentCharacterAnimation = characterAnimation.UpObject;
+                                animator.SetBool(Animated.UP_OBJECT, true);
+                                animator.SetBool(Animated.MOVING_UP, false);
+                            }
+
+                            animator.SetBool(Animated.MOVING_DOWN, false);
+                            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                            animator.SetBool(Animated.DOWN_OBJECT, false);
+                            animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.IDLE_OBJECT, false);
+                        }
+                        else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x))
+                        {
+                            if (flipped)
+                            {
+                                flipSprite();
+                            }
+
+                            if (resources.Count == 0 && currentCharacterAnimation != characterAnimation.Down)
+                            {
+                                currentCharacterAnimation = characterAnimation.Down;
+                                animator.SetBool(Animated.MOVING_DOWN, true);
+                                animator.SetBool(Animated.DOWN_OBJECT, false);
+                            }
+                            else if (resources.Count > 0 && currentCharacterAnimation != characterAnimation.DownObject)
+                            {
+                                currentCharacterAnimation = characterAnimation.DownObject;
+                                animator.SetBool(Animated.DOWN_OBJECT, true);
+                                animator.SetBool(Animated.MOVING_DOWN, false);
+                            }
+
+                            animator.SetBool(Animated.MOVING_UP, false);
+                            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                            animator.SetBool(Animated.UP_OBJECT, false);
+                            animator.SetBool(Animated.SIDEWAYS_OBJECT, false);
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.IDLE_OBJECT, false);
+                        }
+
+                        //if the agent gets to the next vector then delete it from the path
+                        // and go to the next available vector
+                        float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, nextLocation);
+                        if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
+                        {
+                            path.RemoveAt(0);
+                        }
+                        if (path.Count == 0 || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                            && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
+                        {
+                            //if the orc is at the storage goal, deliver resources
+                            if (nextIsGoal)
+                            {
+                                //at the goal, deliver any available goods and then plan a path back
+                                Storage storage = goalObject.GetComponent<Storage>();
+                                if (storage != null)
+                                {
+                                    List<string> removeTheseResources = new List<string>();
+                                    foreach (KeyValuePair<string, int> kvp in resources)
+                                    {
+                                        if (storage.acceptsResource(kvp.Key, kvp.Value))
+                                        {
+                                            storage.addResource(kvp.Key, kvp.Value);
+                                            removeTheseResources.Add(kvp.Key);
+                                        }
+                                    }
+                                    //update resources to remove any resources that were given to a storage building
+                                    foreach (string resourceToRemove in removeTheseResources)
+                                    {
+                                        resources.Remove(resourceToRemove);
+                                    }
+                                }
+                                //if this unit still has resources, it should try to get rid of them
+                                if (resources.Count > 0)
+                                {
+                                    changePath = true;
+                                }
+                                //if the unit is out of resources, it should head back to its place of employment
+                                else
+                                {
+                                    reachedGoal = true;
+                                    if (resources.Count == 0 && hasGoods)
+                                    {
+                                        hasGoods = false;
+                                    }
+                                }
+                                //path = findPathHome();
+                                yield return StartCoroutine(findPathHome(returnPath =>
+                                {
+                                    path = returnPath;
+                                }));
+                                //if the place of employment is destroyed, this gameobject should be as well
+                                if (!placeOfEmployment)
+                                {
+                                    Destroy(gameObject);
+                                }
+                            }
+                            //if the orc has arrived back at its employment from delivering resources, let the employment know
+                            else if (reachedGoal)
+                            {
+                                Employment employment = placeOfEmployment.GetComponent<Employment>();
+                                employment.setWorkerDeliveringGoods(false);
+                                Destroy(gameObject);
+                            }
+                            //if the previous deliver location was destroyed and the orc had to return home, it should
+                            // be updated to no longer be considering "heading home" and it should look for new places
+                            // to deliver resources to
+                            else
+                            {
+                                headingHome = false;
+                                changePath = true;
                             }
                         }
-                        //path = findPathHome();
-                        yield return StartCoroutine(findPathHome(returnPath =>
-                        {
-                            path = returnPath;
-                        }));
-                        //if the place of employment is destroyed, this gameobject should be as well
-                        if (!placeOfEmployment)
-                        {
-                            Destroy(gameObject);
-                        }
                     }
-                    //if the orc has arrived back at its employment from delivering resources, let the employment know
-                    else if (reachedGoal)
-                    {
-                        Employment employment = placeOfEmployment.GetComponent<Employment>();
-                        employment.setWorkerDeliveringGoods(false);
-                        Destroy(gameObject);
-                    }
-                    //if the previous deliver location was destroyed and the orc had to return home, it should
-                    // be updated to no longer be considering "heading home" and it should look for new places
-                    // to deliver resources to
                     else
                     {
-                        headingHome = false;
+                        changePath = true;
+                    }
+                    //TODO?: If I want the orc to check for other storage places as it's going home, I should have a check
+                    // inside of this if statement to see if any still exist
+                    if (runningAStar == false && goalObject == null && !reachedGoal && !headingHome)
+                    {
                         changePath = true;
                     }
                 }
             }
-            else
-            {
-                changePath = true;
-            }
-            //TODO?: If I want the orc to check for other storage places as it's going home, I should have a check
-            // inside of this if statement to see if any still exist
-            if (runningAStar == false && goalObject == null && !reachedGoal && !headingHome)
-            {
-                changePath = true;
-            }
+            yield return null;
         }
-        yield return null;
     }
 
     /// <summary>

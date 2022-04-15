@@ -20,29 +20,30 @@ public class TradingPostPopup : EmploymentPopup
     {
         employmentUpdate();
 
-        employeeNum.text = "" + employment.getNumWorkers();
+        employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
+        if (employment.getNumWorkers() == 0)
+        {
+            status.text = "Unable to assist traders with no workers.";
+        }
+        else if (employment.getNumHealthyWorkers() == 0)
+        {
+            status.text = "Unable to assist traders with no healthy workers.";
+        }
+        else
+        {
+            status.text = "Waiting to assist traders.";
+        }
+
         if (tradingPost == null)
         {
             tradingPost = objectOfPopup.GetComponent<TradingPost>();
         }
         else
         {
-            if (employment.getNumWorkers() == 0)
-            {
-                status.text = "Unable to assist traders with no workers.";
-            }
-            else if (employment.getNumHealthyWorkers() == 0)
-            {
-                status.text = "Unable to assist traders with no healthy workers.";
-            }
-            else if (tradingPost.getCollectingTradeGoods())
+            if (tradingPost.getCollectingTradeGoods())
             {
                 status.text = "Currently assisting a trader.";
-            }
-            else
-            {
-                status.text = "Waiting to assist traders.";
             }
         }
     }

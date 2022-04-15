@@ -70,12 +70,15 @@ public class FishingBoat : Animated
         {
             float progressedTime = Time.time - prevFishingTime;
             prevFishingTime = Time.time;
-            float effectiveTimeToFish = fishingTime / (employment.getNumWorkers() / employment.getNumHealthyWorkers());
-            effectiveProgress += progressedTime / effectiveTimeToFish * 100;
-            if (effectiveProgress >= 100)
+            if (employment.getNumHealthyWorkers() > 0)
             {
-                effectiveProgress = 100;
-                finishedFishing = true;
+                float effectiveTimeToFish = fishingTime * (employment.getWorkerCap() / employment.getNumHealthyWorkers());
+                effectiveProgress += progressedTime / effectiveTimeToFish * 100;
+                if (effectiveProgress >= 100)
+                {
+                    effectiveProgress = 100;
+                    finishedFishing = true;
+                }
             }
         }
         else if (!runningAStar && !findingNearestFishingSpot)
@@ -180,7 +183,7 @@ public class FishingBoat : Animated
             //if the agent gets to the next vector then delete it from the path
             // and go to the next available vector
             float distanceBetweenPoints = myWorld.getDistanceBetweenPoints(gameObject.transform.position, nextLocation);
-            if (distanceBetweenPoints < 0.05f)
+            if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
             {
                 path.RemoveAt(0);
                 if (path.Count > 0 && structureArr[(int)path[0].x, (int)path[0].y] != null
@@ -205,7 +208,7 @@ public class FishingBoat : Animated
             {
                 //Reached fishing spot
                 startedFishing = true;
-                prevFishingTime = Time.unscaledTime;
+                prevFishingTime = Time.time;
             }
         }
         yield return null;

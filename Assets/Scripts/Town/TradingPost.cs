@@ -147,9 +147,10 @@ public class TradingPost : Building
         GameObject newTradeGoodsCollector = Object.Instantiate(tradeGoodsCollector, new Vector2(spawnPosition.x, spawnPosition.y + 0.4f), Quaternion.identity);
         CollectTradeGoods collectTradeGoods = newTradeGoodsCollector.GetComponent<CollectTradeGoods>();
         TradeCityObject tradeCity = waitingTraders[0].GetComponent<Trade>().getTraderCityObject();
-        collectTradeGoods.setSellingAndBuying(tradeCity.getImports(), tradeCity.getExports());
+        collectTradeGoods.initializeCollector(gameObject, tradeCity.getImports(), tradeCity.getExports(), myWorld.getTradeManager().getTradingPerResource());
+        /*collectTradeGoods.setSellingAndBuying(tradeCity.getImports(), tradeCity.getExports());
         collectTradeGoods.setTradingPerResource(myWorld.getTradeManager().getTradingPerResource());
-        collectTradeGoods.setOrcEmployment(gameObject);
+        collectTradeGoods.setOrcEmployment(gameObject);*/
     }
 
     /// <summary>

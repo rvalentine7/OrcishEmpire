@@ -65,6 +65,9 @@ public class World : MonoBehaviour {
     public ResourceTradeInputs ochreTradeInputs;
     public ResourceTradeInputs warPaintTradeInputs;
 
+    //Float value for determining if something is close enough to another
+    public const float CLOSE_ENOUGH_DIST = 0.075f;
+
     //Value used by multiple different buildings
     public const int HEALTH_BUILDING_RADIUS = 15;
 
@@ -208,7 +211,11 @@ public class World : MonoBehaviour {
             GameObject homeThatCanBeMovedInTo = homesToMoveInTo.Dequeue();
             if (homeThatCanBeMovedInTo)
             {
-                homeThatCanBeMovedInTo.GetComponent<AvailableHome>().spawnImmigrant();
+                AvailableHome availableHome = homeThatCanBeMovedInTo.GetComponent<AvailableHome>();
+                if (availableHome != null)
+                {
+                    availableHome.spawnImmigrant();
+                }
             }
         }
 

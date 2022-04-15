@@ -15,8 +15,8 @@ public class TaxCollectorPopup : EmploymentPopup {
     new void Update()
     {
         employmentUpdate();
-        
-        employeeNum.text = "" + employment.getNumWorkers();
+
+        employeeNum.text = "" + employment.getNumWorkers() + "/" + employment.getWorkerCap();
         sickEmployeeNum.text = "" + (employment.getNumWorkers() - employment.getNumHealthyWorkers()) + "/" + employment.getNumWorkers();
         TaxCollector taxCollectorScript = objectOfPopup.GetComponent<TaxCollector>();
         if (employment.getNumWorkers() == 0)

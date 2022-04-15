@@ -15,10 +15,10 @@ public class Production : Building {
     private World myWorld;
     private float progress;
     private float prevUpdateTime;
-    private int numWorkers;
+    private int numHealthyWorkers;
     private Employment employment;
     private bool orcOutForDelivery;
-    //private bool nearTrees;//TODO: use nearTrees to update the status of the building in the UI popup for lumbermills//TODO: have a new class inherit this one for lumbermills?
+    //private bool nearTrees;//TODO: use nearTrees to update the status of the building in the UI popup for lumbermills
     private bool active;
 
     /// <summary>
@@ -29,63 +29,58 @@ public class Production : Building {
         employment = gameObject.GetComponent<Employment>();
         progress = 0.0f;
         prevUpdateTime = 0.0f;
-        numWorkers = employment.getNumWorkers();
+        numHealthyWorkers = employment.getNumHealthyWorkers();
         orcOutForDelivery = false;
         //nearTrees = true;
         active = true;
     }
-	
-	/// <summary>
+
+    /// <summary>
     /// Updates progress on the production and sends out a worker to deliver
     /// the goods upon progress completion.
     /// </summary>
-	void Update () {
+    void Update()
+    {
         orcOutForDelivery = employment.getWorkerDeliveringGoods();
-        numWorkers = employment.getNumWorkers();
-        if (active)
+        numHealthyWorkers = employment.getNumHealthyWorkers();
+        if (gameObject.name.Contains(World.LUMBER) && active)
         {
             //Lumber mills need to be near trees in order to function
-            if (gameObject.name.Contains(World.LUMBER))
-            {
-                //nearTrees = true;
+            //nearTrees = true;
 
-                GameObject world = GameObject.Find(World.WORLD_INFORMATION);
-                World myWorld = world.GetComponent<World>();
-                GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
-                Vector2 millPos = gameObject.transform.position;
-                if (!terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//below bottom left corner
-                    && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//above top left corner
-                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//below bottom right corner
-                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//above top right corner
-                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//to the right of bottom right corner
-                    && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//to the right of the top right corner
-                    && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
-                    (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//to the left of the bottom left corner
-                    && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
-                    (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES))//to the left of the top left corner
-                {
-                    //nearTrees = false;
-                    active = false;
-                }
+            GameObject world = GameObject.Find(World.WORLD_INFORMATION);
+            World myWorld = world.GetComponent<World>();
+            GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
+            Vector2 millPos = gameObject.transform.position;
+            if (!terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
+                (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//below bottom left corner
+                && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1)),
+                (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//above top left corner
+                && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
+                (int)(millPos.y - Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//below bottom right corner
+                && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2)),
+                (int)(millPos.y + Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//above top right corner
+                && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
+                (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//to the right of bottom right corner
+                && !terrainArr[(int)(millPos.x + Mathf.FloorToInt(2 / 2) + 1),
+                (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES)//to the right of the top right corner
+                && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
+                (int)(millPos.y - Mathf.FloorToInt(2 / 2) + 1)].tag.Equals(World.TREES)//to the left of the bottom left corner
+                && !terrainArr[(int)(millPos.x - Mathf.CeilToInt(2 / 2.0f - 1) - 1),
+                (int)(millPos.y + Mathf.FloorToInt(2 / 2))].tag.Equals(World.TREES))//to the left of the top left corner
+            {
+                //nearTrees = false;
+                active = false;
             }
         }
-		if (numWorkers > 0 && active)
+        if (numHealthyWorkers > 0 && active && progress < 100)
         {
-            if (progress < 100)
+            float progressedTime = Time.time - prevUpdateTime;
+            float effectiveTimeToFinish = timeToProduce * (employment.getWorkerCap() / numHealthyWorkers);
+            progress += progressedTime / effectiveTimeToFinish * 100;
+            if (progress >= 100)
             {
-                float progressedTime = Time.time - prevUpdateTime;
-                float effectiveTimeToFinish = timeToProduce / (numWorkers / employment.getNumHealthyWorkers());
-                progress += progressedTime / effectiveTimeToFinish * 100;
-                if (progress >= 100)
-                {
-                    progress = 100;
-                }
+                progress = 100;
             }
         }
         if (progress == 100 && orcOutForDelivery == false)

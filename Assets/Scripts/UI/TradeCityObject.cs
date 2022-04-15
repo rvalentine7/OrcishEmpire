@@ -26,7 +26,8 @@ public class TradeCityObject : WorldPopupButton
         tradeRouteOpened = false;
         traderInPlayerCity = false;
         traderTimeTravelingStarted = 0.0f;
-        traderTravelTime = 10.0f;//TODO: I probably want this at 3min or longer once I confirm it's working
+        //90.0f is an arbitrary time that feels good for how long traders are gone from the city
+        traderTravelTime = 90.0f;
     }
 
     /// <summary>

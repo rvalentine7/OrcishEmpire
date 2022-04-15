@@ -1,11 +1,12 @@
 Win
 PlayerPath?
-D:/Game Development/Orcish Empire/Build Projects/Kingdom.exe
+D:/Game Development/Orcish Empire/Build Projects/Orcish Empire.exe
 SceneListBegin?
 Assets/Scenes/Test Scene.unity
 SceneListEnd?
 984dcc0ba3707b7691fbdca8ff508d28 Unity.TextMeshPro.dll:TMPro.TMP_SelectionCaret
 7b0494dfd7a2718614f6907517be7e58 Assembly-CSharp.dll:.FarmPopup
+0aefd6d5dce38e6c55b5400d8d11f361 Assembly-CSharp.dll:.Trade
 01aa15e337e3a9c62f15153dfac6d589 Unity.TextMeshPro.dll:TMPro.TMP_Dropdown
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationPlayableAsset
 06f0fef534ca4c1d6064fd77a26bf722 UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationTrack
@@ -60,6 +61,7 @@ abf1930d8126d0b2e00e9449129a0190 UnityEngine.UI.dll:UnityEngine.EventSystems.Tou
 71795b122c90dcc2e4fd3a186337a49c Assembly-CSharp.dll:.Animated
 98ad81e9f689a492509f07e75b810aaa Unity.TextMeshPro.dll:TMPro.TMP_InputField
 e29ab0d731322db4e36c35e7f570f8c6 Assembly-CSharp.dll:.SpeedAdjustment
+4f00770a8670574d184fbd85db3d8696 Assembly-CSharp.dll:.TradingPostPopup
 92bd6564b0e7c1d9e7b0e64cba1a5bbb Assembly-CSharp.dll:.PauseMenu
 e15411411244f6f5524bab5c96fcfa67 Assembly-CSharp.dll:.Pub
 cf9f5cf2c3145a37ac07f00e50e460f9 UnityEngine.UI.dll:UnityEngine.UI.AspectRatioFitter
@@ -96,7 +98,7 @@ abf1930d8126d0b2e00e9449129a0190 UnityEngine.UI.dll:UnityEngine.EventSystems.Tou
 64e54c0cbb0177c5ea26f340efb9ff85 UnityEngine.UI.dll:UnityEngine.UI.VerticalLayoutGroup
 7a860f14ad37e7974bad168129f037f5 Assembly-CSharp.dll:.FishingBoat
 14369114ac728176e6877795e5e9f297 Assembly-CSharp.dll:.Bridge
-f6d05b23d4890710a49e88bb20f63508 Assembly-CSharp.dll:.ReservoirPlacement
+b4ad800e58b64701ffed16418460e239 Assembly-CSharp.dll:.ReservoirPlacement
 bcce23591cc6e92b0e46053733bfd2b8 Assembly-CSharp.dll:.WeaponsmithPopup
 6aca33d5de9cee3f347f175192a33add Assembly-CSharp.dll:.FishingWharf
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.LumberMillPopup
@@ -130,6 +132,8 @@ ad9173d3a69d99153f38ed4b62226129 UnityEngine.Networking.dll:UnityEngine.Networki
 9b895dcabbc1faf095c000c32d471fd0 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformChild
 5887ef1bc706b22b773d253fd443ceef UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformVisualizer
 03750162ad9a91dac4ed2939588521fe Assembly-CSharp.dll:.Arena
+f32f437684ebb6383d2f46351878d257 Assembly-CSharp.dll:.TradeGoodsCollectorPopup
+77d6b67135a3c1d87698ab2eccde7dea Assembly-CSharp.dll:.SettingsMenu
 f0deb208e3cf1d657105063e59a0640d Assembly-CSharp.dll:.ItemProduction
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
 ebfa93e8c9a1129469e5eeb8778a8d8a Assembly-CSharp.dll:.WorldPopupPanel
@@ -151,12 +155,13 @@ f32f437684ebb6383d2f46351878d257 Assembly-CSharp.dll:.MarketWorkerPopup
 81e86a7a3383e02ca31ea5308cdfd6b9 Assembly-CSharp.dll:.Reservoir
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.ClosePanel
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.Farm
+d6ddee83b17324126bbcdf5546b22389 Assembly-CSharp.dll:.BuildingTooltip
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.EggFarmPopup
 b3ab2106268377ffe25dd18ac23dca28 Unity.TextMeshPro.dll:TMPro.TMP_Asset
 a91511379c4155c6827ef82da7918a4f Assembly-CSharp.dll:.RoadInformation
 9ecbbead0424258fd7ed461d61c601fb Assembly-CSharp.dll:.TreeObject
 60e5322e0f65b8528e844612fb95d751 Assembly-CSharp.dll:.BreweryPopup
-9ef3deecf4f79e6d3b8992732b38822f Assembly-CSharp.dll:.BuildMode
+b42c5d9a8175058ed1477d81d2a9a3f0 Assembly-CSharp.dll:.BuildMode
 3bf78b7f9508fbbdc2a624c9c886e834 Assembly-CSharp.dll:.Clear
 71bb6a6b6c8f052f948db64c7dd3ca4f Unity.Analytics.Editor.dll:UnityEditor.Analytics.AnalyticsEventTrackerEditor
 514a154185ac4b5d445345b4e51d4580 Assembly-CSharp.dll:.HousePopup
@@ -164,9 +169,11 @@ a91511379c4155c6827ef82da7918a4f Assembly-CSharp.dll:.RoadInformation
 71bb6a6b6c8f052f948db64c7dd3ca4f Unity.TextMeshPro.dll:TMPro.TMP_SpriteAnimator
 26ae682566fa15293a239b1d4f5a8eef Assembly-CSharp.dll:.Immigrate
 3fa549d21f51b30a0c9b2afe6b803239 Assembly-CSharp.dll:.StandardBoat
+f32f437684ebb6383d2f46351878d257 Assembly-CSharp.dll:.TraderPopup
 53b1e5dec743421adb71cbbdf9844af4 Assembly-CSharp.dll:.WorldPopupButton
-d2ec9ff36b296239fade1758ca2c5edb Assembly-CSharp.dll:.HouseInformation
+c961453c60dc87d5fea776aa90260240 Assembly-CSharp.dll:.HouseInformation
 1dbd4351caafd4b2e564aab0c9500f5f Assembly-CSharp.dll:.Storage
+0bc0c0d39e33c35a8679032011ea61f8 Assembly-CSharp.dll:.TradingPost
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.StandardBoatPopup
 4fd8bf02e3089425d3502e26c44ba31a Unity.TextMeshPro.dll:TMPro.TextContainer
 991fa9c1a3be00fc4ed5fd230e2fc77d Assembly-CSharp.dll:.Collect
@@ -193,9 +200,10 @@ b0450462a4a6060fa192c2d6a20e6cd1 Assembly-CSharp.dll:.Fountain
 ac30b164f1070b11cdd79be9f199552e Assembly-CSharp.dll:.BarberPopup
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.OrcInformation
 510fefd6a544e16a3ffefa557ddcba39 Unity.TextMeshPro.dll:TMPro.PackageResourceImporterWindow
-b56b7241c62857f64ba5be059181a7d8 Assembly-CSharp.dll:.HousingPlacement
+872e7e7cb0b9f23ff1997ccac03dcbe1 Assembly-CSharp.dll:.HousingPlacement
 1c0eed73fc1031a65f909daab68fe877 Assembly-CSharp.dll:.WaterBuildingPlacement
 314308d907197ea8258ddfed7af85b59 Assembly-CSharp.dll:.MarketPopup
+991fa9c1a3be00fc4ed5fd230e2fc77d Assembly-CSharp.dll:.CollectTradeGoods
 aa82b3ce4c0c9b227036c0337315c5d3 Unity.TextMeshPro.dll:TMPro.TMP_FontAsset
 e51c09a4cc447f11db225afcd8e3e490 Unity.TextMeshPro.dll:TMPro.TMP_Settings
 71795b122c90dcc2e4fd3a186337a49c Assembly-CSharp.dll:.Building
@@ -207,7 +215,7 @@ cf96e5f7b3d069bab453925bd41be04e UnityEngine.TestRunner.dll:UnityEngine.TestTool
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.Callbacks.RemoteTestResultSender
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.TestRunner.dll:UnityEngine.TestTools.TestRunner.Callbacks.TestResultRendererCallback
 c4f8bb88f56ca39bc7a553414822f3b8 Assembly-CSharp.dll:.TradeCityObject
-c60970274511ffe29a75e3bbefbc0ce6 Assembly-CSharp.dll:.BridgePlacement
+d6cada08da934459083f3868fe4d5d36 Assembly-CSharp.dll:.BridgePlacement
 931f489e44eadf809e9310429c99dde5 UnityEngine.GoogleAudioSpatializer.dll:UnityEngine.Experimental.Audio.Google.GvrAudioListenerExtension
 fb6a1ea36b4f6ef5948d283d93760765 UnityEngine.GoogleAudioSpatializer.dll:UnityEngine.Experimental.Audio.Google.GvrAudioRoom
 5b0391b7e3d9ea9db6c0a8fbd0ca23f6 UnityEngine.GoogleAudioSpatializer.dll:UnityEngine.Experimental.Audio.Google.GvrAudioSoundfieldExtension
@@ -219,11 +227,11 @@ fb6a1ea36b4f6ef5948d283d93760765 UnityEngine.GoogleAudioSpatializer.dll:UnityEng
 5b0391b7e3d9ea9db6c0a8fbd0ca23f6 UnityEngine.GoogleAudioSpatializer.dll:UnityEngine.Experimental.Audio.Google.GvrAudioSourceExtension
 991fa9c1a3be00fc4ed5fd230e2fc77d Assembly-CSharp.dll:.Deliver
 f32f437684ebb6383d2f46351878d257 Assembly-CSharp.dll:.DeliveryOrcPopup
-9818cc20f806477f620699ec7dc9817b Assembly-CSharp.dll:.World
+458c0b6333fcb8ade6d334fdec068282 Assembly-CSharp.dll:.World
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.PigFarmPopup
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.FishingWharfPopup
 a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
-4ec8ef54198bd2ebc13475ac9c2ea69b Assembly-CSharp.dll:.BuildingPlacement
+46ad1deec98649d0a5a8a72cfaa412d8 Assembly-CSharp.dll:.BuildingPlacement
 5fc094978ce3e3591a7500ed380d854a Unity.Analytics.DataPrivacy.dll:UnityEngine.Analytics.DataPrivacyButton
 3bb1b4bae6823a4524e793cdb8702970 Assembly-CSharp.dll:.CitizenPopup
 593989eecfbe711da11afdb5b53c1796 Assembly-CSharp.dll:.PopulationAndCurrency
@@ -231,7 +239,7 @@ a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
 9024811b717b669579cf1b4ceab94096 Assembly-CSharp.dll:.CreateObject
 b3dc3a0e543c66d78ef2186f52d58189 Assembly-CSharp.dll:.WorldUI
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
-8d53232ca2ae5314c681d647ee6fb00a Assembly-CSharp.dll:.RoadPlacement
+93b60fb636456185f4c289d81f91bbe0 Assembly-CSharp.dll:.RoadPlacement
 31bba2fa7a43f6682298d3d1c9dee85f Assembly-CSharp.dll:.MudBath
 f32f437684ebb6383d2f46351878d257 Assembly-CSharp.dll:.ImmigrantPopup
 102ab4281172a10eb00b1eb0cbea3f95 Assembly-CSharp.dll:.Distribute
@@ -259,11 +267,10 @@ c6666661329916e218bee7f5e79e60f5 Unity.TextMeshPro.dll:TMPro.TextMeshPro
 042970a6bccaa514b0bf852d6840640c Assembly-CSharp.dll:.Hospital
 8649814970b42d345b89944b862453cc Unity.TextMeshPro.dll:TMPro.TMP_SubMesh
 f32f437684ebb6383d2f46351878d257 Assembly-CSharp.dll:.FountainPopup
-f9ae09434cf729bb5e190c345926b2ef Assembly-CSharp.dll:.AqueductPlacement
+9aa9f244b4fe5a0149339aa32c66fd62 Assembly-CSharp.dll:.AqueductPlacement
 ff3fa92641f4afc26fe43c6f618eaf19 Assembly-CSharp.dll:.WaterTile
 2c59d8ba5f80e9cb65c6c14d7cb4b439 Assembly-CSharp.dll:.BoatyardPopup
 3696c6ca355bca039cf072e13501b93a Assembly-CSharp.dll:.GladiatorPit
 621780269f88cd0b02d754888767f59e Assembly-CSharp.dll:.OchrePitPopup
 6d66e7628528b05b0dcb8c8c42956cd9 Assembly-CSharp.dll:.Aqueduct
 10e33d6fad2aec1164fac23cb719827a Assembly-CSharp.dll:.TogglePanel
-77d6b67135a3c1d87698ab2eccde7dea Assembly-CSharp.dll:.SettingsMenu

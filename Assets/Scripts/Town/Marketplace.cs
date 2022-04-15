@@ -53,7 +53,6 @@ public class Marketplace : Building {
             && orcOutForCollection == false)))
         {
             orcOutForDelivery = true;
-            employment.setWorkerDeliveringGoods(true);
             createDistributionOrc();
         }
 

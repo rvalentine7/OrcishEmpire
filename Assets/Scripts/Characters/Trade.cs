@@ -18,20 +18,20 @@ public class Trade : Animated
     private GameObject tradingPostGoal;
     private bool waitingOnTradingPost;
     private bool changePath;
-    private bool runningAStar;
     private World myWorld;
     private GameObject[,] structureArr;
     private GameObject[,] terrainArr;
     private Animator animator;
+    private bool initialized;
 
     /// <summary>
     /// Initialization
     /// </summary>
     private void Awake()
     {
+        initialized = false;
         waitingOnTradingPost = false;
         changePath = false;
-        runningAStar = false;
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         structureArr = myWorld.constructNetwork.getConstructArr();
         terrainArr = myWorld.terrainNetwork.getTerrainArr();
@@ -102,17 +102,7 @@ public class Trade : Animated
         {
             tradingPostGoal.GetComponent<TradingPost>().receiveTrader(this);
         }
-    }
-
-    /// <summary>
-    /// Updates the navigation of the trader
-    /// </summary>
-    void Update()
-    {
-        if (!runningAStar && !waitingOnTradingPost)
-        {
-            StartCoroutine(navigate());
-        }
+        StartCoroutine(navigate());
     }
 
     /// <summary>
@@ -121,156 +111,160 @@ public class Trade : Animated
     /// <returns>A time delay to allow this method to update over multiple frames</returns>
     private IEnumerator navigate()
     {
-        if (path == null || path.Count == 0 || changePath == true)
+        while (true)
         {
-            animator.SetBool(Animated.MOVING_DOWN, false);
-            animator.SetBool(Animated.MOVING_UP, false);
-            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-            animator.SetBool(Animated.IDLE, true);
-            currentCharacterAnimation = characterAnimation.Idle;
-
-            AstarSearch aStarSearch = new AstarSearch();
-            //y in the following line of code is floored to an int in case I decide to bump up the position by 0.5 when the agent
-            // spawns so that it is walking in the middle of the block (so that it doesn't appear to walk just below the road)
-            Vector2 start = new Vector2(Mathf.CeilToInt(gameObject.transform.position.x), Mathf.FloorToInt(gameObject.transform.position.y));
-            runningAStar = true;
-            changePath = false;
-            yield return StartCoroutine(aStarSearch.aStar(aStarPath =>
+            if (initialized && !waitingOnTradingPost)
             {
-                if (aStarPath != null)
+                if (path == null || path.Count == 0 || changePath == true)
                 {
-                    path = aStarPath;
-                    runningAStar = false;
-                    if (path.Count == 0)
-                    {
-                        Debug.Log("Trader had no path to exit.  It has been destroyed.");
-                        destroyTrader();
-                    }
-                }
-            }, start, network[Mathf.RoundToInt(navigationGoal.x), Mathf.RoundToInt(navigationGoal.y)], network));
-        }
-        else
-        {
-            if (path[0].x == gameObject.transform.position.x && path[0].y == gameObject.transform.position.y)
-            {
-                path.RemoveAt(0);
-            }
-            if (!myWorld.walkableTerrain.Contains(network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag))
-            {
-                changePath = true;
-            }
-            if (tradingPostGoal == null && navigationGoal != exitLocation)
-            {
-                navigationGoal = exitLocation;
-                changePath = true;
-            }
-            if (!changePath)
-            {
-                //use path to go to the next available vector2 in it
-                Vector2 nextLocation = path[0];
-                Vector2 currentLocation = gameObject.transform.position;
-                //take a step towards the nextLocation
-                Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
-                float length = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
-                Vector2 unitVector = new Vector2(vector.x / length, vector.y / length);
-                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
-                    + unitVector.y * stepSize * Time.deltaTime);
-                gameObject.transform.position = newLocation;
-
-                //animation
-                if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
-                {
-                    if (flipped)
-                    {
-                        flipSprite();
-                    }
-                    animator.SetBool(Animated.IDLE, false);
                     animator.SetBool(Animated.MOVING_DOWN, false);
                     animator.SetBool(Animated.MOVING_UP, false);
-                    animator.SetBool(Animated.MOVING_SIDEWAYS, true);
-                    currentCharacterAnimation = characterAnimation.Right;
-                }
-                else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
-                {
-                    //left. needs to flip sprite because it reuses the sprite for moving right
-                    if (!flipped)
-                    {
-                        flipSprite();
-                    }
-                    animator.SetBool(Animated.IDLE, false);
-                    animator.SetBool(Animated.MOVING_DOWN, false);
-                    animator.SetBool(Animated.MOVING_UP, false);
-                    animator.SetBool(Animated.MOVING_SIDEWAYS, true);
-                    currentCharacterAnimation = characterAnimation.Left;
-                }
-                else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
-                {
-                    if (flipped)
-                    {
-                        flipSprite();
-                    }
-                    animator.SetBool(Animated.IDLE, false);
-                    animator.SetBool(Animated.MOVING_DOWN, false);
                     animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                    animator.SetBool(Animated.MOVING_UP, true);
-                    currentCharacterAnimation = characterAnimation.Up;
-                }
-                else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
-                {
-                    if (flipped)
-                    {
-                        flipSprite();
-                    }
-                    animator.SetBool(Animated.IDLE, false);
-                    animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                    animator.SetBool(Animated.MOVING_UP, false);
-                    animator.SetBool(Animated.MOVING_DOWN, true);
-                    currentCharacterAnimation = characterAnimation.Down;
-                }
+                    animator.SetBool(Animated.IDLE, true);
+                    currentCharacterAnimation = characterAnimation.Idle;
 
-                //if the agent gets to the next vector2 then delete it from the path
-                // and go to the next available vector2
-                float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
-                    * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
-                    * (nextLocation.y - gameObject.transform.position.y));
-                if (distanceBetweenPoints < 0.05f)
-                {
-                    path.RemoveAt(0);
-                }
-                //If going to the trading post and there's a line, make sure I join in the right spot in the line
-                if (navigationGoal != exitLocation)
-                {
-                    int traderWaitPosition = tradingPostGoal.GetComponent<TradingPost>().getTraderWaitPosition(this);
-                    int indexToRemoveAt = Mathf.Max(0, path.Count - traderWaitPosition);
-                    if (indexToRemoveAt == 0)
+                    AstarSearch aStarSearch = new AstarSearch();
+                    //y in the following line of code is floored to an int in case I decide to bump up the position by 0.5 when the agent
+                    // spawns so that it is walking in the middle of the block (so that it doesn't appear to walk just below the road)
+                    Vector2 start = new Vector2(Mathf.RoundToInt(gameObject.transform.position.x), Mathf.FloorToInt(gameObject.transform.position.y));
+                    changePath = false;
+                    yield return StartCoroutine(aStarSearch.aStar(aStarPath =>
                     {
-                        path = new List<Vector2>();
+                        if (aStarPath != null)
+                        {
+                            path = aStarPath;
+                            if (path.Count == 0)
+                            {
+                                Debug.Log("Trader had no path to exit.  It has been destroyed.");
+                                destroyTrader();
+                            }
+                        }
+                    }, start, network[Mathf.RoundToInt(navigationGoal.x), Mathf.RoundToInt(navigationGoal.y)], network));
+                }
+                else
+                {
+                    if (path[0].x == gameObject.transform.position.x && path[0].y == gameObject.transform.position.y)
+                    {
+                        path.RemoveAt(0);
                     }
-                }
-                //the agent has arrived at the goal location
-                if (path.Count == 0)
-                {
-                    if (navigationGoal.Equals(exitLocation))
+                    if (tradingPostGoal == null && navigationGoal != exitLocation)
                     {
-                        //Reached the exit on the map. Disappear from existance
-                        destroyTrader();
+                        navigationGoal = exitLocation;
+                        changePath = true;
+                    }
+                    else if (!myWorld.walkableTerrain.Contains(network[Mathf.RoundToInt(path[0].x), Mathf.RoundToInt(path[0].y)].tag))
+                    {
+                        changePath = true;
                     }
                     else
                     {
-                        //Let the trading post know I've arrived
-                        tradingPostGoal.GetComponent<TradingPost>().traderArrived(this);
-                        waitingOnTradingPost = true;
+                        //use path to go to the next available vector2 in it
+                        Vector2 nextLocation = path[0];
+                        Vector2 currentLocation = gameObject.transform.position;
+                        //take a step towards the nextLocation
+                        Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
+                        float length = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
+                        Vector2 unitVector = new Vector2(vector.x / length, vector.y / length);
+                        Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
+                            + unitVector.y * stepSize * Time.deltaTime);
+                        gameObject.transform.position = newLocation;
 
-                        animator.SetBool(Animated.MOVING_DOWN, false);
-                        animator.SetBool(Animated.MOVING_UP, false);
-                        animator.SetBool(Animated.MOVING_SIDEWAYS, false);
-                        animator.SetBool(Animated.IDLE, true);
-                        currentCharacterAnimation = characterAnimation.Idle;
+                        //animation
+                        if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Right)
+                        {
+                            if (flipped)
+                            {
+                                flipSprite();
+                            }
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.MOVING_DOWN, false);
+                            animator.SetBool(Animated.MOVING_UP, false);
+                            animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                            currentCharacterAnimation = characterAnimation.Right;
+                        }
+                        else if (unitVector.x < 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y) && currentCharacterAnimation != characterAnimation.Left)
+                        {
+                            //left. needs to flip sprite because it reuses the sprite for moving right
+                            if (!flipped)
+                            {
+                                flipSprite();
+                            }
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.MOVING_DOWN, false);
+                            animator.SetBool(Animated.MOVING_UP, false);
+                            animator.SetBool(Animated.MOVING_SIDEWAYS, true);
+                            currentCharacterAnimation = characterAnimation.Left;
+                        }
+                        else if (unitVector.y > 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Up)
+                        {
+                            if (flipped)
+                            {
+                                flipSprite();
+                            }
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.MOVING_DOWN, false);
+                            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                            animator.SetBool(Animated.MOVING_UP, true);
+                            currentCharacterAnimation = characterAnimation.Up;
+                        }
+                        else if (unitVector.y < 0 && Mathf.Abs(vector.y) > Mathf.Abs(vector.x) && currentCharacterAnimation != characterAnimation.Down)
+                        {
+                            if (flipped)
+                            {
+                                flipSprite();
+                            }
+                            animator.SetBool(Animated.IDLE, false);
+                            animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                            animator.SetBool(Animated.MOVING_UP, false);
+                            animator.SetBool(Animated.MOVING_DOWN, true);
+                            currentCharacterAnimation = characterAnimation.Down;
+                        }
+
+                        //if the agent gets to the next vector2 then delete it from the path
+                        // and go to the next available vector2
+                        float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
+                            * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
+                            * (nextLocation.y - gameObject.transform.position.y));
+                        if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
+                        {
+                            path.RemoveAt(0);
+                        }
+                        //If going to the trading post and there's a line, make sure I join in the right spot in the line
+                        if (navigationGoal != exitLocation)
+                        {
+                            int traderWaitPosition = tradingPostGoal.GetComponent<TradingPost>().getTraderWaitPosition(this);
+                            int indexToRemoveAt = Mathf.Max(0, path.Count - traderWaitPosition);
+                            if (indexToRemoveAt == 0)
+                            {
+                                path = new List<Vector2>();
+                            }
+                        }
+                        //the agent has arrived at the goal location
+                        if (path.Count == 0)
+                        {
+                            if (navigationGoal.Equals(exitLocation))
+                            {
+                                //Reached the exit on the map. Disappear from existance
+                                destroyTrader();
+                            }
+                            else
+                            {
+                                //Let the trading post know I've arrived
+                                tradingPostGoal.GetComponent<TradingPost>().traderArrived(this);
+                                waitingOnTradingPost = true;
+
+                                animator.SetBool(Animated.MOVING_DOWN, false);
+                                animator.SetBool(Animated.MOVING_UP, false);
+                                animator.SetBool(Animated.MOVING_SIDEWAYS, false);
+                                animator.SetBool(Animated.IDLE, true);
+                                currentCharacterAnimation = characterAnimation.Idle;
+                            }
+                        }
                     }
                 }
             }
+            yield return null;
         }
-        yield return null;
     }
 
     /// <summary>
@@ -291,6 +285,7 @@ public class Trade : Animated
     public void setMyTradeCityObject(TradeCityObject tradeCityObject)
     {
         myTradeCity = tradeCityObject;
+        initialized = true;
     }
 
     /// <summary>

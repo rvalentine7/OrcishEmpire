@@ -43,7 +43,7 @@ public class TradeManager
     {
         //TODO: is there a smarter/more efficient way of doing this?
         //Goes through the trade routes to determine if a trader should spawn
-        foreach(TradeCityObject tradeCityObject in activeTradeRoutes)
+        foreach (TradeCityObject tradeCityObject in activeTradeRoutes)
         {
             //5.0f is an arbitrary time I chose to spread out the spawn times for traders
             if (!tradeCityObject.getTraderInPlayerCity() && myWorld.getGameTime() > tradeCityObject.getTraderArrivalTime() && Time.time - lastTraderSpawnTime > 5.0f)

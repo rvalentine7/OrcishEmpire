@@ -185,7 +185,7 @@ public class Immigrate : Animated {
                     float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
                         * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
                         * (nextLocation.y - gameObject.transform.position.y));
-                    if (distanceBetweenPoints < 0.05f)
+                    if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
                     {
                         path.RemoveAt(0);
                     }

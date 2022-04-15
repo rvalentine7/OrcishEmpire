@@ -10,6 +10,8 @@ public class CollectTradeGoods : Animated
     private List<string> goodsToSell;//Goods the player can sell
     private List<string> goodsToBuy;//Goods the player can buy
 
+    private bool initialized;
+    private bool collecting;
     private GameObject[,] network;
     private Vector2 originalLocation;
     private GameObject placeOfEmployment;
@@ -35,6 +37,8 @@ public class CollectTradeGoods : Animated
     /// </summary>
     void Awake()
     {
+        initialized = false;
+        collecting = false;
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
         originalLocation = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y);
         reachedGoal = false;
@@ -55,8 +59,7 @@ public class CollectTradeGoods : Animated
     // Update is called once per frame
     void Update()
     {
-        //TODO: when a trade collector picks up goods from a warehouse, subtract it from the city's gold. if the city runs out of gold, the trade collector can return to the trading post
-        if (runningAStar == false)
+        if (initialized && !collecting && runningAStar == false)
         {
             StartCoroutine(runCollect());
         }
@@ -68,6 +71,7 @@ public class CollectTradeGoods : Animated
     /// <returns></returns>
     private IEnumerator runCollect()
     {
+        collecting = true;
         //if the place of employment is destroyed, this gameobject should be as well
         if (!placeOfEmployment)
         {
@@ -113,8 +117,13 @@ public class CollectTradeGoods : Animated
                             path = returnPath;
                         }));
                         //if the place of employment is destroyed, this gameobject should be as well
-                        if (!placeOfEmployment || path.Count == 0)
+                        if (!placeOfEmployment)
                         {
+                            Destroy(gameObject);
+                        }
+                        else if (path.Count == 0)
+                        {
+                            placeOfEmployment.GetComponent<TradingPost>().returnTradeCollector();
                             Destroy(gameObject);
                         }
                         headingHome = true;
@@ -133,8 +142,13 @@ public class CollectTradeGoods : Animated
                     path = returnPath;
                 }));
                 //if the place of employment is destroyed, this gameobject should be as well
-                if (!placeOfEmployment || path.Count == 0)
+                if (!placeOfEmployment)
                 {
+                    Destroy(gameObject);
+                }
+                else if (path.Count == 0)
+                {
+                    placeOfEmployment.GetComponent<TradingPost>().returnTradeCollector();
                     Destroy(gameObject);
                 }
             }
@@ -151,19 +165,29 @@ public class CollectTradeGoods : Animated
             {
                 path.RemoveAt(0);
             }
-            Vector2 nextLocation = path[0];
+            Vector2 nextLocation = path.Count > 0 ? path[0] : currentLocation;
             //if the orc is heading home or the goalobject exists, take a step; otherwise, change the path
             if ((goalObject != null || headingHome || reachedGoal) && (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                && (network[(int)nextLocation.x, (int)nextLocation.y].tag != World.BUILDING
+                && (!network[(int)nextLocation.x, (int)nextLocation.y].tag.Equals(World.BUILDING)
                 || network[(int)nextLocation.x, (int)nextLocation.y] == goalObject)))
             {
-                //take a step towards the nextLocation
                 Vector2 vector = new Vector2(nextLocation.x - currentLocation.x, nextLocation.y - currentLocation.y);
                 float magnitude = Mathf.Sqrt(vector.x * vector.x + vector.y * vector.y);
                 Vector2 unitVector = new Vector2(vector.x / magnitude, vector.y / magnitude);
-                Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
-                    + unitVector.y * stepSize * Time.deltaTime);
-                gameObject.transform.position = newLocation;
+
+                bool nextIsGoal = false;
+                if (nextLocation == goal || (network[(int)nextLocation.x, (int)nextLocation.y] != null
+                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
+                {
+                    nextIsGoal = true;
+                }
+                else if (nextLocation != currentLocation)
+                {
+                    //take a step towards the nextLocation
+                    Vector2 newLocation = new Vector2(currentLocation.x + unitVector.x * stepSize * Time.deltaTime, currentLocation.y
+                        + unitVector.y * stepSize * Time.deltaTime);
+                    gameObject.transform.position = newLocation;
+                }
 
                 //animation
                 if (unitVector.x > 0 && Mathf.Abs(vector.x) > Mathf.Abs(vector.y))
@@ -281,13 +305,7 @@ public class CollectTradeGoods : Animated
                 float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
                     * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
                     * (nextLocation.y - gameObject.transform.position.y));
-                bool nextIsGoal = false;
-                if (nextLocation == goal || (network[(int)nextLocation.x, (int)nextLocation.y] != null
-                    && network[(int)nextLocation.x, (int)nextLocation.y] == goalObject))
-                {
-                    nextIsGoal = true;
-                }
-                if (distanceBetweenPoints < 0.05f)
+                if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST && path.Count > 0)
                 {
                     path.RemoveAt(0);
                 }
@@ -305,30 +323,33 @@ public class CollectTradeGoods : Animated
                         while (k < goodsToSell.Count)
                         {
                             string goodToSell = goodsToSell[k];
-                            ResourceTrading goodResourceTrading = tradingPerResource[goodToSell];
-                            TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
-                            if (goodResourceStatus.Equals(TradeManager.TradeStatus.exporting) && goodResourceTrading.getTradeAmount() > 0)
+                            if (tradingPerResource.ContainsKey(goodToSell))
                             {
-                                //Sell as many as the storage has that the trader will take
-                                int amountToSell = 0;
-                                if (storage.getResourceCount(goodToSell) > goodResourceTrading.getTradeAmount())
+                                ResourceTrading goodResourceTrading = tradingPerResource[goodToSell];
+                                TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
+                                if (goodResourceStatus.Equals(TradeManager.TradeStatus.exporting) && goodResourceTrading.getTradeAmount() > 0)
                                 {
-                                    amountToSell = goodResourceTrading.getTradeAmount();
-                                }
-                                else
-                                {
-                                    amountToSell = storage.getResourceCount(goodToSell);
-                                }
-                                //Update the collector with how many more of the good can be sold
-                                goodResourceTrading.setTradeAmount(goodResourceTrading.getTradeAmount() - amountToSell);
-                                //Removing sold good from storage
-                                storage.removeResource(goodToSell, amountToSell);
-                                //Increasing city's gold from the sale
-                                myWorld.updateCurrency(goodResourceTrading.getCostPerGood() * amountToSell);
-                                //Collector will visibly have goods it brings back to the trader
-                                if (amountToSell > 0)
-                                {
-                                    collectedGoods = true;
+                                    //Sell as many as the storage has that the trader will take
+                                    int amountToSell = 0;
+                                    if (storage.getResourceCount(goodToSell) > goodResourceTrading.getTradeAmount())
+                                    {
+                                        amountToSell = goodResourceTrading.getTradeAmount();
+                                    }
+                                    else
+                                    {
+                                        amountToSell = storage.getResourceCount(goodToSell);
+                                    }
+                                    //Update the collector with how many more of the good can be sold
+                                    goodResourceTrading.setTradeAmount(goodResourceTrading.getTradeAmount() - amountToSell);
+                                    //Removing sold good from storage
+                                    storage.removeResource(goodToSell, amountToSell);
+                                    //Increasing city's gold from the sale
+                                    myWorld.updateCurrency(goodResourceTrading.getCostPerGood() * amountToSell);
+                                    //Collector will visibly have goods it brings back to the trader
+                                    if (amountToSell > 0)
+                                    {
+                                        collectedGoods = true;
+                                    }
                                 }
                             }
                             k++;
@@ -341,33 +362,36 @@ public class CollectTradeGoods : Animated
                             while (k < goodsToBuy.Count)
                             {
                                 string goodToBuy = goodsToBuy[k];
-                                ResourceTrading goodResourceTrading = tradingPerResource[goodToBuy];
-                                TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
-                                if (goodResourceStatus.Equals(TradeManager.TradeStatus.importing)
-                                    && goodResourceTrading.getCostPerGood() <= myWorld.getCurrency()
-                                    && goodResourceTrading.getTradeAmount() > 0)
+                                if (tradingPerResource.ContainsKey(goodToBuy))
                                 {
-                                    //The amount the trader wants to buy
-                                    int amountToBuy = goodResourceTrading.getTradeAmount();
-                                    //The amount the storage can take based purely on space requirements
-                                    if (amountToBuy > storageSpace)
+                                    ResourceTrading goodResourceTrading = tradingPerResource[goodToBuy];
+                                    TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
+                                    if (goodResourceStatus.Equals(TradeManager.TradeStatus.importing)
+                                        && goodResourceTrading.getCostPerGood() <= myWorld.getCurrency()
+                                        && goodResourceTrading.getTradeAmount() > 0)
                                     {
-                                        amountToBuy = storageSpace;
+                                        //The amount the trader wants to buy
+                                        int amountToBuy = goodResourceTrading.getTradeAmount();
+                                        //The amount the storage can take based purely on space requirements
+                                        if (amountToBuy > storageSpace)
+                                        {
+                                            amountToBuy = storageSpace;
+                                        }
+                                        //The cost purely to buy as much as possible without knowing how much money the player has
+                                        int goodsCost = amountToBuy * goodResourceTrading.getCostPerGood();
+                                        //Reducing the amount if the player doesn't have the currency to buy as much as space allows
+                                        if (goodsCost > myWorld.getCurrency())
+                                        {
+                                            amountToBuy = Mathf.FloorToInt(myWorld.getCurrency() / goodResourceTrading.getCostPerGood());
+                                            goodsCost = goodResourceTrading.getCostPerGood() * amountToBuy;
+                                        }
+                                        //Update the collector with how many more of the good can be bought
+                                        goodResourceTrading.setTradeAmount(goodResourceTrading.getTradeAmount() - amountToBuy);
+                                        //Adding bought good to storage
+                                        storage.addResource(goodToBuy, amountToBuy);
+                                        //Decreasing city's gold from the purchase
+                                        myWorld.updateCurrency(-goodsCost);
                                     }
-                                    //The cost purely to buy as much as possible without knowing how much money the player has
-                                    int goodsCost = amountToBuy * goodResourceTrading.getCostPerGood();
-                                    //Reducing the amount if the player doesn't have the currency to buy as much as space allows
-                                    if (goodsCost > myWorld.getCurrency())
-                                    {
-                                        amountToBuy = Mathf.FloorToInt(myWorld.getCurrency() / goodResourceTrading.getCostPerGood());
-                                        goodsCost = goodResourceTrading.getCostPerGood() * amountToBuy;
-                                    }
-                                    //Update the collector with how many more of the good can be bought
-                                    goodResourceTrading.setTradeAmount(goodResourceTrading.getTradeAmount() - amountToBuy);
-                                    //Adding bought good to storage
-                                    storage.addResource(goodToBuy, amountToBuy);
-                                    //Decreasing city's gold from the purchase
-                                    myWorld.updateCurrency(-goodsCost);
                                 }
                                 k++;
                             }
@@ -388,8 +412,13 @@ public class CollectTradeGoods : Animated
                             }));
                         }
                         //if the place of employment is destroyed, this gameobject should be as well
-                        if (!placeOfEmployment || path.Count == 0)
+                        if (!placeOfEmployment)
                         {
+                            Destroy(gameObject);
+                        }
+                        else if (path.Count == 0)
+                        {
+                            placeOfEmployment.GetComponent<TradingPost>().returnTradeCollector();
                             Destroy(gameObject);
                         }
                     }
@@ -419,6 +448,7 @@ public class CollectTradeGoods : Animated
                 changePath = true;
             }
         }
+        collecting = false;
         yield return null;
     }
 
@@ -478,13 +508,16 @@ public class CollectTradeGoods : Animated
                     while (k < goodsToSell.Count && !canTrade)
                     {
                         string goodToSell = goodsToSell[k];
-                        ResourceTrading goodResourceTrading = tradingPerResource[goodToSell];
-                        TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
-                        if (goodResourceStatus.Equals(TradeManager.TradeStatus.exporting) && goodResourceTrading.getTradeAmount() > 0)
+                        if (tradingPerResource.ContainsKey(goodToSell))
                         {
-                            if (warehouseStorage.getResourceCount(goodToSell) > 0)
+                            ResourceTrading goodResourceTrading = tradingPerResource[goodToSell];
+                            TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
+                            if (goodResourceStatus.Equals(TradeManager.TradeStatus.exporting) && goodResourceTrading.getTradeAmount() > 0)
                             {
-                                canTrade = true;
+                                if (warehouseStorage.getResourceCount(goodToSell) > 0)
+                                {
+                                    canTrade = true;
+                                }
                             }
                         }
                         k++;
@@ -496,13 +529,16 @@ public class CollectTradeGoods : Animated
                         while (k < goodsToBuy.Count && !canTrade)
                         {
                             string goodToBuy = goodsToBuy[k];
-                            ResourceTrading goodResourceTrading = tradingPerResource[goodToBuy];
-                            TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
-                            if (goodResourceStatus.Equals(TradeManager.TradeStatus.importing)
-                                && goodResourceTrading.getCostPerGood() <= myWorld.getCurrency()
-                                && goodResourceTrading.getTradeAmount() > 0)
+                            if (tradingPerResource.ContainsKey(goodToBuy))
                             {
-                                canTrade = true;
+                                ResourceTrading goodResourceTrading = tradingPerResource[goodToBuy];
+                                TradeManager.TradeStatus goodResourceStatus = goodResourceTrading.getTradeStatus();
+                                if (goodResourceStatus.Equals(TradeManager.TradeStatus.importing)
+                                    && goodResourceTrading.getCostPerGood() <= myWorld.getCurrency()
+                                    && goodResourceTrading.getTradeAmount() > 0)
+                                {
+                                    canTrade = true;
+                                }
                             }
                             k++;
                         }
@@ -532,6 +568,7 @@ public class CollectTradeGoods : Animated
         //check for other storage-type buildings if there are no available warehouses
         if (possiblePaths.Count == 0)
         {
+            goalObject = null;
             returnPath(new List<Vector2>());
             yield break;
         }
@@ -558,6 +595,11 @@ public class CollectTradeGoods : Animated
             gameObject.GetComponent<SpriteRenderer>().enabled = true;
             returnPath(shortestPath);
             yield break;
+        }
+        else
+        {
+            goalObject = null;
+            returnPath(new List<Vector2>());
         }
         yield return null;
     }
@@ -603,9 +645,10 @@ public class CollectTradeGoods : Animated
     }
 
     /// <summary>
+    /// Finds a road next to the place of employment
     /// TODO: this should really be used in a bunch of places and should therefore be in a class that many other classes can access
     /// </summary>
-    /// <returns></returns>
+    /// <returns>The road next to the place of employment</returns>
     public Vector2 findRoadNextToEmployment()
     {
         World myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
@@ -670,36 +713,24 @@ public class CollectTradeGoods : Animated
     }
 
     /// <summary>
-    /// Sets the place of employment this delivery orc works for.
+    /// Initializes this class
     /// </summary>
     /// <param name="employment">the place of employment</param>
-    public void setOrcEmployment(GameObject employment)
-    {
-        placeOfEmployment = employment;
-    }
-
-    /// <summary>
-    /// Sets the goods the player city is selling and buying
-    /// </summary>
     /// <param name="imports">What goods the city we're trading with is importing</param>
     /// <param name="exports">What goods the city we're trading with is exporting</param>
-    public void setSellingAndBuying(List<string> imports, List<string> exports)
+    /// <param name="tradingPerResource">A deep copy of TradeManager's tradingPerResource</param>
+    public void initializeCollector(GameObject employment, List<string> imports,
+        List<string> exports, Dictionary<string, ResourceTrading> tradingPerResource)
     {
+        placeOfEmployment = employment;
         this.goodsToSell = imports;
         this.goodsToBuy = exports;
-    }
-
-    /// <summary>
-    /// Sets a deep copy of TradeManager's tradingPerResource for this class to work with
-    /// </summary>
-    /// <param name="tradingPerResource">A deep copy of TradeManager's tradingPerResource</param>
-    public void setTradingPerResource(Dictionary<string, ResourceTrading> tradingPerResource)
-    {
         this.tradingPerResource = new Dictionary<string, ResourceTrading>();
         foreach (string key in tradingPerResource.Keys)
         {
             this.tradingPerResource.Add(key, tradingPerResource[key].deepCopy());
         }
+        this.initialized = true;
     }
 
     /// <summary>

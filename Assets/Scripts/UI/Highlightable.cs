@@ -26,7 +26,7 @@ public class Highlightable : MonoBehaviour
     /// </summary>
     private void Update()
     {
-        if (displayTooltip && Time.time > setActiveTime)
+        if (displayTooltip && Time.unscaledTime > setActiveTime)
         {
             tooltip.SetActive(true);
             displayTooltip = false;
@@ -38,7 +38,7 @@ public class Highlightable : MonoBehaviour
     /// </summary>
     public void showToolTip()
     {
-        setActiveTime = Time.time + delayTooltipTime;
+        setActiveTime = Time.unscaledTime + delayTooltipTime;
         displayTooltip = true;
     }
 

@@ -148,7 +148,7 @@ public class StandardBoat : Animated
             float distanceBetweenPoints = Mathf.Sqrt((nextLocation.x - gameObject.transform.position.x)
                 * (nextLocation.x - gameObject.transform.position.x) + (nextLocation.y - gameObject.transform.position.y)
                 * (nextLocation.y - gameObject.transform.position.y));
-            if (distanceBetweenPoints < 0.05f)
+            if (distanceBetweenPoints < World.CLOSE_ENOUGH_DIST)
             {
                 path.RemoveAt(0);
                 if (path.Count > 0 && structureArr[(int)path[0].x, (int)path[0].y] != null

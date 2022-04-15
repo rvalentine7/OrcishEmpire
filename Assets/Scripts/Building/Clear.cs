@@ -1,15 +1,17 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
 /// <summary>
 /// Used by the ClearLand button in the game UI to clear out obstacles
 /// and player-constructed objects in the map.
 /// </summary>
-public class Clear : MonoBehaviour {
+public class Clear : MonoBehaviour
+{
     public Sprite clearSection;
     public GameObject straightRoad;
     public GameObject tempClearObject;
+    private AudioSource clearAudio;
 
     private World myWorld;
     private Vector2 startClearPosition;
@@ -21,8 +23,10 @@ public class Clear : MonoBehaviour {
     /// <summary>
     /// Initialization
     /// </summary>
-    void Start() {
+    void Start()
+    {
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
+        clearAudio = GameObject.Find("Destroy").GetComponent<AudioSource>();
         startClearPosition = new Vector2(-1, -1);
 
         lineRenderer = gameObject.GetComponent<LineRenderer>();
@@ -41,7 +45,8 @@ public class Clear : MonoBehaviour {
     /// Updates the visual location of the "DestroySection" sprite and deletes what is at the location
     /// if the left mouse button is pressed.
     /// </summary>
-    void Update() {
+    void Update()
+    {
         if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
         {
             if (startClearPosition.x != -1 && startClearPosition.y != -1)
@@ -62,7 +67,7 @@ public class Clear : MonoBehaviour {
                 Destroy(gameObject);
             }
         }
-        
+
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.x = Mathf.RoundToInt(mousePos.x);
         mousePos.y = Mathf.RoundToInt(mousePos.y);
@@ -75,7 +80,7 @@ public class Clear : MonoBehaviour {
         {
             transform.position = Vector2.Lerp(transform.position, mousePos, 1f);
 
-            if (Input.GetMouseButtonDown(0) && startClearPosition.x == -1 && startClearPosition.y == -1)
+            if (Input.GetMouseButtonDown(0) && startClearPosition.x == -1 && startClearPosition.y == -1 && !EventSystem.current.IsPointerOverGameObject())
             {
                 startClearPosition = mousePos;
                 spriteRenderer.enabled = false;
@@ -164,6 +169,7 @@ public class Clear : MonoBehaviour {
             startClearPosition.y = -1;
             lineRenderer.enabled = false;
             spriteRenderer.enabled = true;
+            clearAudio.Play();
         }
     }
 
@@ -384,5 +390,10 @@ public class Clear : MonoBehaviour {
                 }
             }
         }
+    }
+
+    private void OnDestroy()
+    {
+        
     }
 }

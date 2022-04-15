@@ -9,8 +9,10 @@ using UnityEngine.EventSystems;
  *  
  *  TODO: OrcInhabitants should be handling more of the starting/quitting jobs instead of HouseInformation
  */
-public class HouseInformation : Building {
+public class HouseInformation : Building
+{
     public float timeInterval;
+    public float eatingInterval;
     public float timeBeforeEntertainmentDecay;
     public int upkeep;
     public GameObject orcImmigrant;
@@ -18,7 +20,6 @@ public class HouseInformation : Building {
     public int inhabitantWaterConsumption;
     public int inhabitantFoodConsumption;
     public int jobSearchRadius;
-    //public GameObject housePopupObject;
     public Sprite sign;
     public Sprite firstLevelHouse;
     public Sprite secondLevelHouse;
@@ -38,6 +39,7 @@ public class HouseInformation : Building {
     private int desirability;
     private bool multipleFoodTypes;
     private float checkTime;
+    private float eatingTime;
     private int householdCurrency;
     private int goldSinceLastTax;
     private float nextPaymentTime;
@@ -57,6 +59,7 @@ public class HouseInformation : Building {
     private int minSickRecoveryWait;
     private int maxSickRecoveryWait;
     private int sickRecoveryChance;
+    private int increasedChanceSickOrcInfectsOthers;
     private List<OrcInhabitant> sickInhabitants;
     private List<OrcInhabitant> inhabitantsWithoutBarbers;
     private Vector2 housePosition;
@@ -93,6 +96,7 @@ public class HouseInformation : Building {
         desirability = 100;
         multipleFoodTypes = false;
         checkTime = 0.0f;
+        eatingTime = 0.0f;
         householdCurrency = 0;
         goldSinceLastTax = 0;
         entertainmentLevel = 0;
@@ -102,14 +106,15 @@ public class HouseInformation : Building {
         nearbyBarbers = new List<GameObject>();
         nearbyBaths = new List<GameObject>();
         nearbyHospitals = new List<GameObject>();
-        baseHealthPercentage = 89;
-        bathHealthPercentage = 5;
-        barberHealthPercentage = 5;
+        baseHealthPercentage = 79;
+        bathHealthPercentage = 10;
+        barberHealthPercentage = 10;
         numSickInhabitantsAtHospital = 0;
         minSickRecoveryWait = 2;
-        maxSickRecoveryWait = 5;
+        maxSickRecoveryWait = 7;
         sickRecoveryChance = 33;
-        
+        increasedChanceSickOrcInfectsOthers = 10;
+
         myWorld = GameObject.Find(World.WORLD_INFORMATION).GetComponent<World>();
         GameObject[,] terrainArr = myWorld.terrainNetwork.getTerrainArr();
         constructArr = myWorld.constructNetwork.getConstructArr();
@@ -173,11 +178,17 @@ public class HouseInformation : Building {
 
         //updates the resources of the household
         Storage storage = gameObject.GetComponent<Storage>();
+        if (Time.time > eatingTime)
+        {
+            eatingTime = Time.time + eatingInterval;
+            updateStorage(storage);
+        }
         if (Time.time > checkTime)//TODO: break these up into separate methods for better clarity (like updateHealth() and updateStorage())
         {
             checkTime = Time.time + timeInterval;
-
-            updateStorage(storage);
+            
+            addBarbersForInhabitants();
+            updateHealth();
 
             //TODO: Add text here for the house popup to pull on the describe why a house is upgrading/downgrading
             //Upgrade
@@ -230,9 +241,9 @@ public class HouseInformation : Building {
                     houseLevel--;
                     updateHouseSprite();
                     houseSize /= 2;
-                    if (/*numInhabitants*/orcInhabitants.Count > houseSize)
+                    if (orcInhabitants.Count > houseSize)
                     {
-                        removeInhabitants(/*numInhabitants*/orcInhabitants.Count - houseSize);
+                        removeInhabitants(orcInhabitants.Count - houseSize);
                     }
                 }
                 else
@@ -263,9 +274,6 @@ public class HouseInformation : Building {
             {
 
             }
-
-            addBarbersForInhabitants();
-            updateHealth();
 
             findJobs();
         }
@@ -304,26 +312,26 @@ public class HouseInformation : Building {
             {
                 numFoodTypes++;
             }
-            if (numFoodTypes > 1)
-            {
-                multipleFoodTypes = true;
-            }
-            else
-            {
-                multipleFoodTypes = false;
-            }
-            storage.removeResource(World.MEAT, orcInhabitants.Count * inhabitantFoodConsumption * (storage.getMeatCount() / storage.getFoodCount()));
+            multipleFoodTypes = numFoodTypes > 1;
+            
+            int totalConsumption = orcInhabitants.Count * inhabitantFoodConsumption;
+            int storageFoodCount = storage.getFoodCount();
+            storage.removeResource(World.MEAT, Mathf.RoundToInt(totalConsumption * (1.0f * storage.getMeatCount() / storageFoodCount)));
             if (storage.getFoodCount() > 0)
             {
-                storage.removeResource(World.WHEAT, orcInhabitants.Count * inhabitantFoodConsumption * (storage.getWheatCount() / storage.getFoodCount()));
+                storage.removeResource(World.WHEAT, Mathf.RoundToInt(totalConsumption * (1.0f * storage.getWheatCount() / storageFoodCount)));
             }
             if (storage.getFoodCount() > 0)
             {
-                storage.removeResource(World.EGGS, orcInhabitants.Count * inhabitantFoodConsumption * (storage.getEggCount() / storage.getFoodCount()));
+                storage.removeResource(World.EGGS, Mathf.RoundToInt(totalConsumption * (1.0f* storage.getEggCount() / storageFoodCount)));
             }
             if (storage.getFoodCount() > 0)
             {
-                storage.removeResource(World.FISH, orcInhabitants.Count * inhabitantFoodConsumption * (storage.getFishCount() / storage.getFoodCount()));
+                storage.removeResource(World.FISH, Mathf.RoundToInt(totalConsumption * (1.0f* storage.getFishCount() / storageFoodCount)));
+            }
+            if (storage.getFoodCount() < 0)
+            {
+                Debug.Log("HouseInformation line 334: ate more food than I had");
             }
         }
         else if (storage.getFoodCount() > 0)
@@ -394,7 +402,6 @@ public class HouseInformation : Building {
             List<OrcInhabitant> sickOrcsNeedingHospitals = new List<OrcInhabitant>();
             for (int i = 0; i < sickInhabitants.Count; i++)
             {
-                //Debug.Log("increasing wait time");
                 sickInhabitants[i].increaseSickTime();
                 //Check if the sick inhabitant has recovered
                 if (sickInhabitants[i].getSickTime() > minSickRecoveryWait && (Random.value * 100 < sickRecoveryChance || sickInhabitants[i].getSickTime() > maxSickRecoveryWait))
@@ -435,10 +442,12 @@ public class HouseInformation : Building {
             }
 
             //Orcs getting sick - 100 represents 100%. Health percentages do not get to 100% because there is always a chance of sickness
-            //Sick orcs that are not at a hospital have a greater chance of getting other orcs sick
-            int chanceOfSickness = 100 - (baseHealthPercentage - (sickInhabitants.Count - numSickInhabitantsAtHospital * 5)
+            int chanceOfSickness = 100 - (baseHealthPercentage
                 + (nearbyBaths.Count > 0 ? bathHealthPercentage : 0)
-                + barberHealthPercentage * ((orcInhabitants.Count - inhabitantsWithoutBarbers.Count) / orcInhabitants.Count));//(orcInhabitants.Count - inhabitantsWithoutBarbers.Count) is the number that have barbers
+                //(orcInhabitants.Count - inhabitantsWithoutBarbers.Count) is the number that have barbers
+                + barberHealthPercentage * ((orcInhabitants.Count - inhabitantsWithoutBarbers.Count) / orcInhabitants.Count)
+                //Sick orcs that are not at a hospital have a greater chance of getting other orcs sick
+                - ((sickInhabitants.Count - numSickInhabitantsAtHospital) * increasedChanceSickOrcInfectsOthers));
             if (sickInhabitants.Count < orcInhabitants.Count && Random.value * 100 <= chanceOfSickness)
             {
                 //Finding one of the remaining healthy orcs and updating it to be sick

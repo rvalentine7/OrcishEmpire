@@ -69,7 +69,7 @@ public class Arena : Building {
                 if (setupProgress < 100 && !ongoingFight)
                 {
                     float progressedTime = Time.time - prevUpdateTime;
-                    float effectiveTimeToFinish = timeToSetup / (employment.getNumWorkers() / numHealthyWorkers);
+                    float effectiveTimeToFinish = timeToSetup * (employment.getWorkerCap() / numHealthyWorkers);
                     setupProgress += progressedTime / effectiveTimeToFinish * 100;
                     if (setupProgress >= 100)
                     {
